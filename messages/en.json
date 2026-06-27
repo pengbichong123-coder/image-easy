@@ -126,6 +126,7 @@
     "t2i": "Text → Image",
     "i2i": "Image → Image",
     "featured": "Featured",
+    "maxPrompt": "Prompt too long (max {max} chars for {model})",
     "descriptions": {
       "gpt-image-2-text-to-image": "OpenAI's latest GPT-Image-2 — industry-leading text rendering and photorealism.",
       "gpt-image-2-image-to-image": "Use GPT-Image-2 to re-render, restyle, or change the scene of a reference image.",
