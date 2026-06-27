@@ -1,0 +1,23 @@
+name: image-easy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: image-easy-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: image_easy
+      POSTGRES_PASSWORD: image_easy_dev_pw
+      POSTGRES_DB: image_easy
+    ports:
+      - "5433:5432"  # 避免与系统已有的 5432 冲突
+    volumes:
+      - image-easy-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U image_easy -d image_easy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  image-easy-pgdata:

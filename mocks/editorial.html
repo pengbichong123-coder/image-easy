@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Editorial Fashion — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#FAF6EF;color:#1A1A1A;font-family:'Inter',system-ui,sans-serif;min-height:100vh;font-weight:300}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 56px}
+
+  /* TOP */
+  .topstrip{padding:14px 56px;border-bottom:1px solid #1A1A1A;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase}
+
+  /* HEADER */
+  header{padding:36px 56px;display:flex;justify-content:space-between;align-items:center}
+  .logo{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:32px;letter-spacing:-.01em;line-height:1}
+  .logo em{font-style:italic;color:#B76E5F}
+  .logo .sub{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#1A1A1A;margin-top:6px;opacity:.7}
+  nav{display:flex;gap:36px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase}
+  nav a{color:#1A1A1A;text-decoration:none}
+  nav a.active{font-style:italic;font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:0;text-transform:none;color:#B76E5F}
+  .sign{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#1A1A1A;text-decoration:none}
+
+  /* HERO */
+  .hero{padding:120px 56px 100px}
+  .hero .issue{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#B76E5F;margin-bottom:40px}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:160px;line-height:.86;letter-spacing:-.04em;max-width:1200px}
+  .hero h1 em{font-style:italic;color:#B76E5F;font-weight:400}
+  .hero .sub{margin-top:64px;display:grid;grid-template-columns:1fr 1fr;gap:80px}
+  .hero .sub p{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;line-height:1.4;font-style:italic}
+
+  /* INDEX */
+  .index{padding:80px 56px;border-top:1px solid #1A1A1A}
+  .index .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:64px;padding-bottom:24px;border-bottom:1px solid #1A1A1A}
+  .index h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:88px;line-height:.9;letter-spacing:-.03em}
+  .index h2 em{font-style:italic;color:#B76E5F}
+  .index .pages{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;text-align:right;line-height:2}
+  .row{display:grid;grid-template-columns:120px 1fr 1.4fr 100px;gap:32px;align-items:baseline;padding:32px 0;border-bottom:1px solid #1A1A1A}
+  .row .n{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:36px;color:#B76E5F}
+  .row .name{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:42px;letter-spacing:-.02em}
+  .row .name em{font-style:italic}
+  .row .desc{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:18px;line-height:1.4;font-style:italic;opacity:.75}
+  .row .arrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;text-align:right}
+
+  /* QUOTE */
+  .quote{padding:140px 56px;text-align:center}
+  .quote .star{color:#B76E5F;font-family:'Cormorant Garamond',serif;font-size:48px;margin-bottom:32px}
+  .quote blockquote{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:64px;line-height:1.1;max-width:1000px;margin:0 auto}
+  .quote .author{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;margin-top:40px;opacity:.7}
+
+  /* FOOTER */
+  footer{padding:60px 56px;border-top:1px solid #1A1A1A;display:flex;justify-content:space-between;align-items:flex-end}
+  footer .lgo{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:48px;letter-spacing:-.02em;line-height:.9}
+  footer .lgo em{font-style:italic;color:#B76E5F}
+  footer .meta{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;text-align:right;line-height:2;opacity:.7}
+</style>
+</head>
+<body>
+  <div class="topstrip">
+    <div>VOLUME I — WINTER 2026</div>
+    <div>AN INDEPENDENT ATELIER</div>
+  </div>
+
+  <header>
+    <div class="logo">Image<em>·</em>Easy<span class="sub">Atelier d'Images</span></div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+    </nav>
+    <a class="sign">Sign in</a>
+  </header>
+
+  <section class="hero">
+    <div class="issue">No. 001 — The Darkroom Edition</div>
+    <h1>An <em>atelier</em><br>for artificial<br>light.</h1>
+    <div class="sub">
+      <p>Five precision instruments for image synthesis. Exposed under one red light, with the gentlest hand.</p>
+      <p></p>
+    </div>
+  </section>
+
+  <section class="index">
+    <div class="head">
+      <h2>The <em>instrument</em><br>shelf.</h2>
+      <div class="pages">FIVE MODELS<br>THREE PROVIDERS<br>PAGES 04—09</div>
+    </div>
+    <div class="row">
+      <div class="n">I</div>
+      <div class="name">GPT <em>Image</em> 2</div>
+      <div class="desc">OpenAI's flagship. Best-in-class text rendering and photorealism.</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="row">
+      <div class="n">II</div>
+      <div class="name">GPT <em>Image</em> 2 Edit</div>
+      <div class="desc">Image-to-image with sixteen reference photographs.</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="row">
+      <div class="n">III</div>
+      <div class="name">Seedream <em>4.5</em></div>
+      <div class="desc">ByteDance. Four-K clarity, multi-image fusion.</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="row">
+      <div class="n">IV</div>
+      <div class="name">Seedream <em>4.5</em> Edit</div>
+      <div class="desc">Identity-preserving adjustments. Two through four-K.</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="row">
+      <div class="n">V</div>
+      <div class="name">Nano <em>Banana</em> Pro</div>
+      <div class="desc">Google Gemini 3.0 Pro. The artist's choice.</div>
+      <div class="arrow">→</div>
+    </div>
+  </section>
+
+  <section class="quote">
+    <div class="star">✦</div>
+    <blockquote>"The camera is an instrument that teaches people how to see without a camera."</blockquote>
+    <div class="author">— Dorothea Lange, 1963</div>
+  </section>
+
+  <footer>
+    <div class="lgo">An atelier for <em>artificial</em> light.</div>
+    <div class="meta">IMAGE EASY / ATELIER / MMXXVI</div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Glassmorphism — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0a14;color:#fff;font-family:'Inter Tight',system-ui,sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+
+  /* AURORA BG */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 10%, rgba(124,58,237,.5), transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 30%, rgba(6,182,212,.35), transparent 60%),
+      radial-gradient(ellipse 50% 60% at 50% 90%, rgba(236,72,153,.3), transparent 60%),
+      radial-gradient(ellipse 80% 50% at 90% 80%, rgba(99,102,241,.4), transparent 60%);
+    filter:blur(20px);
+  }
+  .grid-overlay{position:fixed;inset:0;pointer-events:none;z-index:1;
+    background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);
+  }
+
+  .wrap{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 48px}
+
+  /* TOP */
+  .topstrip{padding:14px 48px;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+  .topstrip .dot{width:6px;height:6px;background:#22d3ee;border-radius:50%;display:inline-block;margin-right:8px;box-shadow:0 0 12px #22d3ee;vertical-align:middle}
+
+  /* HEADER — glass */
+  header{padding:20px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:16px;margin:16px 32px 0;position:sticky;top:16px;z-index:50}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px;letter-spacing:-.01em}
+  .logo .ic{width:28px;height:28px;background:linear-gradient(135deg,#7c3aed,#06b6d4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 0 20px rgba(124,58,237,.4)}
+  nav{display:flex;gap:4px}
+  nav a{padding:8px 16px;font-size:12px;font-weight:500;letter-spacing:.02em;text-decoration:none;color:rgba(255,255,255,.7);border-radius:8px;transition:all .2s}
+  nav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+  nav a.active{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.15)}
+  .sign{padding:8px 18px;font-size:12px;font-weight:500;text-decoration:none;color:#0a0a14;background:linear-gradient(135deg,#a78bfa,#22d3ee);border-radius:8px;font-weight:600;box-shadow:0 0 24px rgba(124,58,237,.4)}
+
+  /* HERO */
+  .hero{padding:80px 48px 60px}
+  .hero h1{font-weight:600;font-size:96px;line-height:.95;letter-spacing:-.04em;max-width:1100px}
+  .hero h1 em{font-style:italic;font-weight:400;background:linear-gradient(135deg,#a78bfa 20%,#22d3ee 60%,#ec4899 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:32px;font-size:18px;line-height:1.6;color:rgba(255,255,255,.7);max-width:560px;font-weight:400}
+
+  /* GLASS SPEC CARD */
+  .specs{margin-top:48px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .glass{background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;position:relative;overflow:hidden}
+  .glass::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)}
+  .glass .lab{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
+  .glass .val{font-size:28px;font-weight:500;letter-spacing:-.02em}
+
+  .ctas{margin-top:48px;display:flex;gap:12px}
+  .btn{padding:14px 28px;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:10px}
+  .btn-primary{color:#0a0a14;background:linear-gradient(135deg,#a78bfa,#22d3ee);font-weight:600;box-shadow:0 0 30px rgba(124,58,237,.5)}
+  .btn-ghost{color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+
+  /* MODELS */
+  .models{padding:60px 48px}
+  .models .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px}
+  .models h2{font-size:48px;font-weight:500;letter-spacing:-.02em;line-height:1.05}
+  .models h2 em{font-style:italic;font-weight:400;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .mcard{background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:28px;position:relative;overflow:hidden;transition:all .3s}
+  .mcard::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)}
+  .mcard .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .mcard .badge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:4px 10px;background:rgba(255,255,255,.08);border-radius:6px;color:rgba(255,255,255,.7)}
+  .mcard .badge.purp{background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff}
+  .mcard .badge.cy{background:linear-gradient(135deg,#06b6d4,#22d3ee);color:#0a0a14}
+  .mcard .badge.pink{background:linear-gradient(135deg,#ec4899,#f472b6);color:#fff}
+  .mcard .badge.moss{background:linear-gradient(135deg,#65a30d,#84cc16);color:#0a0a14}
+  .mcard .badge.amb{background:linear-gradient(135deg,#d97706,#fbbf24);color:#0a0a14}
+  .mcard h3{font-size:24px;font-weight:500;letter-spacing:-.01em;margin-bottom:8px}
+  .mcard p{font-size:13px;line-height:1.5;color:rgba(255,255,255,.65)}
+  .mcard .go{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#a78bfa}
+
+  /* PROCESS */
+  .process{padding:60px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .step{background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px;position:relative;overflow:hidden}
+  .step::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)}
+  .step .n{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#a78bfa;margin-bottom:16px}
+  .step h3{font-size:32px;font-weight:500;letter-spacing:-.02em;margin-bottom:12px}
+  .step p{font-size:14px;line-height:1.6;color:rgba(255,255,255,.7)}
+  .step.purp h3{background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .step.cy h3{background:linear-gradient(135deg,#22d3ee,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .step.pink h3{background:linear-gradient(135deg,#f472b6,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+</head>
+<body>
+  <div class="grid-overlay"></div>
+
+  <div class="topstrip">
+    <div><span class="dot"></span>Live · v0.1</div>
+    <div>Image Easy / Five models</div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <div class="ic">E</div>
+      Image Easy
+    </div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+    </nav>
+    <a class="sign">Sign in</a>
+  </header>
+
+  <section class="hero">
+    <h1>
+      An atelier for<br>
+      <em>artificial</em> light.
+    </h1>
+    <p>Five precision image models, exposed in one interface. Choose your instrument, write your prompt, press the shutter.</p>
+    <div class="ctas">
+      <a class="btn btn-primary">✦ Start exposing</a>
+      <a class="btn btn-ghost">View archive</a>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding:32px 0">
+    <div class="specs">
+      <div class="glass"><div class="lab">Resolution</div><div class="val">4K · 2K · 1K</div></div>
+      <div class="glass"><div class="lab">Process</div><div class="val">10–60s async</div></div>
+      <div class="glass"><div class="lab">Stocks</div><div class="val">10 free</div></div>
+      <div class="glass"><div class="lab">Access</div><div class="val">Google sign-in</div></div>
+    </div>
+  </section>
+
+  <section class="models">
+    <div class="head">
+      <h2>The <em>instrument</em> shelf.</h2>
+      <div class="glass" style="padding:12px 18px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7)">FIVE MODELS · THREE PROVIDERS</div>
+    </div>
+    <div class="grid">
+      <div class="mcard">
+        <div class="head"><span class="badge purp">OpenAI</span><span class="badge">T2I</span></div>
+        <h3>GPT Image 2</h3>
+        <p>Text rendering, photorealism, pixel-level editing. The flagship.</p>
+        <div class="go">Open →</div>
+      </div>
+      <div class="mcard">
+        <div class="head"><span class="badge cy">OpenAI</span><span class="badge">I2I</span></div>
+        <h3>GPT Image 2 Edit</h3>
+        <p>Up to 16 reference images. Style, lighting, scene composition.</p>
+        <div class="go">Open →</div>
+      </div>
+      <div class="mcard">
+        <div class="head"><span class="badge pink">ByteDance</span><span class="badge">T2I</span></div>
+        <h3>Seedream 4.5</h3>
+        <p>4K output, multi-image fusion, strong spatial reasoning.</p>
+        <div class="go">Open →</div>
+      </div>
+      <div class="mcard">
+        <div class="head"><span class="badge pink">ByteDance</span><span class="badge">I2I</span></div>
+        <h3>Seedream 4.5 Edit</h3>
+        <p>Identity-preserving edits. 14 references, 2K–4K.</p>
+        <div class="go">Open →</div>
+      </div>
+      <div class="mcard">
+        <div class="head"><span class="badge moss">Google</span><span class="badge">I2I</span></div>
+        <h3>Nano Banana Pro</h3>
+        <p>Gemini 3.0 Pro. Character consistency, world knowledge.</p>
+        <div class="go">Open →</div>
+      </div>
+      <div class="mcard">
+        <div class="head"><span class="badge amb">Soon</span></div>
+        <h3>More coming</h3>
+        <p>Suggest the next model. We add the best ones.</p>
+        <div class="go">Request →</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="process">
+    <div class="step purp">
+      <div class="n">01 / Compose</div>
+      <h3>Pick an instrument.</h3>
+      <p>Choose a model, set the resolution and aspect ratio, upload references if you need them.</p>
+    </div>
+    <div class="step cy">
+      <div class="n">02 / Expose</div>
+      <h3>Write the prompt.</h3>
+      <p>Describe the subject. Hit the shutter. We carry the negative to the enlarger.</p>
+    </div>
+    <div class="step pink">
+      <div class="n">03 / Print</div>
+      <h3>Take the print.</h3>
+      <p>10 to 60 seconds later, the image appears. Download or expose again.</p>
+    </div>
+  </section>
+</body>
+</html>

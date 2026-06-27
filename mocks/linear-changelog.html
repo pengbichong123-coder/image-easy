@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Linear Changelog — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#08090A;color:#EDEEF0;font-family:'Inter',system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+  /* HEADER */
+  header{padding:16px 24px;border-bottom:1px solid #1A1B1F;display:flex;justify-content:space-between;align-items:center;font-size:13px;background:#08090A;position:sticky;top:0;z-index:10}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:500}
+  .logo .ic{width:18px;height:18px;background:linear-gradient(135deg,#5E6AD2,#3D4AB8);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+  nav{display:flex;gap:4px;font-size:13px}
+  nav a{padding:6px 10px;text-decoration:none;color:#8A8F98;border-radius:6px}
+  nav a:hover{color:#EDEEF0;background:#131316}
+  nav a.active{color:#EDEEF0;background:#131316}
+  .sign{font-size:13px;color:#EDEEF0;text-decoration:none;padding:6px 12px;background:#1A1B1F;border-radius:6px}
+
+  /* HERO — compact */
+  .hero{padding:80px 0 64px;border-bottom:1px solid #1A1B1F}
+  .crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:#5E6AD2;margin-bottom:24px;letter-spacing:.05em}
+  h1{font-size:48px;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:#EDEEF0;margin-bottom:16px}
+  h1 em{font-style:italic;font-weight:500;color:#5E6AD2}
+  .lede{font-size:16px;color:#8A8F98;line-height:1.55;max-width:620px}
+
+  .ctas{margin-top:32px;display:flex;gap:8px}
+  .btn{padding:8px 14px;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-radius:6px}
+  .btn-primary{background:#5E6AD2;color:#fff;font-weight:500}
+  .btn-primary:hover{background:#6F7BE0}
+  .btn-ghost{color:#EDEEF0;background:#131316;border:1px solid #2A2C32}
+
+  /* META BAR */
+  .meta{padding:20px 0;border-bottom:1px solid #1A1B1F;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .metaitem .lab{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;color:#62666D;text-transform:uppercase;margin-bottom:6px}
+  .metaitem .val{font-size:15px;font-weight:500;color:#EDEEF0}
+  .metaitem .val sup{font-size:10px;color:#5E6AD2;font-weight:500;margin-left:2px}
+
+  /* MODELS — changelog-style list */
+  .models{padding:64px 0 32px}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid #1A1B1F}
+  .section-head h2{font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .section-head .count{font-family:'JetBrains Mono',monospace;font-size:11px;color:#62666D}
+  .row{display:grid;grid-template-columns:160px 1fr 120px 60px;gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid #1A1B1F;cursor:pointer;transition:background .15s}
+  .row:hover{background:#0D0E10}
+  .row .when{font-family:'JetBrains Mono',monospace;font-size:11px;color:#62666D;letter-spacing:.05em}
+  .row .when .ver{display:block;color:#5E6AD2;margin-bottom:2px}
+  .row .name{font-size:15px;font-weight:500;color:#EDEEF0}
+  .row .name .desc{display:block;font-size:13px;color:#8A8F98;font-weight:400;margin-top:4px;line-height:1.5}
+  .row .meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:#62666D;letter-spacing:.05em;text-align:right}
+  .row .meta .type{display:inline-block;padding:2px 6px;background:#131316;border-radius:4px;color:#8A8F98;margin-right:6px}
+  .row .meta .type.t2i{color:#5E6AD2}
+  .row .go{font-size:12px;color:#5E6AD2;text-align:right;text-decoration:none}
+
+  /* STEPS — numbered list */
+  .steps{padding:64px 0}
+  .section-head{margin-bottom:24px}
+  .step{padding:24px 0;border-bottom:1px solid #1A1B1F;display:grid;grid-template-columns:60px 1fr;gap:24px}
+  .step:first-of-type{border-top:1px solid #1A1B1F}
+  .step .n{font-family:'JetBrains Mono',monospace;font-size:13px;color:#5E6AD2;font-weight:500}
+  .step h3{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px;color:#EDEEF0}
+  .step p{font-size:14px;line-height:1.6;color:#8A8F98;max-width:620px}
+  .step p code{font-family:'JetBrains Mono',monospace;font-size:12px;color:#5E6AD2;background:#131316;padding:1px 6px;border-radius:4px}
+
+  /* CTA */
+  .cta{padding:64px 0;border-top:1px solid #1A1B1F}
+  .cta h2{font-size:32px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px}
+  .cta h2 em{font-style:italic;color:#5E6AD2;font-weight:500}
+  .cta p{font-size:15px;color:#8A8F98;margin-bottom:24px;max-width:520px}
+
+  /* FOOTER */
+  footer{padding:32px 24px;border-top:1px solid #1A1B1F;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#62666D;letter-spacing:.05em}
+  footer a{color:#62666D;text-decoration:none;margin-left:16px}
+  footer a:hover{color:#EDEEF0}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo"><div class="ic">E</div>Image Easy</div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+    </nav>
+    <a class="sign">Sign in</a>
+  </header>
+
+  <section class="wrap">
+    <div class="hero">
+      <div class="crumb">// v0.1 · 2026-06-27</div>
+      <h1>An atelier for <em>artificial</em> light.</h1>
+      <p class="lede">Five production-grade AI image models, exposed through one focused interface. The same workflow you'd expect from a photographer — instrument, exposure, print.</p>
+      <div class="ctas">
+        <a class="btn btn-primary">Start composing →</a>
+        <a class="btn btn-ghost">View changelog</a>
+      </div>
+    </div>
+
+    <div class="meta">
+      <div class="metaitem"><div class="lab">Resolution</div><div class="val">4K · 2K · 1K</div></div>
+      <div class="metaitem"><div class="lab">Process</div><div class="val">10–60s <sup>async</sup></div></div>
+      <div class="metaitem"><div class="lab">Free credits</div><div class="val">10 <sup>/sign-up</sup></div></div>
+      <div class="metaitem"><div class="lab">Access</div><div class="val">Google <sup>OAuth</sup></div></div>
+    </div>
+
+    <section class="models">
+      <div class="section-head">
+        <h2>Models</h2>
+        <span class="count">5 active · 1 roadmap</span>
+      </div>
+      <div class="row">
+        <div class="when"><span class="ver">v0.1.0</span>2026-06-27</div>
+        <div class="name">GPT Image 2<span class="desc">OpenAI flagship. Photorealism, text rendering, pixel-level editing. The default starting point.</span></div>
+        <div class="meta"><span class="type t2i">T2I</span><span class="type">4K</span></div>
+        <div class="go">→</div>
+      </div>
+      <div class="row">
+        <div class="when"><span class="ver">v0.1.0</span>2026-06-27</div>
+        <div class="name">GPT Image 2 Edit<span class="desc">Up to 16 reference images. Pixel-level control over style, lighting, scene composition.</span></div>
+        <div class="meta"><span class="type">I2I</span><span class="type">4K</span></div>
+        <div class="go">→</div>
+      </div>
+      <div class="row">
+        <div class="when"><span class="ver">v0.1.0</span>2026-06-27</div>
+        <div class="name">Seedream 4.5<span class="desc">ByteDance. 4K output, multi-image fusion, strong spatial reasoning.</span></div>
+        <div class="meta"><span class="type t2i">T2I</span><span class="type">4K</span></div>
+        <div class="go">→</div>
+      </div>
+      <div class="row">
+        <div class="when"><span class="ver">v0.1.0</span>2026-06-27</div>
+        <div class="name">Seedream 4.5 Edit<span class="desc">Identity-preserving edits. 14 references, 2K–4K output.</span></div>
+        <div class="meta"><span class="type">I2I</span><span class="type">4K</span></div>
+        <div class="go">→</div>
+      </div>
+      <div class="row">
+        <div class="when"><span class="ver">v0.1.0</span>2026-06-27</div>
+        <div class="name">Nano Banana Pro<span class="desc">Google Gemini 3.0 Pro. Character consistency, world knowledge, 4K.</span></div>
+        <div class="meta"><span class="type">I2I</span><span class="type">4K</span></div>
+        <div class="go">→</div>
+      </div>
+      <div class="row">
+        <div class="when"><span class="ver">—</span>soon</div>
+        <div class="name">More coming<span class="desc">Request the next model. We add the best ones monthly.</span></div>
+        <div class="meta"><span class="type">SOON</span></div>
+        <div class="go">→</div>
+      </div>
+    </section>
+
+    <section class="steps">
+      <div class="section-head"><h2>Workflow</h2><span class="count">3 steps</span></div>
+      <div class="step">
+        <div class="n">01</div>
+        <div>
+          <h3>Pick an instrument</h3>
+          <p>Choose a model, set resolution and aspect ratio, drop in reference images if you need them. The negative carries itself to the enlarger.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <div>
+          <h3>Compose the prompt</h3>
+          <p>Describe the subject in plain language. We handle the camera settings, the seed, and the post-process.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <div>
+          <h3>Take the print</h3>
+          <p>Ten to sixty seconds later, the image arrives. Download the high-resolution file, or expose again.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Ready to <em>expose</em>?</h2>
+      <p>Ten free exposures on first sign-in. No card required, no auto-recharge.</p>
+      <a class="btn btn-primary">Start composing →</a>
+    </section>
+  </section>
+
+  <footer>
+    <div>© 2026 Image Easy · v0.1.0</div>
+    <div><a>GitHub</a><a>Changelog</a><a>Status</a><a>Pricing</a></div>
+  </footer>
+</body>
+</html>

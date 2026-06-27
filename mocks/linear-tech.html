@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vercel / Linear Tech — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#08080A;color:#ededed;font-family:'Inter',system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+
+  /* HEADER */
+  header{padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a1d;position:sticky;top:0;background:rgba(8,8,10,.7);backdrop-filter:blur(12px);z-index:50}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:500;font-size:14px;letter-spacing:-.01em}
+  .logo .ic{width:24px;height:24px;background:linear-gradient(135deg,#7c3aed,#06b6d4);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff}
+  nav{display:flex;gap:0}
+  nav a{padding:8px 14px;font-size:13px;font-weight:400;text-decoration:none;color:#a1a1aa;border-radius:6px}
+  nav a:hover{color:#fff;background:#1a1a1d}
+  nav a.active{color:#fff;background:#1a1a1d}
+  .sign{font-size:13px;font-weight:500;text-decoration:none;color:#0a0a0a;background:#ededed;padding:8px 16px;border-radius:6px}
+
+  /* HERO */
+  .hero{padding:120px 24px 80px;text-align:center}
+  .hero .badge{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;font-size:12px;font-weight:400;color:#a1a1aa;background:#111114;border:1px solid #1f1f23;border-radius:999px;margin-bottom:32px}
+  .hero .badge .dot{width:5px;height:5px;background:#10b981;border-radius:50%;box-shadow:0 0 8px #10b981}
+  .hero h1{font-weight:600;font-size:72px;line-height:1.05;letter-spacing:-.04em;max-width:800px;margin:0 auto}
+  .hero h1 em{font-style:italic;font-weight:500;background:linear-gradient(135deg,#a78bfa 0%,#22d3ee 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin:24px auto 0;font-size:18px;line-height:1.55;color:#a1a1aa;max-width:560px}
+  .hero .ctas{margin-top:40px;display:flex;gap:12px;justify-content:center}
+  .btn{padding:10px 20px;font-size:14px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-radius:6px;transition:all .2s}
+  .btn-primary{color:#08080A;background:#ededed;font-weight:500}
+  .btn-primary:hover{background:#fff}
+  .btn-ghost{color:#ededed;background:transparent;border:1px solid #2a2a30}
+  .btn-ghost:hover{border-color:#444}
+
+  /* STATS BAR */
+  .stats{margin-top:80px;display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #1f1f23;border-radius:12px;overflow:hidden}
+  .stat{padding:24px;border-left:1px solid #1f1f23;text-align:left}
+  .stat:first-child{border-left:0}
+  .stat .label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:#71717a;text-transform:uppercase;margin-bottom:8px}
+  .stat .val{font-size:28px;font-weight:500;letter-spacing:-.02em;color:#ededed;line-height:1}
+  .stat .val sup{font-size:12px;color:#a78bfa;font-weight:500;margin-left:2px}
+
+  /* MODELS */
+  .models{padding:80px 24px}
+  .models .head{text-align:center;margin-bottom:48px}
+  .models .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#71717a;margin-bottom:16px;display:block}
+  .models h2{font-size:48px;font-weight:600;letter-spacing:-.03em;line-height:1.05}
+  .models h2 em{font-style:italic;font-weight:500;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid #1f1f23;border-radius:12px;overflow:hidden;margin-top:48px}
+  .mcell{padding:28px;border-left:1px solid #1f1f23;border-bottom:1px solid #1f1f23;transition:background .2s;cursor:pointer;position:relative}
+  .mcell:hover{background:#0e0e10}
+  .mcell:nth-child(3n+1){border-left:0}
+  .mcell:nth-last-child(-n+3){border-bottom:0}
+  .mcell .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .mcell .prov{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#71717a}
+  .mcell .badge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.15em;padding:3px 7px;background:#1a1a1d;border-radius:4px;color:#a1a1aa;text-transform:uppercase}
+  .mcell h3{font-size:22px;font-weight:500;letter-spacing:-.01em;margin-bottom:6px}
+  .mcell p{font-size:13px;line-height:1.5;color:#a1a1aa;margin-bottom:16px}
+  .mcell .meta{display:flex;gap:12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#71717a;letter-spacing:.05em}
+  .mcell .meta span{padding:2px 6px;background:#0e0e10;border-radius:4px}
+  .mcell .feat{position:absolute;top:12px;right:12px;font-size:8px;letter-spacing:.2em;color:#a78bfa;text-transform:uppercase;font-weight:500;font-family:'JetBrains Mono',monospace}
+
+  /* PROCESS */
+  .process{padding:80px 24px;background:#0a0a0c;border-top:1px solid #1a1a1d;border-bottom:1px solid #1a1a1d}
+  .process .wrap{padding:0}
+  .process .head{text-align:center;margin-bottom:48px}
+  .process h2{font-size:40px;font-weight:600;letter-spacing:-.03em}
+  .process h2 em{font-style:italic;font-weight:500;background:linear-gradient(135deg,#22d3ee,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stepgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid #1f1f23;border-radius:12px;overflow:hidden}
+  .step{padding:32px;border-left:1px solid #1f1f23}
+  .step:first-child{border-left:0}
+  .step .n{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#a78bfa;margin-bottom:12px}
+  .step h3{font-size:24px;font-weight:500;letter-spacing:-.01em;margin-bottom:8px}
+  .step p{font-size:14px;line-height:1.6;color:#a1a1aa}
+
+  /* CTA */
+  .cta{padding:100px 24px;text-align:center}
+  .cta h2{font-size:48px;font-weight:600;letter-spacing:-.03em;max-width:600px;margin:0 auto 24px;line-height:1.1}
+  .cta h2 em{font-style:italic;font-weight:500;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* FOOTER */
+  footer{padding:48px 24px;border-top:1px solid #1a1a1d;display:flex;justify-content:space-between;align-items:center}
+  footer .left{display:flex;align-items:center;gap:8px;font-size:12px;color:#71717a}
+  footer .links{display:flex;gap:20px;font-size:12px;color:#71717a}
+  footer a{color:#71717a;text-decoration:none}
+  footer a:hover{color:#ededed}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="ic">E</div>
+      Image Easy
+    </div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+    </nav>
+    <a class="sign">Sign in</a>
+  </header>
+
+  <section class="hero">
+    <div class="badge"><span class="dot"></span> v0.1 · Live</div>
+    <h1>
+      An atelier for<br>
+      <em>artificial</em> light.
+    </h1>
+    <p>Five precision image models, exposed in one interface. Choose your instrument. Write your prompt. Press the shutter.</p>
+    <div class="ctas">
+      <a class="btn btn-primary">▶ Start exposing</a>
+      <a class="btn btn-ghost">View archive →</a>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="label">Resolution</div><div class="val">4K <sup>·</sup> 2K <sup>·</sup> 1K</div></div>
+      <div class="stat"><div class="label">Process</div><div class="val">10–60s <sup>async</sup></div></div>
+      <div class="stat"><div class="label">Free credits</div><div class="val">10 <sup>/sign-up</sup></div></div>
+      <div class="stat"><div class="label">Access</div><div class="val">Google <sup>OAuth</sup></div></div>
+    </div>
+  </div>
+
+  <section class="models">
+    <div class="head">
+      <span class="eyebrow">// The instrument shelf</span>
+      <h2>Five <em>models</em>. One <em>interface</em>.</h2>
+    </div>
+    <div class="grid">
+      <div class="mcell">
+        <div class="feat">FEATURED</div>
+        <div class="head"><span class="prov">openai/gpt-image-2</span><span class="badge">T2I</span></div>
+        <h3>GPT Image 2</h3>
+        <p>OpenAI's flagship. Text rendering, photorealism, pixel-level editing.</p>
+        <div class="meta"><span>4K</span><span>Up to 20k chars</span></div>
+      </div>
+      <div class="mcell">
+        <div class="head"><span class="prov">openai/gpt-image-2-i2i</span><span class="badge">I2I</span></div>
+        <h3>GPT Image 2 Edit</h3>
+        <p>16 reference images. Style, lighting, scene composition.</p>
+        <div class="meta"><span>4K</span><span>16 ref max</span></div>
+      </div>
+      <div class="mcell">
+        <div class="head"><span class="prov">bytedance/seedream-4.5</span><span class="badge">T2I</span></div>
+        <h3>Seedream 4.5</h3>
+        <p>4K, multi-image fusion, strong spatial reasoning.</p>
+        <div class="meta"><span>4K</span><span>3k chars</span></div>
+      </div>
+      <div class="mcell">
+        <div class="head"><span class="prov">bytedance/seedream-4.5-edit</span><span class="badge">I2I</span></div>
+        <h3>Seedream 4.5 Edit</h3>
+        <p>Identity-preserving edits. 14 references, 2K–4K.</p>
+        <div class="meta"><span>4K</span><span>14 ref max</span></div>
+      </div>
+      <div class="mcell">
+        <div class="feat">FEATURED</div>
+        <div class="head"><span class="prov">google/nano-banana-pro</span><span class="badge">I2I</span></div>
+        <h3>Nano Banana Pro</h3>
+        <p>Gemini 3.0 Pro. Character consistency, world knowledge.</p>
+        <div class="meta"><span>4K</span><span>8 ref max</span></div>
+      </div>
+      <div class="mcell">
+        <div class="head"><span class="prov">roadmap</span><span class="badge">SOON</span></div>
+        <h3>More coming</h3>
+        <p>Suggest the next model. We add the best ones monthly.</p>
+        <div class="meta"><span>Submit request</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="process">
+    <div class="wrap">
+      <div class="head">
+        <h2>Three <em>steps</em>.</h2>
+      </div>
+      <div class="stepgrid">
+        <div class="step">
+          <div class="n">// 01 compose</div>
+          <h3>Pick an instrument.</h3>
+          <p>Choose a model, set the resolution and aspect ratio, upload references if you need them.</p>
+        </div>
+        <div class="step">
+          <div class="n">// 02 expose</div>
+          <h3>Write the prompt.</h3>
+          <p>Describe the subject. Hit the shutter. We carry the negative to the enlarger.</p>
+        </div>
+        <div class="step">
+          <div class="n">// 03 print</div>
+          <h3>Take the print.</h3>
+          <p>10 to 60 seconds later, the image appears. Download or expose again.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to <em>expose</em>?</h2>
+    <p style="color:#a1a1aa;margin-bottom:32px">Ten free exposures on first sign-in.</p>
+    <a class="btn btn-primary">▶ Start now</a>
+  </section>
+
+  <footer>
+    <div class="left">
+      <div class="ic" style="width:18px;height:18px;background:linear-gradient(135deg,#7c3aed,#06b6d4);border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px;color:#fff">E</div>
+      © 2026 Image Easy
+    </div>
+    <div class="links">
+      <a>Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+      <a>Pricing</a>
+    </div>
+  </footer>
+</body>
+</html>

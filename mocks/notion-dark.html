@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notion Warm Dark — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#191917;color:#F2F0E9;font-family:'Inter',system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;font-feature-settings:"cv02","cv03","cv04","cv11"}
+
+  /* HEADER */
+  header{padding:14px 32px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:500}
+  .logo .ic{width:18px;height:18px;background:#F2F0E9;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#191917}
+  nav{display:flex;gap:4px;font-size:13px;color:#9B968A}
+  nav a{padding:6px 12px;text-decoration:none;color:#9B968A;border-radius:6px}
+  nav a.active{color:#F2F0E9;background:#26241F}
+  .sign{font-size:13px;color:#F2F0E9;text-decoration:none;padding:6px 14px;background:#26241F;border-radius:6px}
+
+  /* HERO */
+  .hero{padding:140px 32px 100px;max-width:880px;margin:0 auto;text-align:left}
+  .eyebrow{font-size:13px;color:#FF7A59;margin-bottom:24px;display:inline-flex;align-items:center;gap:8px}
+  .eyebrow::before{content:"";width:6px;height:6px;background:#FF7A59;border-radius:50%}
+  h1{font-size:72px;font-weight:500;letter-spacing:-.03em;line-height:1.05;color:#F2F0E9;margin-bottom:32px}
+  h1 em{font-style:italic;font-weight:400;color:#FF7A59}
+  .lede{font-size:20px;font-weight:400;line-height:1.5;color:#9B968A;max-width:620px}
+
+  .ctas{margin-top:48px;display:flex;gap:8px;align-items:center}
+  .btn{padding:10px 18px;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-radius:8px}
+  .btn-primary{color:#191917;background:#F2F0E9}
+  .btn-primary:hover{background:#fff}
+  .btn-ghost{color:#9B968A}
+  .btn-ghost:hover{color:#F2F0E9}
+
+  /* FEATURE LIST */
+  .features{padding:0 32px 80px;max-width:880px;margin:0 auto}
+  .feat{margin-top:96px}
+  .feat .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .feat .n{font-size:11px;letter-spacing:.1em;color:#FF7A59;font-weight:500;text-transform:uppercase}
+  .feat .meta{font-size:11px;color:#9B968A;font-family:'JetBrains Mono',monospace}
+  .feat h3{font-size:28px;font-weight:500;letter-spacing:-.01em;margin-bottom:8px;color:#F2F0E9}
+  .feat p{font-size:15px;line-height:1.6;color:#9B968A;max-width:620px}
+
+  /* MODELS — flat list */
+  .models{padding:80px 32px;max-width:880px;margin:0 auto}
+  .models .h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid #26241F}
+  .models h2{font-size:14px;font-weight:500;letter-spacing:.05em;color:#9B968A;text-transform:uppercase}
+  .models .all{font-size:12px;color:#9B968A;text-decoration:none}
+  .row{display:grid;grid-template-columns:60px 1fr 100px 80px;align-items:baseline;padding:24px 0;border-bottom:1px solid #26241F;cursor:pointer}
+  .row:hover{background:#1E1D1B;margin:0 -32px;padding-left:32px;padding-right:32px}
+  .row .n{font-size:13px;color:#FF7A59;font-weight:500}
+  .row .name{font-size:18px;font-weight:500;color:#F2F0E9}
+  .row .name .sub{display:block;font-size:12px;color:#9B968A;font-weight:400;margin-top:2px}
+  .row .type{font-size:11px;color:#9B968A;font-family:'JetBrains Mono',monospace;text-align:right;letter-spacing:.05em}
+  .row .go{font-size:12px;color:#FF7A59;text-align:right;text-decoration:none}
+
+  /* STEPS */
+  .steps{padding:80px 32px;max-width:880px;margin:0 auto}
+  .steps h2{font-size:36px;font-weight:500;letter-spacing:-.02em;line-height:1.15;color:#F2F0E9;margin-bottom:8px}
+  .steps h2 em{font-style:italic;color:#FF7A59;font-weight:400}
+  .steps .lede{font-size:15px;color:#9B968A;margin-bottom:48px;max-width:560px}
+  .step{display:grid;grid-template-columns:32px 1fr;gap:24px;padding:24px 0;border-top:1px solid #26241F}
+  .step:last-child{border-bottom:1px solid #26241F}
+  .step .n{font-size:13px;color:#FF7A59;font-weight:500}
+  .step h3{font-size:18px;font-weight:500;margin-bottom:4px;color:#F2F0E9}
+  .step p{font-size:14px;line-height:1.55;color:#9B968A}
+
+  /* FOOTER */
+  footer{padding:48px 32px;border-top:1px solid #26241F;margin-top:80px;display:flex;justify-content:space-between;font-size:12px;color:#9B968A}
+  footer a{color:#9B968A;text-decoration:none}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo"><div class="ic">E</div>Image Easy</div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+    </nav>
+    <a class="sign">Sign in</a>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Now in public beta</div>
+    <h1>The AI image workspace<br>you actually <em>use</em>.</h1>
+    <p class="lede">Five production-grade image models — from OpenAI, ByteDance and Google — exposed through one quiet, focused interface. No tokens to manage. No vendor lock-in.</p>
+    <div class="ctas">
+      <a class="btn btn-primary">Start composing →</a>
+      <a class="btn btn-ghost">See what's new</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feat">
+      <div class="head"><div class="n">What's inside</div><div class="meta">5 models · 3 providers</div></div>
+      <h3>Every model that matters, on one shelf.</h3>
+      <p>From photorealism (GPT Image 2) to multi-image fusion (Seedream 4.5) to character consistency (Nano Banana Pro). Pick the one that fits the shot.</p>
+    </div>
+    <div class="feat">
+      <div class="head"><div class="n">How it works</div><div class="meta">10s–60s</div></div>
+      <h3>Quiet by default. Loud when you need it.</h3>
+      <p>No neon. No chat. No notifications. Just a prompt field, a model picker, and a result. The negative carries itself to the enlarger.</p>
+    </div>
+    <div class="feat">
+      <div class="head"><div class="n">Pricing</div><div class="meta">10 free</div></div>
+      <h3>Ten free exposures on first sign-in.</h3>
+      <p>After that, top up only when you need to. We don't auto-recharge, we don't burn credits in the background.</p>
+    </div>
+  </section>
+
+  <section class="models">
+    <div class="h">
+      <h2>The shelf</h2>
+      <a class="all">All models →</a>
+    </div>
+    <div class="row">
+      <div class="n">01</div>
+      <div class="name">GPT Image 2<span class="sub">OpenAI · text-to-image · 4K</span></div>
+      <div class="type">T2I · 4K</div>
+      <div class="go">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">02</div>
+      <div class="name">GPT Image 2 Edit<span class="sub">OpenAI · image-to-image · 16 references</span></div>
+      <div class="type">I2I · 4K</div>
+      <div class="go">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">03</div>
+      <div class="name">Seedream 4.5<span class="sub">ByteDance · multi-image fusion · spatial reasoning</span></div>
+      <div class="type">T2I · 4K</div>
+      <div class="go">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">04</div>
+      <div class="name">Seedream 4.5 Edit<span class="sub">ByteDance · identity-preserving · 14 references</span></div>
+      <div class="type">I2I · 4K</div>
+      <div class="go">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">05</div>
+      <div class="name">Nano Banana Pro<span class="sub">Google · Gemini 3.0 Pro · character consistency</span></div>
+      <div class="type">I2I · 4K</div>
+      <div class="go">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">06</div>
+      <div class="name">More coming<span class="sub">Suggest the next model. We add the best ones.</span></div>
+      <div class="type">—</div>
+      <div class="go">Request →</div>
+    </div>
+  </section>
+
+  <section class="steps">
+    <h2>Three steps. <em>One darkroom.</em></h2>
+    <p class="lede">The same workflow you'd expect from a photographer — instrument, exposure, print. No dashboards, no DSLs, no agentic pipelines.</p>
+    <div class="step">
+      <div class="n">01</div>
+      <div><h3>Pick an instrument</h3><p>Choose a model, set the resolution and aspect ratio, drop in reference images if you need them.</p></div>
+    </div>
+    <div class="step">
+      <div class="n">02</div>
+      <div><h3>Compose the prompt</h3><p>Describe the subject. We carry the negative prompt, the seed, and the camera settings.</p></div>
+    </div>
+    <div class="step">
+      <div class="n">03</div>
+      <div><h3>Take the print</h3><p>10 to 60 seconds later, the image appears. Download, or expose again.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2026 Image Easy</div>
+    <div>Atelier · Expose · Archive · Pricing</div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stripe Press — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#F6F4EE;color:#0A2540;font-family:'Inter',system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 48px}
+
+  /* HEADER */
+  header{padding:28px 48px;display:flex;justify-content:space-between;align-items:center}
+  .logo{font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-.01em;font-style:italic}
+  nav{display:flex;gap:32px;font-size:14px;font-weight:500}
+  nav a{color:#0A2540;text-decoration:none}
+  nav a.active{color:#0A2540;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px}
+  .sign{font-size:14px;font-weight:500;color:#0A2540;text-decoration:none;padding:8px 18px;background:#0A2540;color:#F6F4EE;border-radius:6px}
+
+  /* HERO */
+  .hero{padding:96px 0 80px}
+  .eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#635BFF;font-weight:600;margin-bottom:32px}
+  h1{font-family:'DM Serif Display',serif;font-weight:400;font-size:84px;line-height:1;letter-spacing:-.02em;color:#0A2540;margin-bottom:32px}
+  h1 em{font-style:italic;color:#635BFF}
+  .lede{font-size:22px;line-height:1.5;color:#425466;max-width:680px;font-weight:400}
+
+  .ctas{margin-top:40px;display:flex;gap:8px}
+  .btn{padding:12px 22px;font-size:14px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-radius:6px}
+  .btn-primary{color:#F6F4EE;background:#0A2540}
+  .btn-primary:hover{background:#1A2C45}
+  .btn-ghost{color:#0A2540;background:transparent;border:1px solid #C7CCD1}
+  .btn-ghost:hover{border-color:#0A2540}
+
+  /* QUOTE */
+  .quote{padding:60px 0 80px;border-top:1px solid #D6D0C2}
+  .quote blockquote{font-family:'DM Serif Display',serif;font-weight:400;font-size:36px;line-height:1.3;color:#0A2540;max-width:820px;font-style:italic}
+  .quote cite{display:block;font-family:'Inter',sans-serif;font-style:normal;font-size:14px;color:#635BFF;margin-top:24px;letter-spacing:.05em}
+
+  /* MODELS — magazine grid */
+  .models{padding:80px 0}
+  .models h2{font-family:'DM Serif Display',serif;font-weight:400;font-size:48px;line-height:1.1;letter-spacing:-.02em;margin-bottom:8px}
+  .models h2 em{font-style:italic;color:#635BFF}
+  .models .sub{font-size:16px;color:#425466;margin-bottom:48px;max-width:560px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#D6D0C2;border:1px solid #D6D0C2}
+  .m{background:#F6F4EE;padding:32px;cursor:pointer;transition:background .2s}
+  .m:hover{background:#fff}
+  .m .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;font-size:12px;letter-spacing:.1em;color:#635BFF;text-transform:uppercase;font-weight:600}
+  .m .badge{font-size:10px;padding:3px 8px;background:#0A2540;color:#F6F4EE;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+  .m h3{font-family:'DM Serif Display',serif;font-weight:400;font-size:32px;line-height:1.1;letter-spacing:-.01em;color:#0A2540;margin-bottom:8px}
+  .m .prov{font-size:12px;color:#425466;margin-bottom:16px;letter-spacing:.05em}
+  .m p{font-size:14px;line-height:1.55;color:#425466;margin-bottom:24px}
+  .m .more{font-size:12px;color:#635BFF;font-weight:500;text-decoration:none;letter-spacing:.05em}
+
+  /* STEPS — number magazine */
+  .steps{padding:80px 0;border-top:1px solid #D6D0C2}
+  .steps h2{font-family:'DM Serif Display',serif;font-weight:400;font-size:48px;line-height:1.1;letter-spacing:-.02em;margin-bottom:48px}
+  .steps h2 em{font-style:italic;color:#635BFF}
+  .step{display:grid;grid-template-columns:80px 1fr 1fr;gap:32px;padding:32px 0;border-top:1px solid #D6D0C2;align-items:start}
+  .step:last-child{border-bottom:1px solid #D6D0C2}
+  .step .n{font-family:'DM Serif Display',serif;font-size:48px;color:#635BFF;line-height:1}
+  .step h3{font-family:'DM Serif Display',serif;font-weight:400;font-size:28px;line-height:1.15;color:#0A2540;margin-bottom:8px}
+  .step p{font-size:15px;line-height:1.6;color:#425466}
+
+  /* FOOTER */
+  footer{padding:64px 0 48px;border-top:1px solid #D6D0C2;margin-top:80px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;font-size:13px}
+  footer .lgo{font-family:'DM Serif Display',serif;font-size:24px;font-style:italic;color:#0A2540;margin-bottom:8px}
+  footer .lgo .sub{display:block;font-family:'Inter',sans-serif;font-style:normal;font-size:12px;color:#425466;margin-top:8px;letter-spacing:.05em}
+  footer .col h4{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#0A2540;font-weight:600;margin-bottom:16px}
+  footer .col a{display:block;color:#425466;text-decoration:none;padding:4px 0;font-size:13px}
+  footer .col a:hover{color:#0A2540}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">Image Easy</div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+      <a>Pricing</a>
+    </nav>
+    <a class="sign">Sign in</a>
+  </header>
+
+  <section class="hero wrap">
+    <div class="eyebrow">An image atelier</div>
+    <h1>The <em>quiet</em> darkroom<br>for artificial light.</h1>
+    <p class="lede">Five production-grade image models, exposed through one focused interface. Pick your instrument, write the prompt, take the print.</p>
+    <div class="ctas">
+      <a class="btn btn-primary">Start composing →</a>
+      <a class="btn btn-ghost">Read the journal</a>
+    </div>
+  </section>
+
+  <section class="quote wrap">
+    <blockquote>"A photograph is not made by the photographer alone. It is made in collaboration with the subject, the light, and the darkroom."</blockquote>
+    <cite>— FROM THE ARCHIVE · VOL. 04</cite>
+  </section>
+
+  <section class="models wrap">
+    <h2>The <em>instrument</em> shelf.</h2>
+    <p class="sub">Five models. Three providers. One quiet interface.</p>
+    <div class="grid">
+      <div class="m">
+        <div class="head">01 · Text-to-image<span class="badge">4K</span></div>
+        <h3>GPT Image 2</h3>
+        <div class="prov">OpenAI · Flagship · Photorealism &amp; text rendering</div>
+        <p>The most photorealistic model we've tested. Renders text cleanly, follows long prompts, edits at the pixel level.</p>
+        <a class="more">Open instrument →</a>
+      </div>
+      <div class="m">
+        <div class="head">02 · Image-to-image<span class="badge">4K</span></div>
+        <h3>GPT Image 2 Edit</h3>
+        <div class="prov">OpenAI · Up to 16 reference images</div>
+        <p>Pure pixel control. Drop in references, change the lighting, swap the style — the subject stays put.</p>
+        <a class="more">Open instrument →</a>
+      </div>
+      <div class="m">
+        <div class="head">03 · Text-to-image<span class="badge">4K</span></div>
+        <h3>Seedream 4.5</h3>
+        <div class="prov">ByteDance · Multi-image fusion · Spatial reasoning</div>
+        <p>Strong at spatial relationships and multi-image composition. Four-kilobyte outputs that hold their detail.</p>
+        <a class="more">Open instrument →</a>
+      </div>
+      <div class="m">
+        <div class="head">04 · Image-to-image<span class="badge">4K</span></div>
+        <h3>Seedream 4.5 Edit</h3>
+        <div class="prov">ByteDance · Identity-preserving · 14 references</div>
+        <p>The strongest identity preservation we've seen. Keeps the character, changes the scene.</p>
+        <a class="more">Open instrument →</a>
+      </div>
+      <div class="m">
+        <div class="head">05 · Image-to-image<span class="badge">4K</span></div>
+        <h3>Nano Banana Pro</h3>
+        <div class="prov">Google · Gemini 3.0 Pro · World knowledge</div>
+        <p>Understands cultural context, geography, and history. Best at characters that need to keep their face across shots.</p>
+        <a class="more">Open instrument →</a>
+      </div>
+      <div class="m">
+        <div class="head">06 · Roadmap<span class="badge">SOON</span></div>
+        <h3>More coming</h3>
+        <div class="prov">Request the next model</div>
+        <p>We're watching the field. Tell us which model you'd like next, and we'll add the best ones monthly.</p>
+        <a class="more">Submit a request →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps wrap">
+    <h2>Three <em>exposures</em>.</h2>
+    <div class="step">
+      <div class="n">i</div>
+      <h3>Pick an instrument.</h3>
+      <p>Choose a model, set the resolution and aspect ratio, drop in reference images if you need them. The negative carries itself.</p>
+    </div>
+    <div class="step">
+      <div class="n">ii</div>
+      <h3>Compose the prompt.</h3>
+      <p>Describe the subject in plain language. We handle the camera settings, the seed, and the post-process.</p>
+    </div>
+    <div class="step">
+      <div class="n">iii</div>
+      <h3>Take the print.</h3>
+      <p>Ten to sixty seconds later, the image arrives. Download the high-resolution file, or expose again.</p>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <div class="lgo">Image Easy<span class="sub">An atelier for artificial light · MMXXVI</span></div>
+    <div class="col"><h4>Atelier</h4><a>Compose</a><a>Expose</a><a>Archive</a></div>
+    <div class="col"><h4>Library</h4><a>Journal</a><a>Models</a><a>Changelog</a></div>
+    <div class="col"><h4>Company</h4><a>Pricing</a><a>Contact</a><a>Privacy</a></div>
+  </footer>
+</body>
+</html>

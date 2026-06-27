@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>三联风 — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#F5F0E6;color:#1A1A1A;font-family:'Noto Serif SC',serif;min-height:100vh}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 56px}
+
+  /* TOP */
+  .topstrip{padding:14px 56px;border-bottom:1px solid #1A1A1A;display:flex;justify-content:space-between;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.2em}
+
+  /* HEADER */
+  header{padding:32px 56px;border-bottom:1px solid #1A1A1A;display:flex;justify-content:space-between;align-items:center}
+  .logo{font-family:'Noto Serif SC',serif;font-weight:600;font-size:24px;letter-spacing:.05em;display:flex;align-items:center;gap:12px}
+  .logo .seal{width:36px;height:36px;background:#B83A2E;color:#F5F0E6;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;line-height:1;text-align:center;border-radius:2px}
+  .logo .name{display:flex;flex-direction:column;gap:2px;line-height:1.1}
+  .logo .name small{font-family:'Noto Sans SC',sans-serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#5A5A5A;font-weight:400}
+  nav{display:flex;gap:40px;font-family:'Noto Sans SC',sans-serif;font-size:13px;letter-spacing:.1em}
+  nav a{color:#1A1A1A;text-decoration:none;padding-bottom:4px;border-bottom:2px solid transparent}
+  nav a.active{border-bottom-color:#B83A2E;color:#B83A2E}
+  .sign{font-family:'Noto Sans SC',sans-serif;font-size:12px;letter-spacing:.15em;color:#1A1A1A;text-decoration:none;border-bottom:1px solid #1A1A1A;padding-bottom:2px}
+
+  /* HERO */
+  .hero{padding:100px 56px 80px}
+  .hero .issue{font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.4em;color:#B83A2E;margin-bottom:40px;display:flex;align-items:center;gap:12px}
+  .hero .issue .line{width:48px;height:1px;background:#B83A2E;display:inline-block}
+  .hero h1{font-weight:600;font-size:96px;line-height:1.05;letter-spacing:.02em;max-width:1000px}
+  .hero h1 em{font-weight:300;font-style:normal;color:#B83A2E}
+  .hero h1 .sm{font-size:48px;display:block;margin-top:8px;color:#5A5A5A;font-weight:300}
+  .hero .body{margin-top:64px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+  .hero .body p{font-weight:400;font-size:18px;line-height:1.9;color:#1A1A1A}
+  .hero .body .en{font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.2em;color:#5A5A5A;text-transform:uppercase;line-height:1.6}
+
+  /* CTA */
+  .ctas{margin-top:48px;display:flex;gap:16px}
+  .btn{padding:16px 32px;font-family:'Noto Sans SC',sans-serif;font-size:13px;letter-spacing:.15em;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:#1A1A1A;color:#F5F0E6}
+  .btn-secondary{background:transparent;color:#1A1A1A;border:1px solid #1A1A1A}
+
+  /* MODELS */
+  .models{padding:80px 56px;border-top:1px solid #1A1A1A}
+  .models .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;padding-bottom:24px;border-bottom:2px solid #1A1A1A}
+  .models h2{font-weight:600;font-size:56px;letter-spacing:.05em;line-height:1.1}
+  .models h2 em{font-weight:300;color:#B83A2E;font-style:normal}
+  .models .right{font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.2em;text-align:right;line-height:1.8;color:#5A5A5A}
+  .row{display:grid;grid-template-columns:80px 1fr 1.5fr 100px;gap:32px;align-items:baseline;padding:28px 0;border-bottom:1px solid #1A1A1A}
+  .row .n{font-family:'Noto Sans SC',sans-serif;font-weight:500;font-size:20px;color:#B83A2E}
+  .row .name{font-weight:500;font-size:28px;letter-spacing:.03em}
+  .row .desc{font-weight:300;font-size:14px;line-height:1.7;color:#5A5A5A}
+  .row .desc .en{display:block;font-family:'Noto Sans SC',sans-serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#888;margin-top:4px}
+  .row .arrow{font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.2em;text-align:right;color:#B83A2E}
+
+  /* QUOTE */
+  .quote{padding:100px 56px;text-align:center;border-top:1px solid #1A1A1A}
+  .quote .seal-mark{font-family:'Noto Serif SC',serif;font-size:64px;color:#B83A2E;margin-bottom:24px;font-weight:600}
+  .quote blockquote{font-weight:400;font-size:36px;line-height:1.6;max-width:780px;margin:0 auto;letter-spacing:.05em}
+  .quote .author{font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.3em;margin-top:32px;color:#5A5A5A}
+
+  /* FOOTER */
+  footer{padding:60px 56px;border-top:1px solid #1A1A1A;display:flex;justify-content:space-between;align-items:flex-end}
+  footer .lgo{font-weight:600;font-size:40px;letter-spacing:.05em;line-height:1}
+  footer .lgo em{color:#B83A2E;font-weight:300}
+  footer .meta{font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:.2em;text-align:right;line-height:1.8;color:#5A5A5A}
+</style>
+</head>
+<body>
+  <div class="topstrip">
+    <div>创刊号 / 2026 春</div>
+    <div>独立创作者的工具志</div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <div class="seal">图</div>
+      <div class="name">
+        图像手记
+        <small>IMAGE EASY · ATELIER</small>
+      </div>
+    </div>
+    <nav>
+      <a class="active">工坊</a>
+      <a>拍摄</a>
+      <a>档案</a>
+    </nav>
+    <a class="sign">登入 →</a>
+  </header>
+
+  <section class="hero">
+    <div class="issue"><span class="line"></span>第一期 · 暗房特辑</div>
+    <h1>
+      人工智能的<em>光线</em>，<br>
+      也是一种<em>摄影</em>。
+      <span class="sm">An atelier for artificial light. · 一份关于图像的工具档案</span>
+    </h1>
+    <div class="body">
+      <p>我们测试了市面上最值得用的五款 AI 图像模型，把它们放在同一个暗房里：GPT-Image 2、Seedream 4.5、Nano Banana Pro。挑你顺手的那个，剩下的留给灵感。</p>
+      <div class="en">FIVE MODELS · THREE PROVIDERS · ONE DARKROOM</div>
+    </div>
+    <div class="ctas">
+      <a class="btn btn-primary">▸ 第一次拍摄</a>
+      <a class="btn btn-secondary">查看档案</a>
+    </div>
+  </section>
+
+  <section class="models">
+    <div class="head">
+      <h2>五件<em>称手</em>的器械。</h2>
+      <div class="right">FIVE MODELS<br>THREE PROVIDERS<br>PAGES 04—09</div>
+    </div>
+    <div class="row">
+      <div class="n">壹</div>
+      <div class="name">GPT Image 2 <span style="color:#B83A2E;font-size:14px">★</span></div>
+      <div class="desc">OpenAI 最新旗舰。文字渲染与写实质感业界第一。<span class="en">TEXT RENDERING · PHOTOREALISM</span></div>
+      <div class="arrow">→ 打开</div>
+    </div>
+    <div class="row">
+      <div class="n">贰</div>
+      <div class="name">GPT Image 2 Edit</div>
+      <div class="desc">图生图，最多 16 张参考图。像素级重绘、风格迁移。<span class="en">16 REFERENCE IMAGES</span></div>
+      <div class="arrow">→ 打开</div>
+    </div>
+    <div class="row">
+      <div class="n">叁</div>
+      <div class="name">Seedream 4.5</div>
+      <div class="desc">字节跳动出品。4K 真实感，多图融合，空间逻辑强。<span class="en">4K · MULTI-IMAGE FUSION</span></div>
+      <div class="arrow">→ 打开</div>
+    </div>
+    <div class="row">
+      <div class="n">肆</div>
+      <div class="name">Seedream 4.5 Edit</div>
+      <div class="desc">身份保持精修。14 张参考图，2K 到 4K 输出。<span class="en">IDENTITY-PRESERVING</span></div>
+      <div class="arrow">→ 打开</div>
+    </div>
+    <div class="row">
+      <div class="n">伍</div>
+      <div class="name">Nano Banana Pro <span style="color:#B83A2E;font-size:14px">★</span></div>
+      <div class="desc">Google Gemini 3.0 Pro。角色一致性强，世界知识内置。<span class="en">CHARACTER CONSISTENCY</span></div>
+      <div class="arrow">→ 打开</div>
+    </div>
+  </section>
+
+  <section class="quote">
+    <div class="seal-mark">印</div>
+    <blockquote>"摄影是一种学会观看的方法，但不必非有相机。"</blockquote>
+    <div class="author">— 多萝西娅·兰格 / 1963</div>
+  </section>
+
+  <footer>
+    <div class="lgo">图像手记 <em>·</em> 暗房特辑</div>
+    <div class="meta">IMAGE EASY / MMXXVI<br>独立创作者的工具志</div>
+  </footer>
+</body>
+</html>

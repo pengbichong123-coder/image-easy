@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Swiss Modernism — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#FAFAFA;color:#0A0A0A;font-family:'Inter Tight',system-ui,sans-serif;font-feature-settings:"ss01" 1;min-height:100vh}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 48px}
+
+  /* TOP STRIP */
+  .topstrip{display:flex;justify-content:space-between;align-items:center;padding:14px 48px;border-bottom:1px solid #0A0A0A;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+  .topstrip a{color:#0A0A0A;text-decoration:none}
+  .topstrip .meta{display:flex;gap:24px}
+
+  /* HEADER */
+  header{padding:18px 48px;border-bottom:1px solid #0A0A0A;display:flex;justify-content:space-between;align-items:center}
+  .logo{display:flex;align-items:baseline;gap:10px}
+  .logo .dot{width:10px;height:10px;background:#E63312;display:inline-block}
+  .logo .name{font-weight:600;font-size:18px;letter-spacing:-.01em}
+  .logo .sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#0A0A0A;margin-left:8px}
+  nav{display:flex;gap:32px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase}
+  nav a{color:#0A0A0A;text-decoration:none;padding-bottom:4px;border-bottom:1px solid transparent}
+  nav a.active{border-bottom-color:#E63312}
+  .sign{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;color:#0A0A0A;border-bottom:1px solid #0A0A0A;padding-bottom:2px}
+
+  /* HERO */
+  .hero{padding:80px 48px 60px}
+  .hero .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#0A0A0A;margin-bottom:32px;display:flex;align-items:center;gap:8px}
+  .hero .eyebrow .sq{width:6px;height:6px;background:#E63312}
+  .hero h1{font-weight:300;font-size:96px;line-height:.92;letter-spacing:-.04em;max-width:1100px}
+  .hero h1 em{font-style:italic;font-weight:400}
+  .hero h1 .red{color:#E63312}
+  .hero .body{margin-top:48px;display:grid;grid-template-columns:1fr 1fr;gap:48px}
+  .hero .body p{font-weight:300;font-size:18px;line-height:1.5;color:#0A0A0A;max-width:520px}
+  .hero .specs{margin-top:64px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #0A0A0A;padding-top:16px}
+  .hero .specs .item{padding:0 16px;border-left:1px solid #0A0A0A}
+  .hero .specs .item:first-child{border-left:0;padding-left:0}
+  .hero .specs .label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:#0A0A0A;margin-bottom:6px}
+  .hero .specs .val{font-weight:300;font-size:22px;letter-spacing:-.01em}
+
+  /* MODELS INDEX */
+  .models{padding:80px 48px;border-top:1px solid #0A0A0A}
+  .models .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px}
+  .models h2{font-weight:300;font-size:64px;letter-spacing:-.03em}
+  .models h2 em{font-style:italic;color:#E63312}
+  .models .right{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;text-align:right;line-height:1.8}
+  .model{border-top:1px solid #0A0A0A;padding:20px 0;display:grid;grid-template-columns:80px 1fr 1.5fr 140px;align-items:center;gap:24px}
+  .model .num{font-style:italic;font-weight:300;font-size:28px}
+  .model .name{font-weight:300;font-size:28px;letter-spacing:-.01em}
+  .model .name:hover{color:#E63312}
+  .model .desc{font-size:13px;color:#0A0A0A;font-weight:300;line-height:1.5}
+  .model .arrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;text-align:right;color:#0A0A0A}
+  .model .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#E63312;margin-left:8px}
+
+  /* FOOTER */
+  footer{padding:60px 48px 24px;border-top:1px solid #0A0A0A;display:flex;justify-content:space-between;align-items:flex-end;margin-top:80px}
+  footer .ft-logo{font-weight:300;font-size:32px;letter-spacing:-.02em}
+  footer .ft-logo em{font-style:italic;color:#E63312}
+  footer .meta{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;text-align:right;color:#0A0A0A;line-height:1.8}
+</style>
+</head>
+<body>
+  <div class="topstrip">
+    <div>EDITION 01 / 2026</div>
+    <div class="meta"><span>VOL 001</span><span>ATELIER</span></div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <span class="dot"></span>
+      <span class="name">IMAGE EASY</span>
+      <span class="sub">EST. 2026</span>
+    </div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+    </nav>
+    <a class="sign">Sign in →</a>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow"><span class="sq"></span> A PHOTOGRAPHIC DARKROOM FOR AI</div>
+    <h1>An atelier<br>for <em class="red">artificial</em><br>light.</h1>
+    <div class="body">
+      <p>Five precision instruments for image synthesis. GPT-Image 2, Seedream 4.5, Nano Banana Pro — exposed under one red light.</p>
+      <p></p>
+    </div>
+    <div class="specs">
+      <div class="item"><div class="label">Resolution</div><div class="val">4K / 2K / 1K</div></div>
+      <div class="item"><div class="label">Process</div><div class="val">Async 10–60s</div></div>
+      <div class="item"><div class="label">Stocks</div><div class="val">10 credits</div></div>
+      <div class="item"><div class="label">Access</div><div class="val">Google sign-in</div></div>
+    </div>
+  </section>
+
+  <section class="models">
+    <div class="head">
+      <h2>The <em>instrument</em> shelf.</h2>
+      <div class="right">FIVE MODELS<br>THREE PROVIDERS<br>ONE DARKROOM</div>
+    </div>
+    <div class="model">
+      <div class="num">I</div>
+      <div class="name">GPT Image 2 <span class="tag">Featured</span></div>
+      <div class="desc">OpenAI's latest. Text rendering, photorealism, and pixel-level editing — best in class.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="model">
+      <div class="num">II</div>
+      <div class="name">GPT Image 2 Edit</div>
+      <div class="desc">Image-to-image with up to 16 reference images. Style, lighting, scene composition.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="model">
+      <div class="num">III</div>
+      <div class="name">Seedream 4.5</div>
+      <div class="desc">ByteDance's 4K engine. Refined detail, multi-image fusion, strong spatial reasoning.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="model">
+      <div class="num">IV</div>
+      <div class="name">Seedream 4.5 Edit</div>
+      <div class="desc">Identity-preserving edits. 14 reference images, 2K–4K output.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="model">
+      <div class="num">V</div>
+      <div class="name">Nano Banana Pro <span class="tag">Featured</span></div>
+      <div class="desc">Google Gemini 3.0 Pro Image. Character consistency, 4K, world-knowledge grounding.</div>
+      <div class="arrow">Open →</div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ft-logo">An atelier for <em>artificial</em> light.</div>
+    <div class="meta">IMAGE EASY / DARKROOM / 2026</div>
+  </footer>
+</body>
+</html>

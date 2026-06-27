@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Risograph — Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#F4EFE3;color:#1A1A1A;font-family:'Space Mono',monospace;min-height:100vh;position:relative;overflow-x:hidden}
+
+  /* HALFTONE OVERLAY */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;background-image:radial-gradient(circle,#1A1A1A 1px,transparent 1.5px);background-size:6px 6px;opacity:.08;mix-blend-mode:multiply}
+
+  /* COLOR OFFSET HELPER */
+  .pink{color:#FF48B0}
+  .blue{color:#0AE2F0}
+  .pink-bg{background:#FF48B0;color:#1A1A1A}
+  .blue-bg{background:#0AE2F0;color:#1A1A1A}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:0 48px;position:relative;z-index:2}
+
+  /* TOP */
+  .topstrip{padding:14px 48px;border-bottom:2px solid #1A1A1A;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase}
+  .topstrip .stamp{background:#FF48B0;padding:4px 8px;color:#1A1A1A;transform:rotate(-2deg);display:inline-block;font-weight:700}
+
+  /* HEADER */
+  header{padding:24px 48px;border-bottom:2px solid #1A1A1A;display:flex;align-items:center;justify-content:space-between}
+  .logo{position:relative;display:flex;align-items:baseline;gap:10px}
+  .logo .name{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;line-height:1;position:relative}
+  .logo .name::before{content:"Image Easy";position:absolute;left:3px;top:3px;color:#FF48B0;mix-blend-mode:multiply;z-index:-1}
+  .logo .name::after{content:"Image Easy";position:absolute;left:-3px;top:-3px;color:#0AE2F0;mix-blend-mode:multiply;z-index:-1}
+  .logo .sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase}
+
+  nav{display:flex;gap:0}
+  nav a{padding:10px 18px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;color:#1A1A1A;border:2px solid transparent}
+  nav a.active{background:#FF48B0;border:2px solid #1A1A1A;box-shadow:3px 3px 0 #0AE2F0}
+  .sign{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;background:#1A1A1A;color:#F4EFE3;padding:10px 18px;text-decoration:none}
+
+  /* HERO */
+  .hero{padding:80px 48px 60px;position:relative}
+  .hero h1{font-family:'DM Serif Display',serif;font-weight:400;font-size:120px;line-height:.88;letter-spacing:-.02em;position:relative}
+  .hero h1 em{font-style:italic}
+  .hero h1 .layer{position:relative;display:inline-block}
+  .hero h1 .layer::before{content:attr(data-text);position:absolute;left:4px;top:3px;color:#FF48B0;z-index:-1;mix-blend-mode:multiply}
+  .hero h1 .layer::after{content:attr(data-text);position:absolute;left:-3px;top:-2px;color:#0AE2F0;z-index:-1;mix-blend-mode:multiply}
+  .hero h1 .pink-layer{color:#FF48B0}
+  .hero h1 .blue-layer{color:#0AE2F0}
+
+  .hero .body{margin-top:48px;display:grid;grid-template-columns:1fr 1fr;gap:48px}
+  .hero p{font-family:'Space Mono',monospace;font-size:13px;line-height:1.6}
+
+  /* SPECS */
+  .specs{margin-top:64px;display:grid;grid-template-columns:repeat(4,1fr);border:2px solid #1A1A1A}
+  .specs .item{padding:20px;border-left:2px solid #1A1A1A;background:#F4EFE3}
+  .specs .item:first-child{border-left:0}
+  .specs .item:nth-child(odd){background:#F4EFE3}
+  .specs .item:nth-child(even){background:#FF48B0;color:#1A1A1A;background-image:radial-gradient(circle,#1A1A1A 1px,transparent 1.5px);background-size:4px 4px;background-blend-mode:multiply}
+  .specs .label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+  .specs .val{font-family:'DM Serif Display',serif;font-size:28px;line-height:1}
+
+  /* MODELS */
+  .models{padding:60px 48px;background:#0AE2F0;background-image:radial-gradient(circle,#1A1A1A 1px,transparent 1.5px);background-size:4px 4px;background-blend-mode:multiply;border-top:2px solid #1A1A1A;border-bottom:2px solid #1A1A1A;position:relative;z-index:2}
+  .models h2{font-family:'DM Serif Display',serif;font-size:80px;line-height:.9;margin-bottom:48px}
+  .models h2 em{font-style:italic}
+  .row{border-top:2px solid #1A1A1A;padding:24px 0;display:grid;grid-template-columns:80px 1fr 1.5fr 120px;gap:24px;align-items:baseline;background:#F4EFE3;background-image:radial-gradient(circle,#1A1A1A 1px,transparent 1.5px);background-size:4px 4px;background-blend-mode:multiply}
+  .row:last-child{border-bottom:2px solid #1A1A1A}
+  .row .n{font-family:'DM Serif Display',serif;font-style:italic;font-size:32px;color:#FF48B0;background:#F4EFE3;background-image:none;width:fit-content;padding:0 6px}
+  .row .name{font-family:'DM Serif Display',serif;font-size:36px;line-height:1;background:#F4EFE3;background-image:none;width:fit-content;padding:0 6px}
+  .row .desc{font-family:'Space Mono',monospace;font-size:12px;line-height:1.5;background:#F4EFE3;background-image:none;width:fit-content;padding:0 6px}
+  .row .arrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;background:#FF48B0;padding:6px 10px;color:#1A1A1A;text-align:right;width:fit-content;border:2px solid #1A1A1A}
+
+  /* PROCESS */
+  .process{padding:80px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+  .step{background:#F4EFE3;border:2px solid #1A1A1A;padding:32px;position:relative}
+  .step:nth-child(1){background:#FF48B0}
+  .step:nth-child(2){background:#0AE2F0}
+  .step:nth-child(3){background:#F4EFE3}
+  .step .n{font-family:'DM Serif Display',serif;font-style:italic;font-size:64px;line-height:1;margin-bottom:16px}
+  .step h3{font-family:'DM Serif Display',serif;font-size:32px;margin-bottom:12px;line-height:1}
+  .step p{font-family:'Space Mono',monospace;font-size:12px;line-height:1.5}
+
+  /* FOOTER */
+  footer{padding:60px 48px;border-top:2px solid #1A1A1A;margin-top:60px;display:flex;justify-content:space-between;align-items:flex-end}
+  footer .stamp{font-family:'DM Serif Display',serif;font-style:italic;font-size:56px;line-height:.9;position:relative}
+  footer .stamp::before{content:"Image Easy Atelier";position:absolute;left:4px;top:2px;color:#FF48B0;mix-blend-mode:multiply;z-index:-1}
+  footer .stamp::after{content:"Image Easy Atelier";position:absolute;left:-3px;top:-2px;color:#0AE2F0;mix-blend-mode:multiply;z-index:-1}
+  footer .meta{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:right;line-height:1.8}
+</style>
+</head>
+<body>
+  <div class="topstrip">
+    <div>RISO / NO. 001 / 2026</div>
+    <div class="stamp">PRINTED IN TWO COLORS</div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <div class="name">Image Easy</div>
+      <div class="sub">Atelier d'Images</div>
+    </div>
+    <nav>
+      <a class="active">Atelier</a>
+      <a>Expose</a>
+      <a>Archive</a>
+    </nav>
+    <a class="sign">Sign in →</a>
+  </header>
+
+  <section class="hero">
+    <h1>
+      An <em>atelier</em><br>
+      for <span class="layer pink-layer" data-text="artificial">artificial</span><br>
+      <span class="layer blue-layer" data-text="light.">light.</span>
+    </h1>
+    <div class="body">
+      <p>Five AI image models, exposed under one red light. Printed in two colors with imperfect registration.</p>
+      <p></p>
+    </div>
+    <div class="specs">
+      <div class="item"><div class="label">Resolution</div><div class="val">4K · 2K · 1K</div></div>
+      <div class="item"><div class="label">Process</div><div class="val">10–60s</div></div>
+      <div class="item"><div class="label">Stocks</div><div class="val">10 free</div></div>
+      <div class="item"><div class="label">Access</div><div class="val">Google sign-in</div></div>
+    </div>
+  </section>
+
+  <section class="models">
+    <h2>The <em>instrument</em><br>shelf.</h2>
+    <div class="row">
+      <div class="n">I</div>
+      <div class="name">GPT Image 2</div>
+      <div class="desc">OpenAI flagship. Text rendering, photorealism.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">II</div>
+      <div class="name">GPT Image 2 Edit</div>
+      <div class="desc">Up to 16 reference images. Pixel-level control.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">III</div>
+      <div class="name">Seedream 4.5</div>
+      <div class="desc">ByteDance. 4K, multi-image fusion, strong spatial reasoning.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">IV</div>
+      <div class="name">Seedream 4.5 Edit</div>
+      <div class="desc">Identity-preserving edits, 14 reference images.</div>
+      <div class="arrow">Open →</div>
+    </div>
+    <div class="row">
+      <div class="n">V</div>
+      <div class="name">Nano Banana Pro</div>
+      <div class="desc">Google Gemini 3.0 Pro. Character consistency.</div>
+      <div class="arrow">Open →</div>
+    </div>
+  </section>
+
+  <section class="process">
+    <div class="step">
+      <div class="n">I</div>
+      <h3>Compose</h3>
+      <p>Pick your instrument. Set the aperture and shutter speed.</p>
+    </div>
+    <div class="step">
+      <div class="n">II</div>
+      <h3>Expose</h3>
+      <p>Write a prompt — or upload references. Pull the trigger.</p>
+    </div>
+    <div class="step">
+      <div class="n">III</div>
+      <h3>Print</h3>
+      <p>10 to 60 seconds later, the print emerges. Download or expose again.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="stamp">Image Easy Atelier</div>
+    <div class="meta">PRINTED IN TWO COLORS<br>FLUORESCENT PINK + ELECTRIC BLUE<br>MMXXVI</div>
+  </footer>
+</body>
+</html>
