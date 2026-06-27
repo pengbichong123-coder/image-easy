@@ -5,7 +5,13 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/Header";
-import { hasLocale, type Locale, localeHtmlLang, locales } from "@/i18n/routing";
+import {
+  hasLocale,
+  type Locale,
+  localeHtmlLang,
+  localeOgLocale,
+  locales,
+} from "@/i18n/routing";
 import "./globals.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://image-easy.app";
@@ -26,8 +32,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(locale)) return {};
+  const currentLocale = locale as Locale;
 
   const t = await getTranslations({ locale, namespace: "metadata" });
+  const localeUrl = `${SITE_URL}/${currentLocale}`;
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -41,11 +49,11 @@ export async function generateMetadata({
       siteName: t("siteName"),
       title: t("title"),
       description: t("ogDescription"),
-      url: SITE_URL,
-      locale: localeHtmlLang[locale as Locale],
+      url: localeUrl,
+      locale: localeOgLocale[currentLocale],
       alternateLocale: locales
         .filter((l) => l !== locale)
-        .map((l) => localeHtmlLang[l]),
+        .map((l) => localeOgLocale[l]),
       images: [
         {
           url: `${SITE_URL}/og?lang=${locale}`,

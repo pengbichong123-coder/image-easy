@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { locales } from "@/i18n/routing";
+import { locales, type Locale } from "@/i18n/routing";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://image-easy.app";
 
@@ -7,38 +7,33 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://image-easy.app";
 // (no value in indexing a sign-in URL).
 const PAGES = ["/", "/create", "/my-images"] as const;
 
+function localizedPath(locale: Locale, path: (typeof PAGES)[number]) {
+  return path === "/" ? `/${locale}` : `/${locale}${path}`;
+}
+
+function localizedUrl(locale: Locale, path: (typeof PAGES)[number]) {
+  return `${SITE_URL}${localizedPath(locale, path)}`;
+}
+
+function alternateLanguages(path: (typeof PAGES)[number]) {
+  return {
+    ...Object.fromEntries(locales.map((l) => [l, localizedUrl(l, path)])),
+    "x-default": localizedUrl("en", path),
+  };
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
   for (const path of PAGES) {
-    // x-default / canonical entry — en
-    entries.push({
-      url: `${SITE_URL}${path}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: path === "/" ? 1.0 : 0.8,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, `${SITE_URL}${l === "en" ? path : `/${l}${path}`}`]),
-        ),
-      },
-    });
-
-    // Non-en locales get their own entry too
-    for (const l of locales) {
-      if (l === "en") continue;
+    for (const locale of locales) {
       entries.push({
-        url: `${SITE_URL}/${l}${path}`,
+        url: localizedUrl(locale, path),
         lastModified: new Date(),
         changeFrequency: "weekly",
-        priority: path === "/" ? 0.9 : 0.7,
+        priority: path === "/" && locale === "en" ? 1.0 : path === "/" ? 0.9 : 0.7,
         alternates: {
-          languages: Object.fromEntries(
-            locales.map((ll) => [
-              ll,
-              `${SITE_URL}${ll === "en" ? path : `/${ll}${path}`}`,
-            ]),
-          ),
+          languages: alternateLanguages(path),
         },
       });
     }

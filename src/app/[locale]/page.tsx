@@ -57,7 +57,7 @@ export default async function HomePage({
               description: "Free tier with 10 image generations on sign-up",
             },
             inLanguage: [...locales],
-            url: `${SITE_URL}${locale === "en" ? "" : `/${locale}`}`,
+            url: `${SITE_URL}/${locale}`,
           }),
         }}
       />

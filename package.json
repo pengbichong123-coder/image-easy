@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit",
-    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit --incremental false",
+    "typecheck": "tsc --noEmit --incremental false",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate"

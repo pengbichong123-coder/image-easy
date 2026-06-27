@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { locales, hasLocale } from "@/i18n/routing";
+import {
+  locales,
+  hasLocale,
+  localeOgLocale,
+  type Locale,
+} from "@/i18n/routing";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://image-easy.app";
 
@@ -15,6 +20,14 @@ const NS: Record<PageKey, string> = {
   login: "auth",
 };
 
+function localizedPath(locale: Locale, pathname: string) {
+  return pathname === "/" ? `/${locale}` : `/${locale}${pathname}`;
+}
+
+function localizedUrl(locale: Locale, pathname: string) {
+  return `${SITE_URL}${localizedPath(locale, pathname)}`;
+}
+
 export async function generatePageMetadata({
   locale,
   page,
@@ -23,6 +36,7 @@ export async function generatePageMetadata({
   page: PageKey;
 }): Promise<Metadata> {
   if (!hasLocale(locale)) return {};
+  const currentLocale = locale as Locale;
   const ns = NS[page];
   const t = await getTranslations({ locale, namespace: ns });
 
@@ -53,22 +67,26 @@ export async function generatePageMetadata({
   // hreflang block: this page in all 9 locales
   const languages: Record<string, string> = {};
   for (const l of locales) {
-    languages[l] = `${SITE_URL}${l === "en" ? pathname : `/${l}${pathname}`}`;
+    languages[l] = localizedUrl(l, pathname);
   }
-  languages["x-default"] = `${SITE_URL}${page === "home" ? "/" : `/${"en"}${pathname}`}`;
+  languages["x-default"] = localizedUrl("en", pathname);
 
   return {
     title,
     description,
     alternates: {
-      canonical: `${SITE_URL}${locale === "en" ? pathname : `/${locale}${pathname}`}`,
+      canonical: localizedUrl(currentLocale, pathname),
       languages,
     },
     openGraph: {
       type: "website",
       title,
       description,
-      url: `${SITE_URL}${locale === "en" ? pathname : `/${locale}${pathname}`}`,
+      url: localizedUrl(currentLocale, pathname),
+      locale: localeOgLocale[currentLocale],
+      alternateLocale: locales
+        .filter((l) => l !== currentLocale)
+        .map((l) => localeOgLocale[l]),
     },
   };
 }
