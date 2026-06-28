@@ -61,6 +61,7 @@ model User {
   uploads     Upload[]
   assets      Asset[]
   creditTransactions CreditTransaction[]
+  payments    Payment[]
 }
 
 model Upload {
@@ -153,4 +154,39 @@ model CreditTransaction {
   @@index([generationId])
   @@index([createdAt])
   @@unique([generationId, type])
+}
+
+model CreditPackage {
+  id            String   @id @default(cuid())
+  name          String
+  credits       Int
+  priceCents    Int
+  currency      String   @default("usd")
+  stripePriceId String   @unique
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model Payment {
+  id                      String   @id @default(cuid())
+  userId                  String
+  stripeCheckoutSessionId String   @unique
+  stripePaymentIntentId   String?
+  amountCents             Int
+  currency                String
+  credits                 Int
+  status                  String   // pending, paid, failed, canceled
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model StripeWebhookEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
 }
