@@ -17,6 +17,11 @@ type PurchaseCreditInput = CreditInput & {
   paymentId: string;
 };
 
+type SubscriptionCreditInput = CreditInput & {
+  subscriptionId: string;
+  grantKey: string;
+};
+
 export class InsufficientCreditsError extends Error {
   constructor() {
     super("Not enough credits");
@@ -236,4 +241,53 @@ export async function grantPurchasedCredits(
   input: PurchaseCreditInput,
 ): Promise<{ granted: boolean; balanceAfter: number }> {
   return prisma.$transaction(async (tx) => grantPurchasedCreditsInTransaction(tx, input));
+}
+
+export async function grantSubscriptionCreditsInTransaction(
+  tx: TransactionClient,
+  input: SubscriptionCreditInput,
+): Promise<{ granted: boolean; balanceAfter: number }> {
+  const amount = normalizeAmount(input.amount);
+
+  const subscriptionLedger = await tx.creditTransaction.createMany({
+    data: {
+      userId: input.userId,
+      subscriptionId: input.subscriptionId,
+      subscriptionGrantKey: input.grantKey,
+      type: "subscription_grant",
+      amount,
+      balanceAfter: 0,
+      reason: input.reason,
+    },
+    skipDuplicates: true,
+  });
+
+  if (subscriptionLedger.count !== 1) {
+    return {
+      granted: false,
+      balanceAfter: await currentBalance(tx, input.userId),
+    };
+  }
+
+  const user = await tx.user.update({
+    where: { id: input.userId },
+    data: { credits: { increment: amount } },
+    select: { credits: true },
+  });
+
+  await tx.creditTransaction.updateMany({
+    where: {
+      subscriptionGrantKey: input.grantKey,
+      type: "subscription_grant",
+    },
+    data: { balanceAfter: user.credits },
+  });
+
+  return { granted: true, balanceAfter: user.credits };
+}
+
+export async function grantSubscriptionCredits(
+  input: SubscriptionCreditInput,
+): Promise<{ granted: boolean; balanceAfter: number }> {
+  return prisma.$transaction(async (tx) => grantSubscriptionCreditsInTransaction(tx, input));
 }

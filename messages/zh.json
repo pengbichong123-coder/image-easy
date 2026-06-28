@@ -127,7 +127,14 @@
       "costTableModel": "模型",
       "costTableSpec": "规格",
       "costTableCredits": "积分",
-      "costTableCreditValue": "{credits} 积分"
+      "costTableCreditValue": "{credits} 积分",
+      "subscriptionTitle": "订阅套餐",
+      "billingMonthly": "月付",
+      "billingAnnual": "年付",
+      "perMonth": "/月",
+      "perYear": "/年",
+      "creditsPerMonth": "积分 / 月",
+      "annualBadge": "约 17% 优惠"
     },
     "privacy": {
       "metaTitle": "隐私政策",

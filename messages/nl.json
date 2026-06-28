@@ -127,7 +127,14 @@
       "costTableModel": "Model",
       "costTableSpec": "Instelling",
       "costTableCredits": "Credits",
-      "costTableCreditValue": "{credits} credits"
+      "costTableCreditValue": "{credits} credits",
+      "subscriptionTitle": "Abonnementen",
+      "billingMonthly": "Maandelijks",
+      "billingAnnual": "Jaarlijks",
+      "perMonth": "/mnd",
+      "perYear": "/jr",
+      "creditsPerMonth": "credits / maand",
+      "annualBadge": "Ongeveer 17% korting"
     },
     "privacy": {
       "metaTitle": "Privacybeleid",

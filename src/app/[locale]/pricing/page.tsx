@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CreditPackageCheckout } from "@/components/CreditPackageCheckout";
-import { prisma } from "@/lib/db";
+import { SubscriptionPlanCheckout } from "@/components/SubscriptionPlanCheckout";
 import { GENERATION_CREDIT_COST_ROWS } from "@/lib/generation-credit-cost";
 import { isPaidCreditsEnabled } from "@/lib/pricing-mode";
+import { getConfiguredSubscriptionPlans } from "@/lib/subscription-plans";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -37,23 +37,7 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
   const checkoutStatus = Array.isArray(resolvedSearchParams?.checkout)
     ? resolvedSearchParams.checkout[0]
     : resolvedSearchParams?.checkout;
-  const creditPackages = paidCreditsEnabled
-    ? await prisma.creditPackage.findMany({
-        where: { active: true },
-        orderBy: [
-          { priceCents: "asc" },
-          { credits: "asc" },
-        ],
-        select: {
-          id: true,
-          name: true,
-          credits: true,
-          priceCents: true,
-          currency: true,
-          stripePriceId: true,
-        },
-      })
-    : [];
+  const subscriptionPlans = paidCreditsEnabled ? getConfiguredSubscriptionPlans() : [];
 
   return (
     <div className="bg-white">
@@ -68,13 +52,13 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
           {t("lead")}
         </p>
 
-        {creditPackages.length > 0 ? (
+        {subscriptionPlans.length > 0 ? (
           <div className="mt-14 border-t border-[#D2D2D7] pt-10">
             <div className="text-[13px] text-[#6E6E73] mb-3">
               {t("planEyebrow")}
             </div>
             <h2 className="display text-[34px] sm:text-[44px] text-[#1D1D1F] mb-4">
-              {t("planLabel")}
+              {t("subscriptionTitle")}
             </h2>
             {checkoutStatus === "success" ? (
               <div className="mb-6 rounded-[8px] border border-[#B7E4C7] bg-[#F1FFF6] px-4 py-3 text-[14px] text-[#17633A]">
@@ -86,16 +70,21 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
                 {t("checkoutCancel")}
               </div>
             ) : null}
-            <CreditPackageCheckout
+            <SubscriptionPlanCheckout
               labels={{
                 signInRequired: t("checkoutSignInRequired"),
                 failed: t("checkoutFailed"),
                 opening: t("checkoutOpening"),
                 buy: t("checkoutBuy"),
-                credits: t("creditsLabel"),
+                monthly: t("billingMonthly"),
+                annual: t("billingAnnual"),
+                perMonth: t("perMonth"),
+                perYear: t("perYear"),
+                creditsPerMonth: t("creditsPerMonth"),
+                annualBadge: t("annualBadge"),
               }}
               locale={locale}
-              packages={creditPackages}
+              plans={subscriptionPlans}
             />
           </div>
         ) : (

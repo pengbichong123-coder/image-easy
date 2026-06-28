@@ -127,7 +127,14 @@
       "costTableModel": "Modelo",
       "costTableSpec": "Ajuste",
       "costTableCredits": "Créditos",
-      "costTableCreditValue": "{credits} créditos"
+      "costTableCreditValue": "{credits} créditos",
+      "subscriptionTitle": "Planes de suscripción",
+      "billingMonthly": "Mensual",
+      "billingAnnual": "Anual",
+      "perMonth": "/mes",
+      "perYear": "/año",
+      "creditsPerMonth": "créditos / mes",
+      "annualBadge": "Aprox. 17% dto."
     },
     "privacy": {
       "metaTitle": "Política de privacidad",

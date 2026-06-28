@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import type Stripe from "stripe";
-import { grantPurchasedCreditsInTransaction } from "@/lib/credits";
+import { grantPurchasedCreditsInTransaction, grantSubscriptionCreditsInTransaction } from "@/lib/credits";
 import { prisma } from "@/lib/db";
+import {
+  buildStripeInvoiceGrantKey,
+  nextMonthlyCreditGrantAt,
+} from "@/lib/subscription-credit-grants";
+import {
+  findSubscriptionPlanById,
+  findSubscriptionPlanByStripePriceId,
+  type SubscriptionPlan,
+} from "@/lib/subscription-plans";
 import {
   type CheckoutPaymentForValidation,
   validateCheckoutSessionAgainstPayment,
@@ -19,6 +28,76 @@ function stripePaymentIntentId(session: Stripe.Checkout.Session) {
   }
 
   return typeof paymentIntent === "string" ? paymentIntent : paymentIntent.id;
+}
+
+function stripeObjectId(value: unknown) {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && "id" in value && typeof value.id === "string") return value.id;
+  return null;
+}
+
+function stripeDate(value: unknown) {
+  return typeof value === "number" ? new Date(value * 1000) : null;
+}
+
+function checkoutMetadata(session: Stripe.Checkout.Session) {
+  return session.metadata ?? {};
+}
+
+function invoiceMetadata(invoice: Stripe.Invoice) {
+  const rawInvoice = invoice as Stripe.Invoice & {
+    subscription_details?: { metadata?: Stripe.Metadata | null } | null;
+  };
+
+  return {
+    ...(rawInvoice.subscription_details?.metadata ?? {}),
+    ...(invoice.metadata ?? {}),
+  };
+}
+
+function invoiceSubscriptionId(invoice: Stripe.Invoice) {
+  return stripeObjectId((invoice as Stripe.Invoice & { subscription?: unknown }).subscription);
+}
+
+function invoiceCustomerId(invoice: Stripe.Invoice) {
+  return stripeObjectId(invoice.customer);
+}
+
+function invoicePrimaryPriceId(invoice: Stripe.Invoice) {
+  const line = invoice.lines.data[0] as Stripe.InvoiceLineItem & {
+    price?: { id?: string | null } | null;
+    pricing?: { price_details?: { price?: string | null } | null } | null;
+  };
+
+  return line.price?.id ?? line.pricing?.price_details?.price ?? null;
+}
+
+function invoicePeriodStart(invoice: Stripe.Invoice) {
+  return stripeDate(invoice.lines.data[0]?.period?.start) ?? stripeDate(invoice.created) ?? new Date();
+}
+
+function invoicePeriodEnd(invoice: Stripe.Invoice) {
+  return stripeDate(invoice.lines.data[0]?.period?.end);
+}
+
+function subscriptionPriceId(subscription: Stripe.Subscription) {
+  return subscription.items.data[0]?.price?.id ?? null;
+}
+
+function subscriptionPeriodStart(subscription: Stripe.Subscription) {
+  return stripeDate((subscription as Stripe.Subscription & { current_period_start?: number }).current_period_start);
+}
+
+function subscriptionPeriodEnd(subscription: Stripe.Subscription) {
+  return stripeDate((subscription as Stripe.Subscription & { current_period_end?: number }).current_period_end);
+}
+
+function nextGrantForPlan(plan: SubscriptionPlan, grantAt: Date, currentPeriodEnd?: Date | null) {
+  if (plan.interval !== "year") return null;
+  const nextGrantAt = nextMonthlyCreditGrantAt(grantAt);
+  if (currentPeriodEnd && nextGrantAt >= currentPeriodEnd) return null;
+  return nextGrantAt;
 }
 
 function isUniqueConstraintError(error: unknown) {
@@ -174,7 +253,205 @@ async function processCheckoutSessionPaid(tx: Prisma.TransactionClient, session:
   });
 }
 
+async function upsertUserSubscription(
+  tx: Prisma.TransactionClient,
+  input: {
+    userId: string;
+    stripeSubscriptionId: string;
+    stripeCustomerId: string | null;
+    stripeCheckoutSessionId?: string | null;
+    plan: SubscriptionPlan;
+    status: string;
+    currentPeriodStart?: Date | null;
+    currentPeriodEnd?: Date | null;
+    cancelAtPeriodEnd?: boolean;
+  },
+) {
+  return tx.userSubscription.upsert({
+    where: { stripeSubscriptionId: input.stripeSubscriptionId },
+    create: {
+      userId: input.userId,
+      stripeSubscriptionId: input.stripeSubscriptionId,
+      stripeCustomerId: input.stripeCustomerId,
+      stripeCheckoutSessionId: input.stripeCheckoutSessionId,
+      stripePriceId: input.plan.stripePriceId!,
+      planId: input.plan.id,
+      tier: input.plan.tier,
+      interval: input.plan.interval,
+      status: input.status,
+      monthlyCredits: input.plan.monthlyCredits,
+      currency: input.plan.currency,
+      cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
+      currentPeriodStart: input.currentPeriodStart,
+      currentPeriodEnd: input.currentPeriodEnd,
+    },
+    update: {
+      stripeCustomerId: input.stripeCustomerId,
+      stripeCheckoutSessionId: input.stripeCheckoutSessionId,
+      stripePriceId: input.plan.stripePriceId!,
+      planId: input.plan.id,
+      tier: input.plan.tier,
+      interval: input.plan.interval,
+      status: input.status,
+      monthlyCredits: input.plan.monthlyCredits,
+      currency: input.plan.currency,
+      cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
+      currentPeriodStart: input.currentPeriodStart,
+      currentPeriodEnd: input.currentPeriodEnd,
+    },
+  });
+}
+
+async function grantSubscriptionPeriodCredits(
+  tx: Prisma.TransactionClient,
+  input: {
+    subscriptionId: string;
+    stripeSubscriptionId: string;
+    userId: string;
+    plan: SubscriptionPlan;
+    grantKey: string;
+    grantAt: Date;
+    currentPeriodEnd?: Date | null;
+    reason: string;
+  },
+) {
+  const grant = await grantSubscriptionCreditsInTransaction(tx, {
+    userId: input.userId,
+    subscriptionId: input.subscriptionId,
+    grantKey: input.grantKey,
+    amount: input.plan.monthlyCredits,
+    reason: input.reason,
+  });
+
+  if (grant.granted) {
+    await tx.userSubscription.update({
+      where: { id: input.subscriptionId },
+      data: {
+        lastCreditGrantAt: input.grantAt,
+        nextCreditGrantAt: nextGrantForPlan(input.plan, input.grantAt, input.currentPeriodEnd),
+      },
+    });
+  }
+}
+
+async function processSubscriptionCheckoutCompleted(tx: Prisma.TransactionClient, session: Stripe.Checkout.Session) {
+  const metadata = checkoutMetadata(session);
+  const planId = metadata.planId;
+  const userId = metadata.userId;
+  const stripeSubscriptionId = stripeObjectId(session.subscription);
+  if (!planId || !userId || !stripeSubscriptionId) {
+    throw new Error(`Subscription checkout session ${session.id} is missing required metadata`);
+  }
+
+  const plan = findSubscriptionPlanById(planId);
+  if (!plan.stripePriceId) {
+    throw new Error(`Subscription plan ${plan.id} is missing Stripe price id`);
+  }
+
+  const subscription = await upsertUserSubscription(tx, {
+    userId,
+    stripeSubscriptionId,
+    stripeCustomerId: stripeObjectId(session.customer),
+    stripeCheckoutSessionId: session.id,
+    plan,
+    status: session.payment_status === "paid" ? "active" : "incomplete",
+  });
+
+  const invoiceId = stripeObjectId(session.invoice);
+  if (session.payment_status === "paid" && invoiceId) {
+    const grantAt = stripeDate(session.created) ?? new Date();
+    await grantSubscriptionPeriodCredits(tx, {
+      subscriptionId: subscription.id,
+      stripeSubscriptionId,
+      userId,
+      plan,
+      grantKey: buildStripeInvoiceGrantKey(invoiceId),
+      grantAt,
+      reason: "Grant subscription credits after Stripe checkout completed",
+    });
+  }
+}
+
+async function processInvoicePaid(tx: Prisma.TransactionClient, invoice: Stripe.Invoice) {
+  const stripeSubscriptionId = invoiceSubscriptionId(invoice);
+  const stripePriceId = invoicePrimaryPriceId(invoice);
+  if (!stripeSubscriptionId || !stripePriceId) {
+    return;
+  }
+
+  const plan = findSubscriptionPlanByStripePriceId(stripePriceId);
+  const metadata = invoiceMetadata(invoice);
+  let subscription = await tx.userSubscription.findUnique({
+    where: { stripeSubscriptionId },
+  });
+
+  if (!subscription) {
+    if (!metadata.userId) {
+      throw new Error(`Cannot create local subscription for invoice ${invoice.id} without userId metadata`);
+    }
+    subscription = await upsertUserSubscription(tx, {
+      userId: metadata.userId,
+      stripeSubscriptionId,
+      stripeCustomerId: invoiceCustomerId(invoice),
+      plan,
+      status: "active",
+      currentPeriodStart: invoicePeriodStart(invoice),
+      currentPeriodEnd: invoicePeriodEnd(invoice),
+    });
+  } else {
+    subscription = await upsertUserSubscription(tx, {
+      userId: subscription.userId,
+      stripeSubscriptionId,
+      stripeCustomerId: invoiceCustomerId(invoice) ?? subscription.stripeCustomerId,
+      plan,
+      status: "active",
+      currentPeriodStart: invoicePeriodStart(invoice),
+      currentPeriodEnd: invoicePeriodEnd(invoice),
+    });
+  }
+
+  await grantSubscriptionPeriodCredits(tx, {
+    subscriptionId: subscription.id,
+    stripeSubscriptionId,
+    userId: subscription.userId,
+    plan,
+    grantKey: buildStripeInvoiceGrantKey(invoice.id),
+    grantAt: invoicePeriodStart(invoice),
+    currentPeriodEnd: invoicePeriodEnd(invoice),
+    reason: "Grant subscription credits after Stripe invoice paid",
+  });
+}
+
+async function processSubscriptionStatusUpdate(tx: Prisma.TransactionClient, subscription: Stripe.Subscription) {
+  const stripePriceId = subscriptionPriceId(subscription);
+  if (!stripePriceId) return;
+
+  const plan = findSubscriptionPlanByStripePriceId(stripePriceId);
+  const existing = await tx.userSubscription.findUnique({
+    where: { stripeSubscriptionId: subscription.id },
+  });
+  const metadata = subscription.metadata ?? {};
+  const userId = existing?.userId ?? metadata.userId;
+  if (!userId) return;
+
+  await upsertUserSubscription(tx, {
+    userId,
+    stripeSubscriptionId: subscription.id,
+    stripeCustomerId: stripeObjectId(subscription.customer),
+    plan,
+    status: subscription.status,
+    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    currentPeriodStart: subscriptionPeriodStart(subscription),
+    currentPeriodEnd: subscriptionPeriodEnd(subscription),
+  });
+}
+
 async function processCheckoutSessionCompleted(tx: Prisma.TransactionClient, session: Stripe.Checkout.Session) {
+  if (session.mode === "subscription") {
+    await processSubscriptionCheckoutCompleted(tx, session);
+    return;
+  }
+
   const payment = await findCheckoutPayment(tx, session);
 
   if (session.payment_status !== "paid") {
@@ -278,6 +555,13 @@ export async function POST(req: NextRequest) {
           event.type === "checkout.session.async_payment_succeeded"
         ) {
           await processCheckoutSessionCompleted(tx, event.data.object as Stripe.Checkout.Session);
+        } else if (event.type === "invoice.paid") {
+          await processInvoicePaid(tx, event.data.object as Stripe.Invoice);
+        } else if (
+          event.type === "customer.subscription.updated" ||
+          event.type === "customer.subscription.deleted"
+        ) {
+          await processSubscriptionStatusUpdate(tx, event.data.object as Stripe.Subscription);
         }
       });
     }

@@ -127,7 +127,14 @@
       "costTableModel": "Modell",
       "costTableSpec": "Einstellung",
       "costTableCredits": "Credits",
-      "costTableCreditValue": "{credits} Credits"
+      "costTableCreditValue": "{credits} Credits",
+      "subscriptionTitle": "Abonnements",
+      "billingMonthly": "Monatlich",
+      "billingAnnual": "Jährlich",
+      "perMonth": "/Monat",
+      "perYear": "/Jahr",
+      "creditsPerMonth": "Credits / Monat",
+      "annualBadge": "ca. 17% Rabatt"
     },
     "privacy": {
       "metaTitle": "Datenschutzerklärung",

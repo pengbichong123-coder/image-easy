@@ -127,7 +127,14 @@
       "costTableModel": "モデル",
       "costTableSpec": "設定",
       "costTableCredits": "クレジット",
-      "costTableCreditValue": "{credits} クレジット"
+      "costTableCreditValue": "{credits} クレジット",
+      "subscriptionTitle": "サブスクリプションプラン",
+      "billingMonthly": "月払い",
+      "billingAnnual": "年払い",
+      "perMonth": "/月",
+      "perYear": "/年",
+      "creditsPerMonth": "クレジット / 月",
+      "annualBadge": "約17%お得"
     },
     "privacy": {
       "metaTitle": "プライバシーポリシー",

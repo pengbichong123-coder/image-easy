@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { buildCheckoutReturnUrls } from "@/lib/stripe-checkout";
 import { getStripeClient } from "@/lib/stripe";
+import { isPaidCreditsEnabled } from "@/lib/pricing-mode";
+import { findSubscriptionPlanByStripePriceId } from "@/lib/subscription-plans";
 
 export const runtime = "nodejs";
 
@@ -22,6 +24,10 @@ function getAppUrl() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isPaidCreditsEnabled(process.env.ENABLE_PAID_CREDITS)) {
+    return NextResponse.json({ error: "Paid credits are not available" }, { status: 404 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -38,6 +44,53 @@ export async function POST(req: NextRequest) {
       },
       { status: 400 },
     );
+  }
+
+  const stripe = getStripeClient();
+  const { successUrl, cancelUrl } = buildCheckoutReturnUrls(getAppUrl(), body.locale);
+
+  try {
+    const subscriptionPlan = findSubscriptionPlanByStripePriceId(body.priceId);
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [
+        {
+          price: subscriptionPlan.stripePriceId!,
+          quantity: 1,
+        },
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      client_reference_id: session.user.id,
+      customer_email: session.user.email ?? undefined,
+      metadata: {
+        userId: session.user.id,
+        planId: subscriptionPlan.id,
+        tier: subscriptionPlan.tier,
+        interval: subscriptionPlan.interval,
+        monthlyCredits: String(subscriptionPlan.monthlyCredits),
+      },
+      subscription_data: {
+        metadata: {
+          userId: session.user.id,
+          planId: subscriptionPlan.id,
+          tier: subscriptionPlan.tier,
+          interval: subscriptionPlan.interval,
+          monthlyCredits: String(subscriptionPlan.monthlyCredits),
+        },
+      },
+    });
+
+    if (!checkoutSession.url) {
+      throw new Error("Stripe checkout session did not include a redirect URL");
+    }
+
+    return NextResponse.json({ url: checkoutSession.url });
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.startsWith("Unknown Stripe subscription price")) {
+      console.error("Subscription checkout creation failed", error);
+      return NextResponse.json({ error: "Checkout failed" }, { status: 500 });
+    }
   }
 
   const creditPackage = await prisma.creditPackage.findFirst({
@@ -79,8 +132,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const stripe = getStripeClient();
-    const { successUrl, cancelUrl } = buildCheckoutReturnUrls(getAppUrl(), body.locale);
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [

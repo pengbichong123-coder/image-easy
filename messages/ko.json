@@ -127,7 +127,14 @@
       "costTableModel": "모델",
       "costTableSpec": "설정",
       "costTableCredits": "크레딧",
-      "costTableCreditValue": "{credits} 크레딧"
+      "costTableCreditValue": "{credits} 크레딧",
+      "subscriptionTitle": "구독 요금제",
+      "billingMonthly": "월간",
+      "billingAnnual": "연간",
+      "perMonth": "/월",
+      "perYear": "/년",
+      "creditsPerMonth": "크레딧 / 월",
+      "annualBadge": "약 17% 할인"
     },
     "privacy": {
       "metaTitle": "개인정보 처리방침",

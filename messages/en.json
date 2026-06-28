@@ -127,7 +127,14 @@
       "costTableModel": "Model",
       "costTableSpec": "Setting",
       "costTableCredits": "Credits",
-      "costTableCreditValue": "{credits} credits"
+      "costTableCreditValue": "{credits} credits",
+      "subscriptionTitle": "Subscription plans",
+      "billingMonthly": "Monthly",
+      "billingAnnual": "Annual",
+      "perMonth": "/mo",
+      "perYear": "/yr",
+      "creditsPerMonth": "credits / month",
+      "annualBadge": "About 17% off"
     },
     "privacy": {
       "metaTitle": "Privacy Policy",

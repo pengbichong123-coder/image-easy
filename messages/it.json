@@ -127,7 +127,14 @@
       "costTableModel": "Modello",
       "costTableSpec": "Impostazione",
       "costTableCredits": "Crediti",
-      "costTableCreditValue": "{credits} crediti"
+      "costTableCreditValue": "{credits} crediti",
+      "subscriptionTitle": "Piani in abbonamento",
+      "billingMonthly": "Mensile",
+      "billingAnnual": "Annuale",
+      "perMonth": "/mese",
+      "perYear": "/anno",
+      "creditsPerMonth": "crediti / mese",
+      "annualBadge": "Circa 17% off"
     },
     "privacy": {
       "metaTitle": "Informativa sulla privacy",
