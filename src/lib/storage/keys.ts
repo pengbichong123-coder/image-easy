@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 function sanitizeKeySegment(value: string, fallback: string) {
   const sanitized = value
     .trim()
@@ -15,7 +17,7 @@ export function userUploadKey(userId: string, filename: string) {
   const safeUserId = sanitizeKeySegment(userId, "user");
   const safeFilename = sanitizeKeySegment(filename, "upload");
 
-  return `users/${safeUserId}/uploads/${Date.now()}-${safeFilename}`;
+  return `users/${safeUserId}/uploads/${Date.now()}-${randomUUID()}-${safeFilename}`;
 }
 
 export function generatedImageKey(userId: string, generationId: string, index: number, extension: string) {

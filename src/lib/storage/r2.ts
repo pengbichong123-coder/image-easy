@@ -1,7 +1,11 @@
+import "server-only";
+
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const DEFAULT_SIGNED_URL_TTL_SECONDS = 3600;
+const MAX_SIGNED_URL_TTL_SECONDS = 604800;
+const TTL_ERROR_MESSAGE = `R2_SIGNED_URL_TTL_SECONDS must be a positive safe integer no greater than ${MAX_SIGNED_URL_TTL_SECONDS}`;
 
 type R2Config = {
   accountId: string;
@@ -30,13 +34,13 @@ function parseSignedUrlTtl() {
   }
 
   if (!/^\d+$/.test(rawValue)) {
-    throw new Error("R2_SIGNED_URL_TTL_SECONDS must be a positive integer");
+    throw new Error(TTL_ERROR_MESSAGE);
   }
 
-  const ttl = Number.parseInt(rawValue, 10);
+  const ttl = Number(rawValue);
 
-  if (!Number.isFinite(ttl) || ttl <= 0) {
-    throw new Error("R2_SIGNED_URL_TTL_SECONDS must be a positive integer");
+  if (!Number.isSafeInteger(ttl) || ttl <= 0 || ttl > MAX_SIGNED_URL_TTL_SECONDS) {
+    throw new Error(TTL_ERROR_MESSAGE);
   }
 
   return ttl;
@@ -75,6 +79,16 @@ function publicAssetUrl(config: R2Config, key: string) {
   return `${config.publicBaseUrl}/${encodedKey}`;
 }
 
+function sanitizedRemoteImageUrl(value: string) {
+  try {
+    const url = new URL(value);
+
+    return `${url.origin}${url.pathname}`;
+  } catch {
+    return "remote image";
+  }
+}
+
 export async function putObjectToR2(input: {
   key: string;
   body: Buffer | Uint8Array;
@@ -109,11 +123,18 @@ export async function copyRemoteImageToR2(input: {
   sourceUrl: string;
   key: string;
 }): Promise<{ bucket: string; key: string; url?: string; size: number; mimeType: string }> {
-  const response = await fetch(input.sourceUrl);
+  const sanitizedSourceUrl = sanitizedRemoteImageUrl(input.sourceUrl);
+  let response: Response;
+
+  try {
+    response = await fetch(input.sourceUrl);
+  } catch {
+    throw new Error(`Failed to fetch remote image from ${sanitizedSourceUrl}`);
+  }
 
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch remote image from ${input.sourceUrl}: ${response.status} ${response.statusText}`,
+      `Failed to fetch remote image from ${sanitizedSourceUrl}: ${response.status} ${response.statusText}`,
     );
   }
 
