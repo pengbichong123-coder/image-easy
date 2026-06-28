@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="mark-bg" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827" />
+      <stop offset="0.56" stop-color="#172554" />
+      <stop offset="1" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="image-glow" x1="17" y1="19" x2="50" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#60a5fa" />
+      <stop offset="0.52" stop-color="#22d3ee" />
+      <stop offset="1" stop-color="#f97316" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#mark-bg)" />
+  <path
+    d="M18 20.5C18 18 20 16 22.5 16h19C44 16 46 18 46 20.5v23C46 46 44 48 41.5 48h-19C20 48 18 46 18 43.5v-23Z"
+    fill="none"
+    stroke="url(#image-glow)"
+    stroke-width="5"
+    stroke-linejoin="round"
+  />
+  <path d="M22 43 31.1 31.9a3 3 0 0 1 4.7.1L46 45H22Z" fill="#f8fafc" />
+  <path d="M18 44 25.6 34.2a3 3 0 0 1 4.8 0L38 44H18Z" fill="#dbeafe" />
+  <circle cx="40.5" cy="24.5" r="4.5" fill="#fbbf24" />
+  <path
+    d="M49.5 13.5 51 18l4.5 1.5L51 21l-1.5 4.5L48 21l-4.5-1.5L48 18l1.5-4.5Z"
+    fill="#67e8f9"
+  />
+</svg>

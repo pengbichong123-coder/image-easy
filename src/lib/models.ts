@@ -32,6 +32,8 @@ export type ModelCapability = "text-to-image" | "image-to-image";
 
 export interface ModelInfo {
   id: ModelId;
+  kieModel: string;
+  modelSlug: string;
   name: string;
   displayName: string;
   // Provider is i18n-agnostic — kept as a stable machine key.
@@ -55,9 +57,28 @@ export interface ModelInfo {
   recommended: boolean;
 }
 
+export interface ModelGroup {
+  slug: string;
+  displayName: string;
+  provider: ModelInfo["provider"];
+  recommended: boolean;
+  maxResolutionLabel: string;
+  descriptionKey: string;
+  capabilities: ModelInfo[];
+}
+
+export interface ModelParamsState {
+  aspectRatio?: AspectRatio;
+  resolution?: Resolution;
+  quality?: Quality;
+  outputFormat?: OutputFormat;
+}
+
 export const MODELS: Record<ModelId, ModelInfo> = {
   "gpt-image-2-text-to-image": {
     id: "gpt-image-2-text-to-image",
+    kieModel: "gpt-image-2-text-to-image",
+    modelSlug: "gpt-image-2",
     name: "GPT Image 2",
     displayName: "GPT Image 2",
     capability: "text-to-image",
@@ -96,6 +117,8 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "gpt-image-2-image-to-image": {
     id: "gpt-image-2-image-to-image",
+    kieModel: "gpt-image-2-image-to-image",
+    modelSlug: "gpt-image-2",
     name: "GPT Image 2 (i2i)",
     displayName: "GPT Image 2 (Edit)",
     capability: "image-to-image",
@@ -134,6 +157,8 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "seedream-4-5-text-to-image": {
     id: "seedream-4-5-text-to-image",
+    kieModel: "seedream/4.5-text-to-image",
+    modelSlug: "seedream-4-5",
     name: "Seedream 4.5",
     displayName: "Seedream 4.5",
     capability: "text-to-image",
@@ -164,6 +189,8 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "seedream-4-5-edit": {
     id: "seedream-4-5-edit",
+    kieModel: "seedream/4.5-edit",
+    modelSlug: "seedream-4-5",
     name: "Seedream 4.5 (Edit)",
     displayName: "Seedream 4.5 (Edit)",
     capability: "image-to-image",
@@ -194,6 +221,8 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "nano-banana-pro": {
     id: "nano-banana-pro",
+    kieModel: "nano-banana-pro",
+    modelSlug: "nano-banana-pro",
     name: "Nano Banana Pro",
     displayName: "Nano Banana Pro",
     capability: "image-to-image",
@@ -229,10 +258,69 @@ export const MODELS: Record<ModelId, ModelInfo> = {
 
 export const ALL_MODELS: ModelInfo[] = Object.values(MODELS);
 
+export const MODEL_GROUPS: ModelGroup[] = [
+  {
+    slug: "gpt-image-2",
+    displayName: "GPT Image 2",
+    provider: "openai",
+    recommended: true,
+    maxResolutionLabel: "4K",
+    descriptionKey: "gpt-image-2-text-to-image",
+    capabilities: [MODELS["gpt-image-2-text-to-image"], MODELS["gpt-image-2-image-to-image"]],
+  },
+  {
+    slug: "seedream-4-5",
+    displayName: "Seedream 4.5",
+    provider: "bytedance",
+    recommended: false,
+    maxResolutionLabel: "4K",
+    descriptionKey: "seedream-4-5-text-to-image",
+    capabilities: [MODELS["seedream-4-5-text-to-image"], MODELS["seedream-4-5-edit"]],
+  },
+  {
+    slug: "nano-banana-pro",
+    displayName: "Nano Banana Pro",
+    provider: "google",
+    recommended: true,
+    maxResolutionLabel: "4K",
+    descriptionKey: "nano-banana-pro",
+    capabilities: [MODELS["nano-banana-pro"]],
+  },
+];
+
 export function isImageToImageModel(id: ModelId): boolean {
   return MODELS[id].capability === "image-to-image";
 }
 
+export function getModelGroupByModelId(id: ModelId): ModelGroup {
+  const group = MODEL_GROUPS.find((item) => item.capabilities.some((model) => model.id === id));
+  if (!group) {
+    throw new Error(`Model group not found for ${id}`);
+  }
+
+  return group;
+}
+
 export function getModel(id: ModelId): ModelInfo {
   return MODELS[id];
+}
+
+function normalizeOption<T extends string>(
+  supported: boolean,
+  options: readonly T[],
+  current: T | undefined,
+) {
+  if (!supported) return undefined;
+  return current && options.includes(current) ? current : options[0];
+}
+
+export function normalizeModelParams(modelId: ModelId, params: ModelParamsState): ModelParamsState {
+  const model = MODELS[modelId];
+
+  return {
+    aspectRatio: normalizeOption(model.supportsAspectRatio, model.aspectRatioOptions, params.aspectRatio),
+    resolution: normalizeOption(model.supportsResolution, model.resolutionOptions, params.resolution),
+    quality: normalizeOption(model.supportsQuality, model.qualityOptions, params.quality),
+    outputFormat: normalizeOption(model.supportsOutputFormat, model.outputFormatOptions, params.outputFormat),
+  };
 }

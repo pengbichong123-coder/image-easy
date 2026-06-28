@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { parseJsonStringArray, resolveGenerationResultUrls } from "@/lib/generation-results";
+import { MODEL_GROUPS } from "@/lib/models";
+import { deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
+const GENERATION_STILL_PROCESSING_MESSAGE = "Generation is still processing. Please wait before deleting it.";
+
+async function getGenerationResultUrls(generation: {
+  resultUrls: string | null;
+  resultAssetKeys: string | null;
+}) {
+  return resolveGenerationResultUrls(generation, getSignedAssetUrl);
+}
 
 // GET /api/history?limit=30&cursor=xxx
 export async function GET(req: NextRequest) {
@@ -15,9 +26,17 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get("limit") ?? "30", 10), 100);
   const cursor = searchParams.get("cursor") ?? undefined;
   const model = searchParams.get("model") ?? undefined;
+  const modelGroupSlug = searchParams.get("modelGroup") ?? undefined;
+  const modelGroup = modelGroupSlug
+    ? MODEL_GROUPS.find((group) => group.slug === modelGroupSlug)
+    : undefined;
 
   const where: Record<string, unknown> = { userId: session.user.id };
-  if (model) where.model = model;
+  if (modelGroup) {
+    where.model = { in: modelGroup.capabilities.map((capability) => capability.id) };
+  } else if (model) {
+    where.model = model;
+  }
 
   const items = await prisma.generation.findMany({
     where,
@@ -34,22 +53,24 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({
-    items: items.map((g) => ({
-      id: g.id,
-      model: g.model,
-      prompt: g.prompt,
-      aspectRatio: g.aspectRatio,
-      resolution: g.resolution,
-      quality: g.quality,
-      outputFormat: g.outputFormat,
-      status: g.status,
-      resultUrls: g.resultUrls ? JSON.parse(g.resultUrls) : [],
-      errorMessage: g.errorMessage,
-      createdAt: g.createdAt,
-      upload: g.upload
-        ? { id: g.upload.id, url: g.upload.url, filename: g.upload.filename }
-        : null,
-    })),
+    items: await Promise.all(
+      items.map(async (g) => ({
+        id: g.id,
+        model: g.model,
+        prompt: g.prompt,
+        aspectRatio: g.aspectRatio,
+        resolution: g.resolution,
+        quality: g.quality,
+        outputFormat: g.outputFormat,
+        status: g.status,
+        resultUrls: await getGenerationResultUrls(g),
+        errorMessage: g.errorMessage,
+        createdAt: g.createdAt,
+        upload: g.upload
+          ? { id: g.upload.id, url: g.upload.url, filename: g.upload.filename }
+          : null,
+      })),
+    ),
     nextCursor,
   });
 }
@@ -65,11 +86,62 @@ export async function DELETE(req: NextRequest) {
   if (!id) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
-  const result = await prisma.generation.deleteMany({
-    where: { id, userId: session.user.id },
+
+  const { found, isProcessing, resultAssetKeys } = await prisma.$transaction(async (tx) => {
+    const generation = await tx.generation.findFirst({
+      where: { id, userId: session.user.id },
+      select: {
+        id: true,
+        status: true,
+        resultAssetKeys: true,
+      },
+    });
+
+    if (!generation) {
+      return { found: false, isProcessing: false, resultAssetKeys: [] };
+    }
+
+    if (generation.status === "pending" || generation.status === "processing") {
+      return { found: true, isProcessing: true, resultAssetKeys: [] };
+    }
+
+    const resultAssetKeys = parseJsonStringArray(generation.resultAssetKeys);
+    if (resultAssetKeys.length > 0) {
+      await tx.asset.deleteMany({
+        where: {
+          userId: session.user.id,
+          key: { in: resultAssetKeys },
+        },
+      });
+    }
+
+    await tx.generation.deleteMany({
+      where: { id: generation.id, userId: session.user.id },
+    });
+
+    return { found: true, isProcessing: false, resultAssetKeys };
   });
-  if (result.count === 0) {
+
+  if (!found) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+
+  if (isProcessing) {
+    return NextResponse.json(
+      { error: GENERATION_STILL_PROCESSING_MESSAGE },
+      { status: 409 },
+    );
+  }
+
+  await Promise.all(
+    resultAssetKeys.map(async (key) => {
+      try {
+        await deleteObjectFromR2(key);
+      } catch {
+        console.error("Failed to delete generated R2 object");
+      }
+    }),
+  );
+
   return NextResponse.json({ success: true });
 }

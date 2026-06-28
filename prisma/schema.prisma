@@ -55,45 +55,81 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts   Account[]
-  sessions   Session[]
+  accounts    Account[]
+  sessions    Session[]
   generations Generation[]
-  uploads    Upload[]
+  uploads     Upload[]
+  assets      Asset[]
+  creditTransactions CreditTransaction[]
+  payments    Payment[]
+  subscriptions UserSubscription[]
+  billingEvents BillingEvent[]
 }
 
 model Upload {
-  id        String   @id @default(cuid())
-  userId    String
-  url       String
-  filename  String
-  size      Int
-  mimeType  String
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  url         String
+  filename    String
+  size        Int
+  mimeType    String
+  r2Key       String?
+  r2Url       String?
+  providerUrl String?
+  createdAt   DateTime @default(now())
 
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   generations Generation[]
 
   @@index([userId])
+  @@index([userId, createdAt])
+}
+
+model Asset {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String // upload, generated
+  bucket    String
+  key       String   @unique
+  url       String?
+  filename  String
+  mimeType  String
+  size      Int
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([kind])
+  @@index([createdAt])
 }
 
 model Generation {
-  id          String   @id @default(cuid())
-  userId      String
-  model       String   // gpt-image-2, gpt-image-2-i2i, seedream-4-5, seedream-4-5-t2i, nano-banana-pro
-  prompt      String
+  id             String   @id @default(cuid())
+  userId         String
+  model          String // gpt-image-2, gpt-image-2-i2i, seedream-4-5, seedream-4-5-t2i, nano-banana-pro
+  prompt         String
   negativePrompt String?
-  aspectRatio String?
-  resolution  String?
-  quality     String?
-  outputFormat String?
-  imageCount  Int      @default(1)
-  taskId      String?
-  status      String   @default("pending") // pending, processing, completed, failed
-  errorMessage String?
-  resultUrls  String?  // JSON array of image URLs
-  uploadId    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  aspectRatio    String?
+  resolution     String?
+  quality        String?
+  outputFormat   String?
+  imageCount     Int      @default(1)
+  taskId         String?
+  status         String   @default("pending") // pending, processing, completed, failed
+  errorMessage   String?
+  resultUrls     String? // JSON array of image URLs
+  resultAssetKeys String? // JSON array of generated R2 asset keys
+  storageStatus  String? // processing, completed, failed
+  storageStartedAt DateTime?
+  storageAttemptId String?
+  providerPollErrorCount Int @default(0)
+  providerPollErrorCode String?
+  uploadId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   upload Upload? @relation(fields: [uploadId], references: [id], onDelete: SetNull)
@@ -101,4 +137,129 @@ model Generation {
   @@index([userId])
   @@index([taskId])
   @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([userId, status, createdAt])
+}
+
+model CreditTransaction {
+  id           String   @id @default(cuid())
+  userId       String
+  generationId String?
+  paymentId    String?
+  subscriptionId String?
+  subscriptionGrantKey String? @unique
+  type         String   // grant, reserve, consume, refund, purchase, admin_adjust
+  amount       Int
+  balanceAfter Int
+  reason       String
+  metadata     String?
+  createdAt    DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  subscription UserSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([generationId])
+  @@index([paymentId])
+  @@index([subscriptionId])
+  @@index([createdAt])
+  @@unique([generationId, type])
+  @@unique([paymentId, type])
+}
+
+model CreditPackage {
+  id            String   @id @default(cuid())
+  name          String
+  credits       Int
+  priceCents    Int
+  currency      String   @default("usd")
+  stripePriceId String   @unique
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model Payment {
+  id                      String   @id @default(cuid())
+  userId                  String
+  stripeCheckoutSessionId String?  @unique
+  stripePaymentIntentId   String?  @unique
+  amountCents             Int
+  currency                String
+  credits                 Int
+  status                  String   // pending, paid, failed, canceled
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditTransactions CreditTransaction[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model BillingEvent {
+  id                    String   @id @default(cuid())
+  userId                String
+  subscriptionId        String?
+  stripeEventId         String   @unique
+  stripeInvoiceId       String?
+  stripePaymentIntentId String?
+  stripeChargeId        String?
+  stripeRefundId        String?
+  type                  String   // checkout_completed, invoice_paid, invoice_payment_failed, refund_created
+  status                String   // paid, failed, refunded, informational
+  amountCents           Int?
+  currency              String?
+  description           String?
+  hostedInvoiceUrl      String?
+  invoicePdf            String?
+  occurredAt            DateTime
+  metadata              String?
+  createdAt             DateTime @default(now())
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription UserSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@index([subscriptionId])
+  @@index([type])
+  @@index([status])
+}
+
+model UserSubscription {
+  id                      String   @id @default(cuid())
+  userId                  String
+  stripeSubscriptionId    String   @unique
+  stripeCustomerId        String?
+  stripeCheckoutSessionId String?  @unique
+  stripePriceId           String
+  planId                  String
+  tier                    String
+  interval                String   // month, year
+  status                  String   // active, trialing, past_due, canceled, incomplete, incomplete_expired, unpaid
+  monthlyCredits          Int
+  currency                String   @default("usd")
+  cancelAtPeriodEnd       Boolean  @default(false)
+  currentPeriodStart      DateTime?
+  currentPeriodEnd        DateTime?
+  lastCreditGrantAt       DateTime?
+  nextCreditGrantAt       DateTime?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditTransactions CreditTransaction[]
+  billingEvents BillingEvent[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([interval, nextCreditGrantAt])
+  @@index([stripeCustomerId])
+}
+
+model StripeWebhookEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
 }

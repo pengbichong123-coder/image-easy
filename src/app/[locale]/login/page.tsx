@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { SiteFooter } from "@/components/SiteFooter";
 import { LoginContent } from "./login-content";
 import { generatePageMetadata } from "@/lib/page-metadata";
 
@@ -13,8 +14,11 @@ export async function generateMetadata({
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={null}>
-      <LoginContent />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <LoginContent />
+      </Suspense>
+      <SiteFooter variant="compact" />
+    </>
   );
 }

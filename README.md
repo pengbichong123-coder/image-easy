@@ -40,6 +40,16 @@ cp .env.example .env
 - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`: Google OAuth 凭据
 - `AUTH_SECRET`: 一个 32+ 字符的随机字符串（生产环境）
 - `KIE_API_KEY`: kie.ai 的 API key
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID`: Google Analytics 4 Measurement ID，例如 `G-XXXXXXXXXX`；不配置则不加载 GA
+- `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET_NAME`: Cloudflare R2 存储桶配置
+- `R2_PUBLIC_BASE_URL`: R2 自定义域名或公开访问基础 URL；如果使用私有桶和签名 URL，可以留空
+- `R2_SIGNED_URL_TTL_SECONDS`: R2 签名下载 URL 的有效期，默认 `3600`
+- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`: Stripe Checkout 和 webhook 服务端密钥
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe 前端 publishable key
+- `ENABLE_PAID_CREDITS`: 设置为 `true` 后显示订阅套餐并允许创建 Stripe Checkout
+- `STRIPE_PRICE_ENV`: 当前使用哪套套餐价格配置，`sandbox` 或 `production`；套餐详情和 Price ID 在 `src/config/pricing.ts` 中维护
+- `CRON_SECRET`: Vercel Cron 调用年付月度积分发放接口的密钥
+- `NEXT_PUBLIC_APP_URL`: 站点公开 URL，生产环境使用 `https://www.image-easy.com`
 
 ### 3. 初始化数据库
 
@@ -142,6 +152,61 @@ docker-compose.yml                         # PostgreSQL
 ### 生产数据库
 
 把 `DATABASE_URL` 换成生产 PostgreSQL（Neon / Supabase / RDS 都行），跑 `npx prisma db push`。
+
+本项目当前用 `npx prisma db push` / `npm run db:push` 应用 schema 变更；生产环境必须先对生产数据库执行同步，再部署会写入新字段的路由（例如 `Upload.r2Key`、`Asset`、`Generation.resultAssetKeys`、`Generation.storageStatus`、`Generation.storageStartedAt`、`Generation.storageAttemptId`）。
+
+### 环境变量
+
+生产环境除了数据库、Auth 和 kie.ai 配置外，还需要按实际部署方式配置 R2：
+
+```text
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=
+R2_PUBLIC_BASE_URL=
+R2_SIGNED_URL_TTL_SECONDS=3600
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+ENABLE_PAID_CREDITS=false
+STRIPE_PRICE_ENV=sandbox
+CRON_SECRET=
+NEXT_PUBLIC_APP_URL=https://www.image-easy.com
+```
+
+- `R2_ACCOUNT_ID`: Cloudflare 账户 ID，用于拼接 R2 S3 API endpoint。
+- `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`: R2 API Token 的访问密钥，不要提交到代码仓库。
+- `R2_BUCKET_NAME`: 保存用户上传图和生成结果的 R2 bucket 名称。
+- `R2_PUBLIC_BASE_URL`: 如果 bucket 绑定了公开域名，填完整基础 URL；私有 bucket 或只使用签名 URL 时可以留空。
+- `R2_SIGNED_URL_TTL_SECONDS`: 私有资源签名 URL 的有效期秒数，未配置时默认 `3600`。
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID`: Google Analytics 4 Measurement ID；缺省时前端不会注入 GA 脚本。
+- `STRIPE_SECRET_KEY`: Stripe secret key，用于服务端创建 Checkout Session。
+- `STRIPE_WEBHOOK_SECRET`: Stripe webhook endpoint secret，用于 `/api/stripe/webhook` 验签。
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe publishable key，供前端 Stripe 集成使用。
+- `ENABLE_PAID_CREDITS`: 生产打开支付时设为 `true`；未开启时价格页只展示限时免费说明。
+- `STRIPE_PRICE_ENV`: 设置为 `sandbox` 使用沙盒 Price ID，设置为 `production` 使用正式 Price ID。套餐详情、价格、级别、类型和 Price ID 在 `src/config/pricing.ts` 中维护。
+- `CRON_SECRET`: 保护 `/api/cron/subscription-credits`。年付订阅首月由 Stripe webhook 发放，后续每月由 Vercel Cron 发放。
+- `NEXT_PUBLIC_APP_URL`: Checkout success/cancel 回跳的公开站点 URL，生产环境设置为 `https://www.image-easy.com`。
+
+### Stripe webhook 事件
+
+Stripe webhook endpoint 配置为：
+
+```text
+https://www.image-easy.com/api/stripe/webhook
+```
+
+至少勾选这些事件：
+
+- `checkout.session.completed`
+- `checkout.session.expired`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.async_payment_failed`
+- `invoice.paid`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
 
 ## License
 

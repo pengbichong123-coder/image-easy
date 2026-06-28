@@ -55,8 +55,16 @@ export const localeOgLocale: Record<Locale, string> = {
 export const pathnames = {
   "/": "/",
   "/create": "/create",
-  "/my-images": "/my-images",
+  "/creations": "/creations",
   "/login": "/login",
+  "/pricing": "/pricing",
+  "/billing": "/billing",
+  "/examples": "/examples",
+  "/privacy": "/privacy",
+  "/terms": "/terms",
+  "/legal": "/legal",
+  "/contact": "/contact",
+  "/about": "/about",
 } as const;
 
 export const routing = {

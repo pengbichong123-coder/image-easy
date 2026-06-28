@@ -7,6 +7,13 @@ import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { locales, localeLabels, type Locale } from "@/i18n/routing";
 
+type AccountSummary = {
+  credits: number;
+  planTier: string | null;
+  planInterval: string | null;
+  planStatus: string | null;
+};
+
 export function Header() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
@@ -17,6 +24,7 @@ export function Header() {
   const tLanguage = useTranslations("language");
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [accountSummary, setAccountSummary] = useState<AccountSummary | null>(null);
   const [, startTransition] = useTransition();
 
   function switchLocale(next: Locale) {
@@ -25,6 +33,34 @@ export function Header() {
       router.replace(pathname, { locale: next });
     });
   }
+
+  async function refreshAccountSummary() {
+    try {
+      const response = await fetch("/api/account/summary", {
+        cache: "no-store",
+      });
+      if (!response.ok) return;
+      const summary = await response.json() as AccountSummary;
+      setAccountSummary(summary);
+    } catch {
+      // Keep the session snapshot as a fallback when the summary endpoint is unavailable.
+    }
+  }
+
+  function toggleAccountMenu() {
+    const nextOpen = !menuOpen;
+    setMenuOpen(nextOpen);
+    if (nextOpen) {
+      refreshAccountSummary();
+    }
+  }
+
+  const accountPlanLabel = formatAccountPlanLabel({
+    interval: accountSummary?.planInterval ?? session?.user?.planInterval,
+    locale,
+    tier: accountSummary?.planTier ?? session?.user?.planTier,
+  });
+  const accountCredits = accountSummary?.credits ?? session?.user?.credits ?? 0;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-[#D2D2D7]/40">
@@ -37,8 +73,9 @@ export function Header() {
         {/* Center nav — Apple product style */}
         <nav className="hidden md:flex items-center">
           <NavItem href="/" label={tNav("atelier")} pathname={pathname} />
+          <NavItem href="/pricing" label={tNav("pricing")} pathname={pathname} />
           <NavItem href="/create" label={tNav("expose")} pathname={pathname} />
-          <NavItem href="/my-images" label={tNav("archive")} pathname={pathname} />
+          <NavItem href="/creations" label={tNav("archive")} pathname={pathname} />
         </nav>
 
         {/* Right */}
@@ -84,7 +121,7 @@ export function Header() {
           ) : session?.user ? (
             <div className="relative">
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
+                onClick={toggleAccountMenu}
                 className="flex items-center gap-2 hover:opacity-70 transition-opacity"
               >
                 {session.user.image ? (
@@ -112,17 +149,29 @@ export function Header() {
                     <div className="text-[11px] text-[#6E6E73] truncate">
                       {session.user.email}
                     </div>
-                    <div className="text-[11px] text-[#1D1D1F] mt-2 tabular">
-                      {session.user.credits ?? 0} credits
+                    <div className="text-[11px] text-[#1D1D1F] mt-2 font-medium">
+                      {accountPlanLabel}
+                    </div>
+                    <div className="text-[11px] text-[#6E6E73] mt-1 tabular">
+                      {locale === "zh"
+                        ? `${accountCredits} 积分`
+                        : `${accountCredits} credits`}
                     </div>
                   </div>
                   <div className="p-1">
                     <Link
-                      href="/my-images"
+                      href="/pricing"
                       onClick={() => setMenuOpen(false)}
                       className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
                     >
-                      {tNav("archive")}
+                      {tNav("pricing")}
+                    </Link>
+                    <Link
+                      href="/billing"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
+                    >
+                      {tNav("billing")}
                     </Link>
                     <Link
                       href="/create"
@@ -130,6 +179,13 @@ export function Header() {
                       className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
                     >
                       {tNav("expose")}
+                    </Link>
+                    <Link
+                      href="/creations"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
+                    >
+                      {tNav("archive")}
                     </Link>
                   </div>
                   <div className="border-t border-[#E5E5E7] p-1">
@@ -157,12 +213,33 @@ export function Header() {
   );
 }
 
+function formatAccountPlanLabel({
+  interval,
+  locale,
+  tier,
+}: {
+  interval?: string | null;
+  locale: string;
+  tier?: string | null;
+}) {
+  if (!tier) return locale === "zh" ? "免费套餐" : "Free";
+
+  const planName = tier.charAt(0).toUpperCase() + tier.slice(1);
+  if (interval === "month") {
+    return `${planName} · ${locale === "zh" ? "月付" : "Monthly"}`;
+  }
+  if (interval === "year") {
+    return `${planName} · ${locale === "zh" ? "年付" : "Annual"}`;
+  }
+  return planName;
+}
+
 function NavItem({
   href,
   label,
   pathname,
 }: {
-  href: "/" | "/create" | "/my-images";
+  href: "/" | "/create" | "/pricing" | "/billing" | "/creations";
   label: string;
   pathname: string;
 }) {

@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Suspense } from "react";
 import { ModelSelector } from "@/components/ModelSelector";
 import { ModelParams } from "@/components/ModelParams";
 import { PromptInput } from "@/components/PromptInput";
 import { ImageUploader, type UploadedImage } from "@/components/ImageUploader";
 import { GenerationResult, type GenerationOutput } from "@/components/GenerationResult";
+import { trackEvent, type AnalyticsParams } from "@/lib/analytics";
+import { getGenerationCreditCost } from "@/lib/generation-credit-cost";
 import {
   MODELS,
   type ModelId,
@@ -18,15 +20,19 @@ import {
   type Quality,
   type OutputFormat,
   isImageToImageModel,
+  normalizeModelParams,
 } from "@/lib/models";
 
 export function CreateContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
   const t = useTranslations("create");
   const tCommon = useTranslations("common");
   const tAuth = useTranslations("auth");
+  const reuseId = searchParams.get("reuse");
+  const trackedReuseIds = useRef<Set<string>>(new Set());
 
   // Form state
   const [modelId, setModelId] = useState<ModelId>("gpt-image-2-text-to-image");
@@ -42,8 +48,63 @@ export function CreateContent() {
   const [output, setOutput] = useState<GenerationOutput | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [insufficientCredits, setInsufficientCredits] = useState(false);
 
   const modelInfo = MODELS[modelId];
+  const normalizedParams = useMemo(
+    () =>
+      normalizeModelParams(modelId, {
+        aspectRatio,
+        resolution,
+        quality,
+        outputFormat,
+      }),
+    [aspectRatio, modelId, outputFormat, quality, resolution],
+  );
+  const estimatedCredits = getGenerationCreditCost({
+    model: modelId,
+    aspectRatio: normalizedParams.aspectRatio,
+    resolution: normalizedParams.resolution,
+    quality: normalizedParams.quality,
+    outputFormat: normalizedParams.outputFormat,
+  });
+
+  function commonAnalyticsParams(
+    status: string,
+    model: ModelId = modelId,
+    hasReferenceImage = images.length > 0,
+  ): AnalyticsParams {
+    return buildCommonAnalyticsParams(status, locale, model, hasReferenceImage);
+  }
+
+  function handleModelChange(nextModelId: ModelId) {
+    if (nextModelId !== modelId) {
+      trackEvent("select_model", commonAnalyticsParams("selected", nextModelId));
+    }
+    setModelId(nextModelId);
+  }
+
+  function handleUpload(uploaded: UploadedImage[]) {
+    trackEvent("upload_image", {
+      ...commonAnalyticsParams("uploaded", modelId, images.length + uploaded.length > 0),
+      image_count: uploaded.length,
+      total_image_count: images.length + uploaded.length,
+    });
+  }
+
+  function trackResultAction(name: "download_result" | "copy_result_url", index: number) {
+    if (!output) return;
+    const outputModel = isModelId(output.model) ? output.model : modelId;
+    trackEvent(name, {
+      ...commonAnalyticsParams(
+        name === "download_result" ? "downloaded" : "copied",
+        outputModel,
+        output.hasReferenceImage ?? images.length > 0,
+      ),
+      task_id: output.taskId,
+      result_index: index,
+    });
+  }
 
   // Load model from query string
   useEffect(() => {
@@ -53,24 +114,27 @@ export function CreateContent() {
 
   // Reuse from history
   useEffect(() => {
-    const reuseId = searchParams.get("reuse");
     if (!reuseId) return;
+    let cancelled = false;
     fetch("/api/history?limit=50")
       .then((r) => r.json())
       .then((data) => {
+        if (cancelled) return;
         const item = data.items?.find(
           (i: { id: string; model: string; prompt: string; aspectRatio?: string; resolution?: string; quality?: string; outputFormat?: string; resultUrls?: string[] }) =>
             i.id === reuseId,
         );
         if (!item) return;
-        setModelId(item.model as ModelId);
+        if (!isModelId(item.model)) return;
+        const hasReferenceImage = isImageToImageModel(item.model) && Boolean(item.resultUrls?.[0]);
+        setModelId(item.model);
         setPrompt(item.prompt);
         if (item.aspectRatio) setAspectRatio(item.aspectRatio as AspectRatio);
         if (item.resolution) setResolution(item.resolution as Resolution);
         if (item.quality) setQuality(item.quality as Quality);
         if (item.outputFormat) setOutputFormat(item.outputFormat as OutputFormat);
 
-        if (isImageToImageModel(item.model as ModelId) && item.resultUrls?.[0]) {
+        if (hasReferenceImage && item.resultUrls?.[0]) {
           const refUrl = item.resultUrls[0];
           setImages([
             {
@@ -81,17 +145,27 @@ export function CreateContent() {
             },
           ]);
         }
+        if (!trackedReuseIds.current.has(reuseId)) {
+          trackedReuseIds.current.add(reuseId);
+          trackEvent("reuse_prompt", {
+            ...buildCommonAnalyticsParams("loaded", locale, item.model, hasReferenceImage),
+            reuse_id: reuseId,
+          });
+        }
       })
       .catch(() => {});
-  }, [searchParams]);
+    return () => {
+      cancelled = true;
+    };
+  }, [reuseId, locale]);
 
-  // Reset params not supported by current model
+  // Keep model-specific params valid as users switch between providers.
   useEffect(() => {
-    if (!modelInfo.supportsAspectRatio) setAspectRatio(undefined);
-    if (!modelInfo.supportsResolution) setResolution(undefined);
-    if (!modelInfo.supportsQuality) setQuality(undefined);
-    if (!modelInfo.supportsOutputFormat) setOutputFormat(undefined);
-  }, [modelId, modelInfo]);
+    if (normalizedParams.aspectRatio !== aspectRatio) setAspectRatio(normalizedParams.aspectRatio);
+    if (normalizedParams.resolution !== resolution) setResolution(normalizedParams.resolution);
+    if (normalizedParams.quality !== quality) setQuality(normalizedParams.quality);
+    if (normalizedParams.outputFormat !== outputFormat) setOutputFormat(normalizedParams.outputFormat);
+  }, [aspectRatio, modelId, normalizedParams, outputFormat, quality, resolution]);
 
   if (status === "loading") {
     return (
@@ -130,22 +204,30 @@ export function CreateContent() {
     if (!prompt.trim()) return;
     if (isImageToImageModel(modelId) && images.length === 0) {
       setError(t("errorRequiresImage"));
+      setInsufficientCredits(false);
       return;
     }
     setLoading(true);
     setError(null);
+    setInsufficientCredits(false);
     setOutput(null);
+    const submittedModelId = modelId;
+    const submittedHasReferenceImage = isImageToImageModel(submittedModelId) && images.length > 0;
     try {
+      trackEvent(
+        "submit_generation",
+        commonAnalyticsParams("submitted", submittedModelId, submittedHasReferenceImage),
+      );
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: modelId,
           prompt: prompt.trim(),
-          aspectRatio: aspectRatio,
-          resolution: resolution,
-          quality: quality,
-          outputFormat: outputFormat,
+          aspectRatio: normalizedParams.aspectRatio,
+          resolution: normalizedParams.resolution,
+          quality: normalizedParams.quality,
+          outputFormat: normalizedParams.outputFormat,
           uploadIds: images.filter((i) => i.uploadId).map((i) => i.uploadId!),
           imageUrls: images.filter((i) => !i.uploadId).map((i) => i.url),
           nsfwChecker: nsfwChecker || undefined,
@@ -157,15 +239,29 @@ export function CreateContent() {
       }
       const data = await res.json();
       const completed = await pollGeneration(data.id);
+      trackEvent("generation_completed", {
+        ...commonAnalyticsParams("completed", submittedModelId, submittedHasReferenceImage),
+        task_id: completed.taskId || data.id,
+        result_count: completed.resultUrls?.length || 0,
+        cost_time: completed.costTime,
+      });
       setOutput({
         resultUrls: completed.resultUrls || [],
         taskId: completed.taskId,
         costTime: completed.costTime,
         prompt: prompt.trim(),
-        model: modelId,
+        model: submittedModelId,
+        hasReferenceImage: submittedHasReferenceImage,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : tCommon("error"));
+      const message = e instanceof Error ? e.message : tCommon("error");
+      const failureReason = classifyGenerationFailure(message);
+      trackEvent("generation_failed", {
+        ...commonAnalyticsParams("failed", submittedModelId, submittedHasReferenceImage),
+        failure_reason: failureReason,
+      });
+      setInsufficientCredits(failureReason === "insufficient_credits");
+      setError(failureReason === "insufficient_credits" ? t("errorInsufficientCredits") : message);
     } finally {
       setLoading(false);
     }
@@ -196,7 +292,7 @@ export function CreateContent() {
           {/* 01 — Instrument */}
           <section>
             <SectionLabel num={t("section1Num")} label={t("section1Label")} />
-            <ModelSelector value={modelId} onChange={setModelId} />
+            <ModelSelector value={modelId} onChange={handleModelChange} />
           </section>
 
           {/* 02 — References (only for I2I) */}
@@ -209,6 +305,7 @@ export function CreateContent() {
                   onChange={setImages}
                   maxImages={modelInfo.maxInputImages}
                   disabled={loading}
+                  onUpload={handleUpload}
                 />
                 {images.length === 0 && (
                   <p className="text-[12px] text-[#86868B] mt-3 pt-3 border-t border-[#E5E5E7]">
@@ -239,6 +336,9 @@ export function CreateContent() {
               canSubmit={canSubmit}
               submitting={loading}
             />
+            <p className="mt-3 text-[12px] text-[#86868B]">
+              {t("estimatedCredits", { credits: estimatedCredits })}
+            </p>
           </section>
 
           {/* 04 — Settings */}
@@ -250,10 +350,10 @@ export function CreateContent() {
             <div className="bg-[#F5F5F7] rounded-[18px] p-5">
               <ModelParams
                 modelId={modelId}
-                aspectRatio={aspectRatio}
-                resolution={resolution}
-                quality={quality}
-                outputFormat={outputFormat}
+                aspectRatio={normalizedParams.aspectRatio}
+                resolution={normalizedParams.resolution}
+                quality={normalizedParams.quality}
+                outputFormat={normalizedParams.outputFormat}
                 nsfwChecker={nsfwChecker}
                 onAspectRatioChange={setAspectRatio}
                 onResolutionChange={setResolution}
@@ -273,15 +373,85 @@ export function CreateContent() {
               output={output}
               loading={loading}
               error={error}
+              errorAction={
+                insufficientCredits
+                  ? { href: "/pricing", label: t("pricingCta") }
+                  : undefined
+              }
               prompt={prompt}
               model={modelId}
               onRegenerate={canSubmit ? handleSubmit : undefined}
+              onDownloadResult={(index) => trackResultAction("download_result", index)}
+              onCopyResultUrl={(index) => trackResultAction("copy_result_url", index)}
             />
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function buildCommonAnalyticsParams(
+  status: string,
+  locale: string,
+  model: ModelId,
+  hasReferenceImage: boolean,
+): AnalyticsParams {
+  return {
+    model,
+    capability: MODELS[model].capability,
+    locale,
+    has_reference_image: hasReferenceImage,
+    status,
+  };
+}
+
+function isModelId(value: unknown): value is ModelId {
+  return typeof value === "string" && value in MODELS;
+}
+
+function classifyGenerationFailure(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("timeout") || normalized.includes("timed out")) {
+    return "timeout";
+  }
+  if (
+    normalized.includes("rate limit") ||
+    normalized.includes("rate_limited") ||
+    normalized.includes("too many requests") ||
+    normalized.includes("429")
+  ) {
+    return "rate_limited";
+  }
+  if (
+    normalized.includes("insufficient") ||
+    normalized.includes("credit") ||
+    normalized.includes("balance") ||
+    normalized.includes("payment")
+  ) {
+    return "insufficient_credits";
+  }
+  if (
+    normalized.includes("validation") ||
+    normalized.includes("invalid") ||
+    normalized.includes("required") ||
+    normalized.includes("bad request") ||
+    normalized.includes("400")
+  ) {
+    return "validation_error";
+  }
+  if (
+    normalized.includes("provider") ||
+    normalized.includes("storage") ||
+    normalized.includes("upload") ||
+    normalized.includes("s3") ||
+    normalized.includes("kie")
+  ) {
+    return "provider_or_storage_error";
+  }
+
+  return "unknown";
 }
 
 async function pollGeneration(id: string) {
@@ -320,4 +490,3 @@ function SectionLabel({ num, label }: { num: string; label: string }) {
     </div>
   );
 }
-

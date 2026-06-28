@@ -5,10 +5,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { HistoryGrid, type HistoryItem } from "@/components/HistoryGrid";
-import { ALL_MODELS, type ModelId } from "@/lib/models";
+import {
+  getHistoryItemsNeedingStatusRefresh,
+  mergeHistoryItemStatusRefresh,
+} from "@/lib/history-status-refresh";
+import { MODEL_GROUPS } from "@/lib/models";
 import { cn } from "@/lib/utils";
 
-export function MyImagesContent() {
+export function CreationsContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const t = useTranslations("archive");
@@ -16,7 +20,35 @@ export function MyImagesContent() {
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
+  const [modelFilter, setModelFilter] = useState<string | "all">("all");
+
+  const refreshProcessingItems = useCallback(async (historyItems: HistoryItem[]) => {
+    const ids = getHistoryItemsNeedingStatusRefresh(historyItems);
+    if (ids.length === 0) return;
+
+    const results = await Promise.allSettled(
+      ids.map(async (id) => {
+        const res = await fetch(`/api/generate/${id}`, { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok && data.status !== "failed") {
+          throw new Error(data.error || "Failed to refresh generation status");
+        }
+
+        return data as Partial<HistoryItem> & { id: string };
+      }),
+    );
+
+    const refreshedItems = results
+      .filter((result): result is PromiseFulfilledResult<Partial<HistoryItem> & { id: string }> => result.status === "fulfilled")
+      .map((result) => result.value);
+
+    if (refreshedItems.length === 0) return;
+
+    setItems((currentItems) => refreshedItems.reduce(
+      (nextItems, refreshedItem) => mergeHistoryItemStatusRefresh(nextItems, refreshedItem),
+      currentItems,
+    ));
+  }, []);
 
   const load = useCallback(
     async (cursor?: string) => {
@@ -25,10 +57,10 @@ export function MyImagesContent() {
         const params = new URLSearchParams();
         params.set("limit", "24");
         if (cursor) params.set("cursor", cursor);
-        if (modelFilter !== "all") params.set("model", modelFilter);
+        if (modelFilter !== "all") params.set("modelGroup", modelFilter);
         const res = await fetch("/api/history?" + params.toString());
         if (res.status === 401) {
-          router.push("/login?callbackUrl=/my-images");
+          router.push("/login?callbackUrl=/creations");
           return;
         }
         const data = await res.json();
@@ -36,19 +68,20 @@ export function MyImagesContent() {
           setItems((prev) => [...prev, ...data.items]);
         } else {
           setItems(data.items);
+          void refreshProcessingItems(data.items);
         }
         setNextCursor(data.nextCursor);
       } finally {
         setLoading(false);
       }
     },
-    [router, modelFilter],
+    [router, modelFilter, refreshProcessingItems],
   );
 
   useEffect(() => {
     if (status === "loading") return;
     if (!session) {
-      router.push("/login?callbackUrl=/my-images");
+      router.push("/login?callbackUrl=/creations");
       return;
     }
     load();
@@ -93,12 +126,12 @@ export function MyImagesContent() {
           onClick={() => setModelFilter("all")}
           label={t("filterAll")}
         />
-        {ALL_MODELS.map((m) => (
+        {MODEL_GROUPS.map((modelGroup) => (
           <FilterPill
-            key={m.id}
-            active={modelFilter === m.id}
-            onClick={() => setModelFilter(m.id)}
-            label={m.displayName}
+            key={modelGroup.slug}
+            active={modelFilter === modelGroup.slug}
+            onClick={() => setModelFilter(modelGroup.slug)}
+            label={modelGroup.displayName}
           />
         ))}
       </div>

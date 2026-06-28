@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { Header } from "@/components/Header";
 import {
   hasLocale,
@@ -44,6 +45,9 @@ export async function generateMetadata({
       template: `%s · Image Easy`,
     },
     description: t("description"),
+    icons: {
+      icon: "/icon.svg",
+    },
     openGraph: {
       type: "website",
       siteName: t("siteName"),
@@ -86,6 +90,7 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={localeHtmlLang[locale as Locale]}>
       <body>
+        <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SessionProvider session={session}>
             <Header />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -10,25 +11,35 @@ export interface GenerationOutput {
   costTime?: number;
   prompt?: string;
   model?: string;
+  hasReferenceImage?: boolean;
 }
 
 interface Props {
   output: GenerationOutput | null;
   loading: boolean;
   error: string | null;
+  errorAction?: {
+    href: "/pricing";
+    label: string;
+  };
   prompt: string;
   model: string;
   createdAt?: Date | string;
   onRegenerate?: () => void;
+  onDownloadResult?: (index: number, url: string) => void;
+  onCopyResultUrl?: (index: number, url: string) => void;
 }
 
 export function GenerationResult({
   output,
   loading,
   error,
+  errorAction,
   prompt,
   model,
   onRegenerate,
+  onDownloadResult,
+  onCopyResultUrl,
 }: Props) {
   const t = useTranslations("result");
   const tCommon = useTranslations("common");
@@ -49,9 +60,16 @@ export function GenerationResult({
       {/* Content */}
       <div className="flex-1 p-5 sm:p-6 flex items-center justify-center">
         {loading && <LoadingState />}
-        {error && <ErrorState error={error} onRegenerate={onRegenerate} />}
+        {error && <ErrorState error={error} action={errorAction} onRegenerate={onRegenerate} />}
         {output && output.resultUrls.length > 0 && (
-          <ResultDisplay output={output} prompt={prompt} model={model} onRegenerate={onRegenerate} />
+          <ResultDisplay
+            output={output}
+            prompt={prompt}
+            model={model}
+            onRegenerate={onRegenerate}
+            onDownloadResult={onDownloadResult}
+            onCopyResultUrl={onCopyResultUrl}
+          />
         )}
         {!loading && !error && !output && <EmptyState />}
       </div>
@@ -93,9 +111,19 @@ function LoadingState() {
   );
 }
 
-function ErrorState({ error, onRegenerate }: { error: string; onRegenerate?: () => void }) {
+function ErrorState({
+  error,
+  action,
+  onRegenerate,
+}: {
+  error: string;
+  action?: {
+    href: "/pricing";
+    label: string;
+  };
+  onRegenerate?: () => void;
+}) {
   const t = useTranslations("result");
-  const tCommon = useTranslations("common");
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-5 w-full text-center">
       <div className="text-[14px] text-[#D70015] font-medium">
@@ -104,11 +132,18 @@ function ErrorState({ error, onRegenerate }: { error: string; onRegenerate?: () 
       <p className="text-[17px] text-[#1D1D1F] max-w-md leading-[1.4]">
         {error}
       </p>
-      {onRegenerate && (
-        <button onClick={onRegenerate} className="btn btn-secondary">
-          {t("tryAgain")}
-        </button>
-      )}
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {action ? (
+          <Link href={action.href} className="btn btn-primary">
+            {action.label}
+          </Link>
+        ) : null}
+        {onRegenerate && (
+          <button onClick={onRegenerate} className="btn btn-secondary">
+            {t("tryAgain")}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -132,11 +167,15 @@ function ResultDisplay({
   prompt,
   model,
   onRegenerate,
+  onDownloadResult,
+  onCopyResultUrl,
 }: {
   output: GenerationOutput;
   prompt: string;
   model: string;
   onRegenerate?: () => void;
+  onDownloadResult?: (index: number, url: string) => void;
+  onCopyResultUrl?: (index: number, url: string) => void;
 }) {
   const t = useTranslations("result");
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -167,13 +206,19 @@ function ResultDisplay({
                 rel="noreferrer"
                 className="bg-white/95 backdrop-blur text-[#1D1D1F] text-[13px] py-2 px-4 rounded-full hover:bg-white flex-1 text-center"
                 download
+                onClick={() => onDownloadResult?.(i, url)}
               >
                 {t("download")}
               </a>
               <button
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText(url);
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    onCopyResultUrl?.(i, url);
+                  } catch {
+                    // Keep the existing no-UI-error behavior, but do not report a success event.
+                  }
                 }}
                 className="bg-white/95 backdrop-blur text-[#1D1D1F] text-[13px] py-2 px-4 rounded-full hover:bg-white"
               >

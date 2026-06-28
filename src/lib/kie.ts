@@ -8,6 +8,7 @@ import type {
   Quality,
   OutputFormat,
 } from "./models";
+import { MODELS } from "./models";
 
 const KIE_BASE_URL = process.env.KIE_API_BASE || "https://api.kie.ai";
 
@@ -30,7 +31,7 @@ interface CreateTaskResponse {
 export interface TaskRecord {
   taskId: string;
   model: string;
-  state: "waiting" | "queuing" | "generating" | "success" | "fail";
+  state: string;
   param: string;
   resultJson?: string;
   failCode?: string;
@@ -56,13 +57,41 @@ interface UploadResult {
 }
 
 export class KieError extends Error {
-  constructor(public code: number | string, message: string) {
+  terminal: boolean;
+
+  constructor(public code: number | string, message: string, options: { terminal?: boolean } = {}) {
     super(message);
     this.name = "KieError";
+    this.terminal = options.terminal ?? false;
   }
 }
 
-function buildInput(model: ModelId, params: CreateTaskInput) {
+function isTerminalKieCode(code: number | string) {
+  const numericCode = typeof code === "number" ? code : Number.parseInt(code, 10);
+  return [400, 401, 402, 404, 422, 433, 501, 505].includes(numericCode);
+}
+
+function taskState(record: TaskRecord) {
+  return String(record.state ?? "").toLowerCase();
+}
+
+function isSuccessfulTaskState(record: TaskRecord) {
+  return ["success", "succeeded", "completed", "complete"].includes(taskState(record));
+}
+
+function isFailedTaskState(record: TaskRecord) {
+  return ["fail", "failed", "failure", "error", "canceled", "cancelled"].includes(taskState(record));
+}
+
+function taskFailureCode(record: TaskRecord) {
+  return record.failCode || "fail";
+}
+
+function taskFailureMessage(record: TaskRecord) {
+  return record.failMsg || "Generation failed";
+}
+
+export function buildKieInput(model: ModelId, params: CreateTaskInput) {
   const input: Record<string, unknown> = {
     prompt: params.prompt,
   };
@@ -75,6 +104,8 @@ function buildInput(model: ModelId, params: CreateTaskInput) {
     // Different models use different param name for images
     if (model === "nano-banana-pro") {
       input.image_input = params.imageUrls;
+    } else if (model === "gpt-image-2-image-to-image") {
+      input.input_urls = params.imageUrls;
     } else {
       input.image_urls = params.imageUrls;
     }
@@ -95,8 +126,8 @@ async function createTask(
   }
 
   const body: Record<string, unknown> = {
-    model,
-    input: buildInput(model, input),
+    model: MODELS[model].kieModel,
+    input: buildKieInput(model, input),
   };
   if (callBackUrl) body.callBackUrl = callBackUrl;
 
@@ -139,12 +170,16 @@ async function getTask(taskId: string): Promise<TaskRecord> {
   });
 
   if (!res.ok) {
-    throw new KieError(res.status, `recordInfo HTTP ${res.status}`);
+    throw new KieError(res.status, `recordInfo HTTP ${res.status}`, {
+      terminal: isTerminalKieCode(res.status),
+    });
   }
 
   const data: TaskDetailResponse = await res.json();
   if (data.code !== 200) {
-    throw new KieError(data.code, data.msg || "recordInfo failed");
+    throw new KieError(data.code, data.msg || "recordInfo failed", {
+      terminal: isTerminalKieCode(data.code),
+    });
   }
   return data.data;
 }
@@ -171,6 +206,7 @@ function parseSuccessfulTask(record: TaskRecord): GenerationResult {
       throw new KieError(
         "parse",
         `Failed to parse resultJson: ${(e as Error).message}`,
+        { terminal: true },
       );
     }
   }
@@ -203,21 +239,21 @@ export async function getGenerationTaskResult(taskId: string): Promise<{
 }> {
   const record = await getTask(taskId);
 
-  if (record.state === "fail") {
+  if (isFailedTaskState(record)) {
     throw new KieError(
-      record.failCode || "fail",
-      record.failMsg || "Generation failed",
+      taskFailureCode(record),
+      taskFailureMessage(record),
+      { terminal: true },
     );
   }
 
-  if (record.state === "success") {
+  if (isSuccessfulTaskState(record)) {
     return { record, result: parseSuccessfulTask(record) };
   }
 
   return { record };
 }
 
-const TERMINAL_STATES = new Set(["success", "fail"]);
 const MAX_POLL_TIME_MS = 15 * 60 * 1000; // 15 min
 const INITIAL_POLL_INTERVAL_MS = 2000;
 const MAX_POLL_INTERVAL_MS = 10000;
@@ -247,11 +283,12 @@ export async function waitForTask(
     const record = await getTask(taskId);
     options.onUpdate?.(record);
 
-    if (TERMINAL_STATES.has(record.state)) {
-      if (record.state === "fail") {
+    if (isSuccessfulTaskState(record) || isFailedTaskState(record)) {
+      if (isFailedTaskState(record)) {
         throw new KieError(
-          record.failCode || "fail",
-          record.failMsg || "Generation failed",
+          taskFailureCode(record),
+          taskFailureMessage(record),
+          { terminal: true },
         );
       }
       return parseSuccessfulTask(record);

@@ -1,6 +1,7 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { getAccountSummary } from "@/lib/account-summary";
 import { prisma } from "@/lib/db";
 
 declare module "next-auth" {
@@ -8,13 +9,17 @@ declare module "next-auth" {
     user: {
       id: string;
       credits: number;
+      planTier?: string | null;
+      planInterval?: string | null;
+      planStatus?: string | null;
     } & DefaultSession["user"];
   }
-}
 
-declare module "@auth/core/jwt" {
   interface JWT {
     credits?: number;
+    planTier?: string | null;
+    planInterval?: string | null;
+    planStatus?: string | null;
   }
 }
 
@@ -34,19 +39,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user, trigger }) {
       if (user) {
-        // On sign-in, fetch credits from DB
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id as string },
-          select: { credits: true },
-        });
-        token.credits = dbUser?.credits ?? 10;
+        const summary = await getAccountSummary(user.id as string);
+        token.credits = summary.credits;
+        token.planTier = summary.planTier;
+        token.planInterval = summary.planInterval;
+        token.planStatus = summary.planStatus;
       }
       if (trigger === "update" && token.sub) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.sub },
-          select: { credits: true },
-        });
-        token.credits = dbUser?.credits ?? 10;
+        const summary = await getAccountSummary(token.sub);
+        token.credits = summary.credits;
+        token.planTier = summary.planTier;
+        token.planInterval = summary.planInterval;
+        token.planStatus = summary.planStatus;
       }
       return token;
     },
@@ -57,6 +61,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (typeof token.credits === "number") {
         session.user.credits = token.credits;
       }
+      session.user.planTier = typeof token.planTier === "string" ? token.planTier : null;
+      session.user.planInterval =
+        typeof token.planInterval === "string" ? token.planInterval : null;
+      session.user.planStatus = typeof token.planStatus === "string" ? token.planStatus : null;
       return session;
     },
   },

@@ -1,31 +1,21 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { refundGenerationCreditInTransaction } from "@/lib/credits";
+import { getGenerationCreditCostForRecord } from "@/lib/generation-credit-cost";
 import { prisma } from "@/lib/db";
-import { getGenerationTaskResult, KieError } from "@/lib/kie";
+import {
+  generationToDto,
+  processGenerationProviderResult,
+} from "@/lib/generation-processing";
 
 export const runtime = "nodejs";
+
+const PENDING_START_STALE_MS = 10 * 60 * 1000;
+const PENDING_START_TIMEOUT_MESSAGE = "Generation did not start in time. Please try again.";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
-
-function toDto(generation: {
-  id: string;
-  model: string;
-  taskId: string | null;
-  status: string;
-  resultUrls: string | null;
-  errorMessage: string | null;
-}) {
-  return {
-    id: generation.id,
-    model: generation.model,
-    taskId: generation.taskId,
-    status: generation.status,
-    resultUrls: generation.resultUrls ? JSON.parse(generation.resultUrls) : [],
-    errorMessage: generation.errorMessage,
-  };
-}
 
 export async function GET(_req: Request, { params }: Props) {
   const session = await auth();
@@ -43,7 +33,14 @@ export async function GET(_req: Request, { params }: Props) {
       taskId: true,
       status: true,
       resultUrls: true,
+      resultAssetKeys: true,
       errorMessage: true,
+      providerPollErrorCount: true,
+      aspectRatio: true,
+      resolution: true,
+      quality: true,
+      outputFormat: true,
+      createdAt: true,
     },
   });
 
@@ -51,89 +48,66 @@ export async function GET(_req: Request, { params }: Props) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  if (!generation.taskId || generation.status === "completed" || generation.status === "failed") {
-    return NextResponse.json(toDto(generation));
-  }
+  if (generation.status === "pending" && !generation.taskId) {
+    const stalePendingStartedBefore = new Date(Date.now() - PENDING_START_STALE_MS);
 
-  try {
-    const { record, result } = await getGenerationTaskResult(generation.taskId);
+    if (generation.createdAt <= stalePendingStartedBefore) {
+      const { current, markedFailed } = await prisma.$transaction(async (tx) => {
+        const write = await tx.generation.updateMany({
+          where: {
+            id: generation.id,
+            userId: generation.userId,
+            status: "pending",
+            taskId: null,
+            createdAt: { lte: stalePendingStartedBefore },
+          },
+          data: {
+            status: "failed",
+            errorMessage: PENDING_START_TIMEOUT_MESSAGE,
+          },
+        });
 
-    if (!result) {
-      return NextResponse.json({
-        ...toDto(generation),
-        status: "processing",
-        taskState: record.state,
+        if (write.count === 1) {
+          await refundGenerationCreditInTransaction(tx, {
+            userId: generation.userId,
+            generationId: generation.id,
+            amount: getGenerationCreditCostForRecord(generation),
+            reason: "Refund reserved credit after generation start timed out",
+          });
+        }
+
+        const currentGeneration = await tx.generation.findUniqueOrThrow({
+          where: { id: generation.id },
+          select: {
+            id: true,
+            model: true,
+            taskId: true,
+            status: true,
+            resultUrls: true,
+            resultAssetKeys: true,
+            errorMessage: true,
+            aspectRatio: true,
+            resolution: true,
+            quality: true,
+            outputFormat: true,
+          },
+        });
+
+        return {
+          current: currentGeneration,
+          markedFailed: write.count === 1,
+        };
       });
+
+      return NextResponse.json(await generationToDto(current), { status: markedFailed ? 500 : 200 });
     }
 
-    const creditsToConsume = Math.max(result.creditsConsumed ?? 1, 1);
-    const updated = await prisma.$transaction(async (tx) => {
-      const write = await tx.generation.updateMany({
-        where: {
-          id: generation.id,
-          status: { notIn: ["completed", "failed"] },
-        },
-        data: {
-          status: "completed",
-          resultUrls: JSON.stringify(result.resultUrls),
-        },
-      });
-
-      if (write.count === 1) {
-        await tx.user.update({
-          where: { id: generation.userId },
-          data: { credits: { decrement: creditsToConsume } },
-        });
-      }
-
-      return tx.generation.findUniqueOrThrow({
-        where: { id: generation.id },
-        select: {
-          id: true,
-          model: true,
-          taskId: true,
-          status: true,
-          resultUrls: true,
-          errorMessage: true,
-        },
-      });
-    });
-
     return NextResponse.json({
-      ...toDto(updated),
-      costTime: result.costTime,
-      creditsConsumed: creditsToConsume,
+      ...(await generationToDto(generation)),
+      taskState: "pending",
     });
-  } catch (error) {
-    const message =
-      error instanceof KieError
-        ? error.message
-        : error instanceof Error
-        ? error.message
-        : "Generation failed";
-
-    const failed = await prisma.$transaction(async (tx) => {
-      await tx.generation.updateMany({
-        where: {
-          id: generation.id,
-          status: { not: "completed" },
-        },
-        data: { status: "failed", errorMessage: message },
-      });
-
-      return tx.generation.findUniqueOrThrow({
-        where: { id: generation.id },
-        select: {
-          id: true,
-          model: true,
-          taskId: true,
-          status: true,
-          resultUrls: true,
-          errorMessage: true,
-        },
-      });
-    });
-
-    return NextResponse.json(toDto(failed), { status: 500 });
   }
+
+  const result = await processGenerationProviderResult(generation);
+  return NextResponse.json(result.body, { status: result.status });
 }

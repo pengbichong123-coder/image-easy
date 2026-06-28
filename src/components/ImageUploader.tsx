@@ -20,9 +20,10 @@ interface Props {
   onChange: (images: UploadedImage[]) => void;
   maxImages: number;
   disabled?: boolean;
+  onUpload?: (images: UploadedImage[]) => void;
 }
 
-export function ImageUploader({ images, onChange, maxImages, disabled }: Props) {
+export function ImageUploader({ images, onChange, maxImages, disabled, onUpload }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const t = useTranslations("create");
   const [uploading, setUploading] = useState(false);
@@ -74,7 +75,10 @@ export function ImageUploader({ images, onChange, maxImages, disabled }: Props) 
           preview: dataUrl,
         });
       }
-      onChange([...images, ...uploaded]);
+      if (uploaded.length > 0) {
+        onChange([...images, ...uploaded]);
+        onUpload?.(uploaded);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : t("uploaderFailed"));
     } finally {

@@ -1,4 +1,4 @@
-import { MyImagesContent } from "./my-images-content";
+import { CreationsContent } from "./creations-content";
 import { generatePageMetadata } from "@/lib/page-metadata";
 
 export async function generateMetadata({
@@ -7,9 +7,9 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return generatePageMetadata({ locale, page: "my-images" });
+  return generatePageMetadata({ locale, page: "creations" });
 }
 
-export default function MyImagesPage() {
-  return <MyImagesContent />;
+export default function CreationsPage() {
+  return <CreationsContent />;
 }
