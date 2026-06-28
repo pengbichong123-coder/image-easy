@@ -7,6 +7,7 @@ import {
 } from "@/lib/credits";
 import { KieError, submitGenerationTask } from "@/lib/kie";
 import { prisma } from "@/lib/db";
+import { assertCanGenerate, RateLimitError } from "@/lib/rate-limit";
 import { MODELS, type ModelId, type AspectRatio, type Resolution, type Quality, type OutputFormat } from "@/lib/models";
 import { z } from "zod";
 
@@ -129,6 +130,23 @@ export async function POST(req: NextRequest) {
         error: `Prompt too long (max ${modelInfo.maxPromptLength} chars for ${modelInfo.displayName})`,
       },
       { status: 400 },
+    );
+  }
+
+  try {
+    await assertCanGenerate(session.user.id);
+  } catch (error) {
+    if (error instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 429 },
+      );
+    }
+
+    console.error("Failed to check generation rate limit", error);
+    return NextResponse.json(
+      { error: "Generation failed" },
+      { status: 500 },
     );
   }
 

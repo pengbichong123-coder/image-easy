@@ -4,6 +4,7 @@ import { uploadBase64, KieError } from "@/lib/kie";
 import { prisma } from "@/lib/db";
 import { deleteObjectFromR2, putObjectToR2 } from "@/lib/storage/r2";
 import { userUploadKey } from "@/lib/storage/keys";
+import { assertCanUpload, RateLimitError } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -158,6 +159,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    await assertCanUpload(session.user.id);
+
     const body = await req.json();
     const { base64Data, filename, mimeType } = body as {
       base64Data?: string;
@@ -241,6 +244,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: error.message, code: error.code },
         { status: error.code === 401 ? 401 : 500 },
+      );
+    }
+    if (error instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 429 },
       );
     }
     console.error("Upload error:", error);
