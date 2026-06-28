@@ -67,7 +67,7 @@ export class KieError extends Error {
 
 function isTerminalKieCode(code: number | string) {
   const numericCode = typeof code === "number" ? code : Number.parseInt(code, 10);
-  return Number.isInteger(numericCode) && numericCode >= 400 && numericCode < 500 && numericCode !== 429;
+  return [400, 401, 402, 404, 422, 433, 501, 505].includes(numericCode);
 }
 
 function taskState(record: TaskRecord) {
