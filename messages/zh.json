@@ -24,7 +24,7 @@
     "atelier": "首页",
     "expose": "创建",
     "pricing": "价格",
-    "archive": "我的图片",
+    "archive": "我的作品",
     "billing": "账单与用量"
   },
   "header": {
@@ -59,7 +59,7 @@
     "footerAtelier": "首页",
     "footerCompose": "概览",
     "footerExpose": "创建",
-    "footerArchive": "我的图片",
+    "footerArchive": "我的作品",
     "footerModels": "模型",
     "footerResources": "资源",
     "footerJournal": "日志",
@@ -85,7 +85,7 @@
     "modelCompareBody": "GPT Image 2 适合真实感和文字渲染，Seedream 4.5 适合高保真复杂场景，Nano Banana Pro 适合一致性和 4K 输出。",
     "step1Text": "选择文本生成或参考图编辑模型，并按任务调整比例、分辨率等参数。",
     "step2Text": "输入自然语言提示词，生成前即可看到预计积分消耗。",
-    "step3Text": "结果会自动保存到你的图片记录中，方便查看、复用和下载。",
+    "step3Text": "结果会自动保存到你的作品记录中，方便查看、复用和下载。",
     "useCasesKicker": "使用场景",
     "useCasesTitle": "从想法到可用图片。",
     "useCasesLead": "Image Easy 适合需要快速比较模型效果、保留生成记录、并控制生成成本的创作者和小团队。",

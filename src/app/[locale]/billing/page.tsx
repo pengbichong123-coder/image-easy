@@ -23,6 +23,14 @@ function formatDate(value: Date | null | undefined, locale: string) {
   return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(value);
 }
 
+function formatDateTime(value: Date | null | undefined, locale: string) {
+  if (!value) return "-";
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "medium",
+  }).format(value);
+}
+
 function formatMoney(amountCents: number | null, currency: string | null, locale: string) {
   if (typeof amountCents !== "number" || !currency) return "-";
   return new Intl.NumberFormat(locale, {
@@ -138,7 +146,7 @@ export default async function BillingPage({ params }: PageProps) {
               <tbody>
                 {overview.creditTransactions.map((item) => (
                   <tr key={item.id} className="border-t border-[#E5E5E7]">
-                    <td className="px-4 py-3 text-[#6E6E73]">{formatDate(item.createdAt, locale)}</td>
+                    <td className="px-4 py-3 text-[#6E6E73]">{formatDateTime(item.createdAt, locale)}</td>
                     <td className="px-4 py-3 text-[#1D1D1F]">
                       {creditTypeLabels[item.type] ?? t("creditTypeOther")}
                     </td>
