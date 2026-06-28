@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { MODEL_GROUPS } from "@/lib/models";
 import { deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
@@ -52,9 +53,17 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get("limit") ?? "30", 10), 100);
   const cursor = searchParams.get("cursor") ?? undefined;
   const model = searchParams.get("model") ?? undefined;
+  const modelGroupSlug = searchParams.get("modelGroup") ?? undefined;
+  const modelGroup = modelGroupSlug
+    ? MODEL_GROUPS.find((group) => group.slug === modelGroupSlug)
+    : undefined;
 
   const where: Record<string, unknown> = { userId: session.user.id };
-  if (model) where.model = model;
+  if (modelGroup) {
+    where.model = { in: modelGroup.capabilities.map((capability) => capability.id) };
+  } else if (model) {
+    where.model = model;
+  }
 
   const items = await prisma.generation.findMany({
     where,

@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link, locales } from "@/i18n/routing";
-import { ALL_MODELS } from "@/lib/models";
+import { MODEL_GROUPS } from "@/lib/models";
 import { setRequestLocale, getMessages } from "next-intl/server";
 import { generatePageMetadata } from "@/lib/page-metadata";
 
@@ -116,17 +116,24 @@ export default async function HomePage({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {ALL_MODELS.map((model) => (
+          {MODEL_GROUPS.map((model) => (
             <Link
-              key={model.id}
-              href={{ pathname: "/create", query: { model: model.id } }}
+              key={model.slug}
+              href={{ pathname: "/create", query: { model: model.capabilities[0]?.id } }}
               className="group bg-[#F5F5F7] hover:bg-white rounded-[24px] p-8 min-h-[380px] flex flex-col justify-between text-left transition-colors border border-transparent hover:border-[#E5E5E7]"
             >
               <div>
                 <div className="flex items-start justify-between mb-5">
-                  <span className="text-[13px] text-[#6E6E73] tabular">
-                    {model.capability === "text-to-image" ? tModel("t2i") : tModel("i2i")}
-                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {model.capabilities.map((capability) => (
+                      <span
+                        key={capability.id}
+                        className="rounded-full bg-white px-2.5 py-1 text-[12px] text-[#6E6E73]"
+                      >
+                        {capability.capability === "text-to-image" ? tModel("t2i") : tModel("i2i")}
+                      </span>
+                    ))}
+                  </div>
                   {model.recommended && (
                     <span className="text-[11px] bg-[#1D1D1F] text-white px-2.5 py-1 rounded-full">
                       {tModel("featured")}
@@ -137,7 +144,7 @@ export default async function HomePage({
                   {model.displayName}
                 </h3>
                 <div className="text-[14px] text-[#6E6E73]">
-                  {PROVIDER_NAME[model.provider]} · 4K
+                  {PROVIDER_NAME[model.provider]} · {model.maxResolutionLabel}
                 </div>
               </div>
               <div>

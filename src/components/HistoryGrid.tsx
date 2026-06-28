@@ -2,7 +2,13 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { MODELS, type ModelId, type ModelInfo } from "@/lib/models";
+import {
+  MODELS,
+  getModelGroupByModelId,
+  type ModelCapability,
+  type ModelId,
+  type ModelInfo,
+} from "@/lib/models";
 import { formatDate } from "@/lib/utils";
 
 export interface HistoryItem {
@@ -71,6 +77,8 @@ function HistoryCard({
   const [promptOverflows, setPromptOverflows] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const model = MODELS[item.model];
+  const modelGroup = getModelGroupByModelId(item.model);
+  const modelLabel = modelGroup.displayName || model?.displayName || item.model;
   const firstImage = item.resultUrls[0];
 
   // Detect whether the prompt actually needs more than 2 lines so we
@@ -127,7 +135,7 @@ function HistoryCard({
       <div className="mt-3 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[12px] tracking-[0.05em] uppercase text-[#86868B] font-medium truncate">
-            {model?.displayName || item.model}
+            {modelLabel}
           </span>
           <span className="text-[11px] text-[#86868B] tabular">
             {formatDate(item.createdAt)}
@@ -198,6 +206,7 @@ function HistoryCard({
         <DetailsDialog
           item={item}
           model={model}
+          modelLabel={modelLabel}
           onClose={() => setDetailsOpen(false)}
         />
       )}
@@ -208,13 +217,17 @@ function HistoryCard({
 function DetailsDialog({
   item,
   model,
+  modelLabel,
   onClose,
 }: {
   item: HistoryItem;
   model: ModelInfo | undefined;
+  modelLabel: string;
   onClose: () => void;
 }) {
   const t = useTranslations("archive");
+  const tModel = useTranslations("model");
+  const capabilityText = model ? capabilityLabel(tModel, model.capability) : null;
 
   // Esc to close — small QoL nicety.
   useEffect(() => {
@@ -226,7 +239,7 @@ function DetailsDialog({
   }, [onClose]);
 
   const paramRows: Array<[string, string | null | undefined]> = [
-    [t("fieldModel"), model?.displayName || item.model],
+    [t("fieldModel"), capabilityText ? `${modelLabel} · ${capabilityText}` : modelLabel],
     [t("fieldStatus"), item.status],
     [t("fieldCreated"), formatDate(item.createdAt)],
     [t("fieldAspectRatio"), item.aspectRatio],
@@ -302,4 +315,8 @@ function DetailsDialog({
       </div>
     </div>
   );
+}
+
+function capabilityLabel(t: ReturnType<typeof useTranslations>, capability: ModelCapability) {
+  return capability === "text-to-image" ? t("t2i") : t("i2i");
 }

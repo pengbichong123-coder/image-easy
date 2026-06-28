@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { HistoryGrid, type HistoryItem } from "@/components/HistoryGrid";
-import { ALL_MODELS, type ModelId } from "@/lib/models";
+import { MODEL_GROUPS } from "@/lib/models";
 import { cn } from "@/lib/utils";
 
 export function MyImagesContent() {
@@ -16,7 +16,7 @@ export function MyImagesContent() {
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
+  const [modelFilter, setModelFilter] = useState<string | "all">("all");
 
   const load = useCallback(
     async (cursor?: string) => {
@@ -25,7 +25,7 @@ export function MyImagesContent() {
         const params = new URLSearchParams();
         params.set("limit", "24");
         if (cursor) params.set("cursor", cursor);
-        if (modelFilter !== "all") params.set("model", modelFilter);
+        if (modelFilter !== "all") params.set("modelGroup", modelFilter);
         const res = await fetch("/api/history?" + params.toString());
         if (res.status === 401) {
           router.push("/login?callbackUrl=/my-images");
@@ -93,12 +93,12 @@ export function MyImagesContent() {
           onClick={() => setModelFilter("all")}
           label={t("filterAll")}
         />
-        {ALL_MODELS.map((m) => (
+        {MODEL_GROUPS.map((modelGroup) => (
           <FilterPill
-            key={m.id}
-            active={modelFilter === m.id}
-            onClick={() => setModelFilter(m.id)}
-            label={m.displayName}
+            key={modelGroup.slug}
+            active={modelFilter === modelGroup.slug}
+            onClick={() => setModelFilter(modelGroup.slug)}
+            label={modelGroup.displayName}
           />
         ))}
       </div>
