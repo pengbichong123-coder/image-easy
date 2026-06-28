@@ -27,13 +27,11 @@ export function Header() {
   }
 
   function toggleAccountMenu() {
-    setMenuOpen((open) => {
-      const nextOpen = !open;
-      if (nextOpen) {
-        update().catch(() => {});
-      }
-      return nextOpen;
-    });
+    const nextOpen = !menuOpen;
+    setMenuOpen(nextOpen);
+    if (nextOpen) {
+      update().catch(() => {});
+    }
   }
 
   const accountPlanLabel = formatAccountPlanLabel({
