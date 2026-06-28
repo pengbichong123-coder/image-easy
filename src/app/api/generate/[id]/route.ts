@@ -13,6 +13,7 @@ const STORAGE_FAILED_MESSAGE = "Image generated but storage failed. Please retry
 const STORAGE_LOCK_STALE_MS = 10 * 60 * 1000;
 const PENDING_START_STALE_MS = 10 * 60 * 1000;
 const PENDING_START_TIMEOUT_MESSAGE = "Generation did not start in time. Please try again.";
+const PROVIDER_TRANSIENT_ERROR_LIMIT = 3;
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -59,6 +60,10 @@ async function toDto(generation: {
     resultUrls,
     errorMessage: generation.errorMessage,
   };
+}
+
+function providerTransientFailureMessage(message: string) {
+  return `Generation provider returned a temporary error after ${PROVIDER_TRANSIENT_ERROR_LIMIT} retries: ${message}`;
 }
 
 function extensionFromMimeType(mimeType: string | undefined) {
@@ -135,6 +140,7 @@ export async function GET(_req: Request, { params }: Props) {
       resultUrls: true,
       resultAssetKeys: true,
       errorMessage: true,
+      providerPollErrorCount: true,
       createdAt: true,
     },
   });
@@ -222,11 +228,96 @@ export async function GET(_req: Request, { params }: Props) {
         : "Generation failed";
 
     if (!(error instanceof KieError && error.terminal)) {
+      const { current, markedFailed } = await prisma.$transaction(async (tx) => {
+        await tx.generation.updateMany({
+          where: {
+            id: generation.id,
+            userId: generation.userId,
+            status: { notIn: ["completed", "failed"] },
+          },
+          data: {
+            providerPollErrorCount: { increment: 1 },
+            providerPollErrorCode: error instanceof KieError ? String(error.code) : null,
+            errorMessage: message,
+          },
+        });
+
+        const currentGeneration = await tx.generation.findUniqueOrThrow({
+          where: { id: generation.id },
+          select: {
+            id: true,
+            model: true,
+            taskId: true,
+            status: true,
+            resultUrls: true,
+            resultAssetKeys: true,
+            errorMessage: true,
+            providerPollErrorCount: true,
+          },
+        });
+
+        if (
+          currentGeneration.status !== "completed" &&
+          currentGeneration.status !== "failed" &&
+          currentGeneration.providerPollErrorCount >= PROVIDER_TRANSIENT_ERROR_LIMIT
+        ) {
+          const failureMessage = providerTransientFailureMessage(message);
+          const write = await tx.generation.updateMany({
+            where: {
+              id: generation.id,
+              status: { notIn: ["completed", "failed"] },
+            },
+            data: {
+              status: "failed",
+              errorMessage: failureMessage,
+            },
+          });
+
+          if (write.count === 1) {
+            await refundGenerationCreditInTransaction(tx, {
+              userId: generation.userId,
+              generationId: generation.id,
+              amount: GENERATION_CREDIT_COST,
+              reason: "Refund reserved credit after provider transient errors exceeded retry limit",
+            });
+          }
+
+          const failedGeneration = await tx.generation.findUniqueOrThrow({
+            where: { id: generation.id },
+            select: {
+              id: true,
+              model: true,
+              taskId: true,
+              status: true,
+              resultUrls: true,
+              resultAssetKeys: true,
+              errorMessage: true,
+            },
+          });
+
+          return {
+            current: failedGeneration,
+            markedFailed: write.count === 1,
+          };
+        }
+
+        return {
+          current: currentGeneration,
+          markedFailed: false,
+        };
+      });
+
+      if (current.status === "failed") {
+        return NextResponse.json(await toDto(current), { status: markedFailed ? 500 : 200 });
+      }
+
       return NextResponse.json({
-        ...(await toDto(generation)),
+        ...(await toDto(current)),
         status: "processing",
         errorMessage: message,
         taskState: "polling_error",
+        providerPollErrorCount:
+          "providerPollErrorCount" in current ? current.providerPollErrorCount : undefined,
       });
     }
 
@@ -287,9 +378,43 @@ export async function GET(_req: Request, { params }: Props) {
   }
 
   const { record, result } = taskResult;
+  let responseGeneration = generation;
+  if (generation.providerPollErrorCount > 0) {
+    responseGeneration = await prisma.$transaction(async (tx) => {
+      await tx.generation.updateMany({
+        where: {
+          id: generation.id,
+          userId: generation.userId,
+          status: { notIn: ["completed", "failed"] },
+        },
+        data: {
+          providerPollErrorCount: 0,
+          providerPollErrorCode: null,
+          errorMessage: null,
+        },
+      });
+
+      return tx.generation.findUniqueOrThrow({
+        where: { id: generation.id },
+        select: {
+          id: true,
+          userId: true,
+          model: true,
+          taskId: true,
+          status: true,
+          resultUrls: true,
+          resultAssetKeys: true,
+          errorMessage: true,
+          providerPollErrorCount: true,
+          createdAt: true,
+        },
+      });
+    });
+  }
+
   if (!result) {
     return NextResponse.json({
-      ...(await toDto(generation)),
+      ...(await toDto(responseGeneration)),
       status: "processing",
       taskState: record.state,
     });

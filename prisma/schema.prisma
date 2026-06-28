@@ -123,6 +123,8 @@ model Generation {
   storageStatus  String? // processing, completed, failed
   storageStartedAt DateTime?
   storageAttemptId String?
+  providerPollErrorCount Int @default(0)
+  providerPollErrorCode String?
   uploadId       String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

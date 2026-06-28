@@ -167,7 +167,9 @@ async function getTask(taskId: string): Promise<TaskRecord> {
   });
 
   if (!res.ok) {
-    throw new KieError(res.status, `recordInfo HTTP ${res.status}`);
+    throw new KieError(res.status, `recordInfo HTTP ${res.status}`, {
+      terminal: isTerminalKieCode(res.status),
+    });
   }
 
   const data: TaskDetailResponse = await res.json();
