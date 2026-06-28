@@ -60,6 +60,7 @@ model User {
   generations Generation[]
   uploads     Upload[]
   assets      Asset[]
+  creditTransactions CreditTransaction[]
 }
 
 model Upload {
@@ -129,5 +130,23 @@ model Generation {
 
   @@index([userId])
   @@index([taskId])
+  @@index([createdAt])
+}
+
+model CreditTransaction {
+  id           String   @id @default(cuid())
+  userId       String
+  generationId String?
+  type         String   // grant, reserve, consume, refund, purchase, admin_adjust
+  amount       Int
+  balanceAfter Int
+  reason       String
+  metadata     String?
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([generationId])
   @@index([createdAt])
 }

@@ -1,12 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { consumeReservedCreditInTransaction, refundGenerationCreditInTransaction } from "@/lib/credits";
 import { prisma } from "@/lib/db";
 import { getGenerationTaskResult, KieError } from "@/lib/kie";
 import { generatedImageKey } from "@/lib/storage/keys";
 import { deleteObjectFromR2, fetchRemoteImageForR2, getSignedAssetUrl, putObjectToR2 } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
+const GENERATION_CREDIT_COST = 1;
 const STORAGE_FAILED_MESSAGE = "Image generated but storage failed. Please retry.";
 const STORAGE_LOCK_STALE_MS = 10 * 60 * 1000;
 
@@ -154,13 +156,22 @@ export async function GET(_req: Request, { params }: Props) {
         : "Generation failed";
 
     const failed = await prisma.$transaction(async (tx) => {
-      await tx.generation.updateMany({
+      const write = await tx.generation.updateMany({
         where: {
           id: generation.id,
-          status: { not: "completed" },
+          status: { notIn: ["completed", "failed"] },
         },
         data: { status: "failed", errorMessage: message },
       });
+
+      if (write.count === 1) {
+        await refundGenerationCreditInTransaction(tx, {
+          userId: generation.userId,
+          generationId: generation.id,
+          amount: GENERATION_CREDIT_COST,
+          reason: "Refund reserved credit after generation failed",
+        });
+      }
 
       return tx.generation.findUniqueOrThrow({
         where: { id: generation.id },
@@ -240,7 +251,7 @@ export async function GET(_req: Request, { params }: Props) {
       });
     }
 
-    const creditsToConsume = Math.max(result.creditsConsumed ?? 1, 1);
+    const creditsToConsume = GENERATION_CREDIT_COST;
     const generatedAssets: Awaited<ReturnType<typeof copyGeneratedImage>>[] = [];
     for (const [index, sourceUrl] of result.resultUrls.entries()) {
       generatedAssets.push(
@@ -297,9 +308,11 @@ export async function GET(_req: Request, { params }: Props) {
         });
       }
 
-      await tx.user.update({
-        where: { id: generation.userId },
-        data: { credits: { decrement: creditsToConsume } },
+      await consumeReservedCreditInTransaction(tx, {
+        userId: generation.userId,
+        generationId: generation.id,
+        amount: creditsToConsume,
+        reason: "Consume reserved credit after generation completed",
       });
 
       return tx.generation.findUniqueOrThrow({

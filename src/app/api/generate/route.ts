@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import {
+  InsufficientCreditsError,
+  refundReservedCreditWithoutGeneration,
+  reserveGenerationCredit,
+} from "@/lib/credits";
 import { KieError, submitGenerationTask } from "@/lib/kie";
 import { prisma } from "@/lib/db";
 import { MODELS, type ModelId, type AspectRatio, type Resolution, type Quality, type OutputFormat } from "@/lib/models";
 import { z } from "zod";
 
 export const runtime = "nodejs";
+const GENERATION_CREDIT_COST = 1;
 
 const generateSchema = z.object({
   model: z.enum([
@@ -45,17 +51,6 @@ export async function POST(req: NextRequest) {
   const modelInfo = MODELS[body.model];
   if (!modelInfo) {
     return NextResponse.json({ error: "Unknown model" }, { status: 400 });
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { credits: true },
-  });
-  if (!user || user.credits <= 0) {
-    return NextResponse.json(
-      { error: "Not enough credits" },
-      { status: 402 },
-    );
   }
 
   // Validate image-to-image models have images
@@ -104,7 +99,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let reservedCredit = false;
   try {
+    await reserveGenerationCredit({
+      userId: session.user.id,
+      amount: GENERATION_CREDIT_COST,
+      reason: "Reserve credit for image generation",
+    });
+    reservedCredit = true;
+
     const taskId = await submitGenerationTask({
       model: body.model as ModelId,
       prompt: body.prompt,
@@ -139,6 +142,25 @@ export async function POST(req: NextRequest) {
       status: generation.status,
     });
   } catch (error) {
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json(
+        { error: "Not enough credits" },
+        { status: 402 },
+      );
+    }
+
+    if (reservedCredit) {
+      try {
+        await refundReservedCreditWithoutGeneration({
+          userId: session.user.id,
+          amount: GENERATION_CREDIT_COST,
+          reason: "Refund reserved credit after generation task creation failed",
+        });
+      } catch (refundError) {
+        console.error("Failed to refund reserved generation credit", refundError);
+      }
+    }
+
     const message =
       error instanceof KieError
         ? error.message
