@@ -69,9 +69,7 @@ export default async function HomePage({
           {t("kicker")}
         </div>
         <h1 className="display text-[64px] sm:text-[80px] lg:text-[96px] text-[#1D1D1F] mb-6">
-          {t("titleA")}
-          <br />
-          <span className="display-em">{t("titleEm")}</span> {t("titleB")}
+          {t("title")}
         </h1>
         <p className="text-[19px] sm:text-[21px] leading-[1.4] text-[#6E6E73] max-w-[760px] mx-auto">
           {t("lead", { models: t("leadModels"), noNoise: t("leadNoNoise") })}
@@ -92,8 +90,7 @@ export default async function HomePage({
       <section className="px-3 sm:px-5 pb-20">
         <div className="max-w-[1280px] mx-auto bg-gradient-to-b from-[#F5F5F7] to-white rounded-[24px] px-5 py-20 sm:py-24 text-center">
           <h2 className="display text-[48px] sm:text-[64px] text-[#1D1D1F] mb-4">
-            {t("limitedTitleA")} <span className="display-em text-[#0066CC]">{t("limitedTitleEm")}</span>
-            {t("limitedTitleB")}
+            {t("limitedTitle")}
           </h2>
           <div className="text-[19px] text-[#6E6E73] max-w-[580px] mx-auto leading-[1.4]">
             {t("limitedBody")}
@@ -112,8 +109,7 @@ export default async function HomePage({
       <section className="max-w-[1280px] mx-auto px-3 sm:px-5 pb-20">
         <div className="text-center mb-12">
           <h2 className="display text-[40px] sm:text-[56px] text-[#1D1D1F] mb-3">
-            {t("modelCompareTitleA")} <span className="display-em text-[#0066CC]">{t("modelCompareTitleEm")}</span>
-            {t("modelCompareTitleB")}
+            {t("modelCompareTitle")}
           </h2>
           <div className="text-[19px] text-[#6E6E73] max-w-[520px] mx-auto leading-[1.4]">
             {t("modelCompareBody")}
@@ -171,7 +167,7 @@ export default async function HomePage({
       <section className="bg-[#F5F5F7] py-20 sm:py-28">
         <div className="max-w-[1080px] mx-auto px-5 text-center">
           <h2 className="display text-[40px] sm:text-[56px] text-[#1D1D1F] mb-3">
-            {t("section2TitleA")} <span className="display-em text-[#0066CC]">{t("section2TitleEm")}</span>
+            {t("section2Title")}
           </h2>
           <div className="text-[19px] text-[#6E6E73] max-w-[560px] mx-auto leading-[1.4] mb-14">
             {t("section2Body", { em: t("section2BodyEm") })}
@@ -225,8 +221,7 @@ export default async function HomePage({
           ============================================ */}
       <section className="max-w-[980px] mx-auto px-5 py-24 text-center">
         <h2 className="display text-[40px] sm:text-[56px] text-[#1D1D1F] mb-4">
-          {t("section3TitleA")} <span className="display-em text-[#0066CC]">{t("section3TitleEm")}</span>
-          {t("section3TitleB")}
+          {t("section3Title")}
         </h2>
         <div className="text-[19px] text-[#6E6E73] mb-8">
           {t("section3Body")}
