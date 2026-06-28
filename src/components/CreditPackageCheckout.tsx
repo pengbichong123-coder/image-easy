@@ -24,8 +24,8 @@ type CheckoutLabels = {
   credits: string;
 };
 
-function formatPrice(priceCents: number, currency: string) {
-  return new Intl.NumberFormat(undefined, {
+function formatPrice(priceCents: number, currency: string, locale: string) {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format(priceCents / 100);
@@ -58,11 +58,7 @@ export function CreditPackageCheckout({
       const data = (await response.json()) as CheckoutResponse;
 
       if (!response.ok || !data.url) {
-        setMessage(
-          response.status === 401
-            ? labels.signInRequired
-            : data.error ?? labels.failed,
-        );
+        setMessage(response.status === 401 ? labels.signInRequired : labels.failed);
         return;
       }
 
@@ -97,7 +93,7 @@ export function CreditPackageCheckout({
               </div>
               <div className="mt-1 text-[14px] text-[#6E6E73]">{labels.credits}</div>
               <div className="mt-6 text-[20px] font-semibold text-[#1D1D1F]">
-                {formatPrice(creditPackage.priceCents, creditPackage.currency)}
+                {formatPrice(creditPackage.priceCents, creditPackage.currency, locale)}
               </div>
               <button
                 type="button"
