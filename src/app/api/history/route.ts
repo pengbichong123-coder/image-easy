@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
+const DELETED_BEFORE_COMPLETION_MESSAGE = "Generation deleted before completion.";
 
 function parseJsonStringArray(value: string | null) {
   if (!value) {
@@ -105,30 +106,41 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
 
-  const generation = await prisma.generation.findFirst({
-    where: { id, userId: session.user.id },
-    select: {
-      id: true,
-      status: true,
-      resultAssetKeys: true,
-    },
-  });
+  const { found, resultAssetKeys } = await prisma.$transaction(async (tx) => {
+    const terminalClaim = await tx.generation.updateMany({
+      where: {
+        id,
+        userId: session.user.id,
+        status: { notIn: ["completed", "failed"] },
+      },
+      data: {
+        status: "failed",
+        errorMessage: DELETED_BEFORE_COMPLETION_MESSAGE,
+      },
+    });
 
-  if (!generation) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
-  const resultAssetKeys = parseJsonStringArray(generation.resultAssetKeys);
-  await prisma.$transaction(async (tx) => {
-    if (generation.status !== "completed" && generation.status !== "failed") {
+    if (terminalClaim.count === 1) {
       await refundGenerationCreditInTransaction(tx, {
         userId: session.user.id,
-        generationId: generation.id,
+        generationId: id,
         amount: 1,
         reason: "Refund reserved credit after deleting unfinished generation",
       });
     }
 
+    const generation = await tx.generation.findFirst({
+      where: { id, userId: session.user.id },
+      select: {
+        id: true,
+        resultAssetKeys: true,
+      },
+    });
+
+    if (!generation) {
+      return { found: false, resultAssetKeys: [] };
+    }
+
+    const resultAssetKeys = parseJsonStringArray(generation.resultAssetKeys);
     if (resultAssetKeys.length > 0) {
       await tx.asset.deleteMany({
         where: {
@@ -138,10 +150,16 @@ export async function DELETE(req: NextRequest) {
       });
     }
 
-    await tx.generation.delete({
-      where: { id: generation.id },
+    await tx.generation.deleteMany({
+      where: { id: generation.id, userId: session.user.id },
     });
+
+    return { found: true, resultAssetKeys };
   });
+
+  if (!found) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
 
   await Promise.all(
     resultAssetKeys.map(async (key) => {
