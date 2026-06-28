@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import type Stripe from "stripe";
 import { grantPurchasedCreditsInTransaction, grantSubscriptionCreditsInTransaction } from "@/lib/credits";
+import {
+  billingEventLabel,
+  stripeAmountToCents,
+  stripeCurrency,
+  type BillingEventStatus,
+  type BillingEventType,
+} from "@/lib/billing-events";
 import { prisma } from "@/lib/db";
 import {
   buildStripeInvoiceGrantKey,
@@ -81,6 +88,23 @@ function invoicePeriodEnd(invoice: Stripe.Invoice) {
   return stripeDate(invoice.lines.data[0]?.period?.end);
 }
 
+function invoicePaymentIntentId(invoice: Stripe.Invoice) {
+  return stripeObjectId((invoice as Stripe.Invoice & { payment_intent?: unknown }).payment_intent);
+}
+
+function invoiceChargeId(invoice: Stripe.Invoice) {
+  return stripeObjectId((invoice as Stripe.Invoice & { charge?: unknown }).charge);
+}
+
+function invoiceAmount(invoice: Stripe.Invoice, kind: "paid" | "due") {
+  const rawInvoice = invoice as Stripe.Invoice & {
+    amount_paid?: number | null;
+    amount_due?: number | null;
+  };
+
+  return stripeAmountToCents(kind === "paid" ? rawInvoice.amount_paid : rawInvoice.amount_due);
+}
+
 function subscriptionPriceId(subscription: Stripe.Subscription) {
   return subscription.items.data[0]?.price?.id ?? null;
 }
@@ -108,6 +132,80 @@ function buildPaymentIntentUpdate(session: Stripe.Checkout.Session) {
   const paymentIntentId = stripePaymentIntentId(session);
 
   return paymentIntentId ? { stripePaymentIntentId: paymentIntentId } : {};
+}
+
+async function recordBillingEvent(
+  tx: Prisma.TransactionClient,
+  input: {
+    userId: string;
+    subscriptionId?: string | null;
+    stripeEventId: string;
+    stripeInvoiceId?: string | null;
+    stripePaymentIntentId?: string | null;
+    stripeChargeId?: string | null;
+    stripeRefundId?: string | null;
+    type: BillingEventType;
+    status: BillingEventStatus;
+    amountCents?: number | null;
+    currency?: string | null;
+    description?: string | null;
+    hostedInvoiceUrl?: string | null;
+    invoicePdf?: string | null;
+    occurredAt: Date;
+    metadata?: Record<string, string | number | boolean | null | undefined>;
+  },
+) {
+  await tx.billingEvent.createMany({
+    data: {
+      userId: input.userId,
+      subscriptionId: input.subscriptionId ?? null,
+      stripeEventId: input.stripeEventId,
+      stripeInvoiceId: input.stripeInvoiceId ?? null,
+      stripePaymentIntentId: input.stripePaymentIntentId ?? null,
+      stripeChargeId: input.stripeChargeId ?? null,
+      stripeRefundId: input.stripeRefundId ?? null,
+      type: input.type,
+      status: input.status,
+      amountCents: input.amountCents ?? null,
+      currency: stripeCurrency(input.currency),
+      description: input.description ?? billingEventLabel(input.type),
+      hostedInvoiceUrl: input.hostedInvoiceUrl ?? null,
+      invoicePdf: input.invoicePdf ?? null,
+      occurredAt: input.occurredAt,
+      metadata: input.metadata ? JSON.stringify(input.metadata) : null,
+    },
+    skipDuplicates: true,
+  });
+}
+
+async function recordInvoiceBillingEvent(
+  tx: Prisma.TransactionClient,
+  input: {
+    eventId: string;
+    invoice: Stripe.Invoice;
+    subscriptionId?: string | null;
+    userId: string;
+    type: Extract<BillingEventType, "invoice_paid" | "invoice_payment_failed">;
+    status: Extract<BillingEventStatus, "paid" | "failed">;
+    amountKind: "paid" | "due";
+  },
+) {
+  await recordBillingEvent(tx, {
+    userId: input.userId,
+    subscriptionId: input.subscriptionId,
+    stripeEventId: input.eventId,
+    stripeInvoiceId: input.invoice.id,
+    stripePaymentIntentId: invoicePaymentIntentId(input.invoice),
+    stripeChargeId: invoiceChargeId(input.invoice),
+    type: input.type,
+    status: input.status,
+    amountCents: invoiceAmount(input.invoice, input.amountKind),
+    currency: input.invoice.currency,
+    description: billingEventLabel(input.type),
+    hostedInvoiceUrl: input.invoice.hosted_invoice_url,
+    invoicePdf: input.invoice.invoice_pdf,
+    occurredAt: stripeDate(input.invoice.created) ?? new Date(),
+  });
 }
 
 async function findCheckoutPayment(
@@ -334,7 +432,11 @@ async function grantSubscriptionPeriodCredits(
   }
 }
 
-async function processSubscriptionCheckoutCompleted(tx: Prisma.TransactionClient, session: Stripe.Checkout.Session) {
+async function processSubscriptionCheckoutCompleted(
+  tx: Prisma.TransactionClient,
+  session: Stripe.Checkout.Session,
+  eventId: string,
+) {
   const metadata = checkoutMetadata(session);
   const planId = metadata.planId;
   const userId = metadata.userId;
@@ -357,6 +459,24 @@ async function processSubscriptionCheckoutCompleted(tx: Prisma.TransactionClient
     status: session.payment_status === "paid" ? "active" : "incomplete",
   });
 
+  await recordBillingEvent(tx, {
+    userId,
+    subscriptionId: subscription.id,
+    stripeEventId: eventId,
+    stripeInvoiceId: stripeObjectId(session.invoice),
+    type: "checkout_completed",
+    status: session.payment_status === "paid" ? "paid" : "informational",
+    amountCents: stripeAmountToCents(session.amount_total),
+    currency: session.currency,
+    description: billingEventLabel("checkout_completed"),
+    occurredAt: stripeDate(session.created) ?? new Date(),
+    metadata: {
+      checkoutSessionId: session.id,
+      paymentStatus: session.payment_status,
+      planId,
+    },
+  });
+
   const invoiceId = stripeObjectId(session.invoice);
   if (session.payment_status === "paid" && invoiceId) {
     const grantAt = stripeDate(session.created) ?? new Date();
@@ -372,7 +492,7 @@ async function processSubscriptionCheckoutCompleted(tx: Prisma.TransactionClient
   }
 }
 
-async function processInvoicePaid(tx: Prisma.TransactionClient, invoice: Stripe.Invoice) {
+async function processInvoicePaid(tx: Prisma.TransactionClient, invoice: Stripe.Invoice, eventId: string) {
   const stripeSubscriptionId = invoiceSubscriptionId(invoice);
   const stripePriceId = invoicePrimaryPriceId(invoice);
   if (!stripeSubscriptionId || !stripePriceId) {
@@ -420,6 +540,52 @@ async function processInvoicePaid(tx: Prisma.TransactionClient, invoice: Stripe.
     currentPeriodEnd: invoicePeriodEnd(invoice),
     reason: "Grant subscription credits after Stripe invoice paid",
   });
+
+  await recordInvoiceBillingEvent(tx, {
+    eventId,
+    invoice,
+    subscriptionId: subscription.id,
+    userId: subscription.userId,
+    type: "invoice_paid",
+    status: "paid",
+    amountKind: "paid",
+  });
+}
+
+async function processInvoicePaymentFailed(tx: Prisma.TransactionClient, invoice: Stripe.Invoice, eventId: string) {
+  const stripeSubscriptionId = invoiceSubscriptionId(invoice);
+  if (!stripeSubscriptionId) return;
+
+  const existing = await tx.userSubscription.findUnique({
+    where: { stripeSubscriptionId },
+  });
+  const metadata = invoiceMetadata(invoice);
+  const userId = existing?.userId ?? metadata.userId;
+  if (!userId) return;
+
+  let subscriptionId = existing?.id ?? null;
+  if (existing) {
+    const updated = await tx.userSubscription.update({
+      where: { id: existing.id },
+      data: {
+        status: "past_due",
+        currentPeriodStart: invoicePeriodStart(invoice),
+        currentPeriodEnd: invoicePeriodEnd(invoice),
+      },
+      select: { id: true },
+    });
+    subscriptionId = updated.id;
+  }
+
+  await recordInvoiceBillingEvent(tx, {
+    eventId,
+    invoice,
+    subscriptionId,
+    userId,
+    type: "invoice_payment_failed",
+    status: "failed",
+    amountKind: "due",
+  });
 }
 
 async function processSubscriptionStatusUpdate(tx: Prisma.TransactionClient, subscription: Stripe.Subscription) {
@@ -446,9 +612,13 @@ async function processSubscriptionStatusUpdate(tx: Prisma.TransactionClient, sub
   });
 }
 
-async function processCheckoutSessionCompleted(tx: Prisma.TransactionClient, session: Stripe.Checkout.Session) {
+async function processCheckoutSessionCompleted(
+  tx: Prisma.TransactionClient,
+  session: Stripe.Checkout.Session,
+  eventId: string,
+) {
   if (session.mode === "subscription") {
-    await processSubscriptionCheckoutCompleted(tx, session);
+    await processSubscriptionCheckoutCompleted(tx, session, eventId);
     return;
   }
 
@@ -468,6 +638,22 @@ async function processCheckoutSessionCompleted(tx: Prisma.TransactionClient, ses
   }
 
   await processCheckoutSessionPaid(tx, session);
+
+  await recordBillingEvent(tx, {
+    userId: payment.userId,
+    stripeEventId: eventId,
+    stripePaymentIntentId: stripePaymentIntentId(session),
+    type: "checkout_completed",
+    status: "paid",
+    amountCents: stripeAmountToCents(session.amount_total),
+    currency: session.currency,
+    description: billingEventLabel("checkout_completed"),
+    occurredAt: stripeDate(session.created) ?? new Date(),
+    metadata: {
+      checkoutSessionId: session.id,
+      paymentId: payment.id,
+    },
+  });
 }
 
 async function processCheckoutSessionTerminalFailure(
@@ -482,6 +668,99 @@ async function processCheckoutSessionTerminalFailure(
   await markCheckoutSessionPayment(tx, {
     ...input,
     payment,
+  });
+}
+
+async function findBillingEventUserByStripeRefs(
+  tx: Prisma.TransactionClient,
+  input: {
+    stripePaymentIntentId?: string | null;
+    stripeInvoiceId?: string | null;
+    stripeChargeId?: string | null;
+  },
+) {
+  if (input.stripePaymentIntentId) {
+    const payment = await tx.payment.findUnique({
+      where: { stripePaymentIntentId: input.stripePaymentIntentId },
+      select: { userId: true },
+    });
+    if (payment) return payment.userId;
+  }
+
+  const event = await tx.billingEvent.findFirst({
+    where: {
+      OR: [
+        input.stripePaymentIntentId ? { stripePaymentIntentId: input.stripePaymentIntentId } : undefined,
+        input.stripeInvoiceId ? { stripeInvoiceId: input.stripeInvoiceId } : undefined,
+        input.stripeChargeId ? { stripeChargeId: input.stripeChargeId } : undefined,
+      ].filter(Boolean) as Prisma.BillingEventWhereInput[],
+    },
+    select: { userId: true },
+    orderBy: { occurredAt: "desc" },
+  });
+
+  return event?.userId ?? null;
+}
+
+async function processChargeRefunded(tx: Prisma.TransactionClient, charge: Stripe.Charge, eventId: string) {
+  const stripePaymentIntentId = stripeObjectId(charge.payment_intent);
+  const stripeInvoiceId = stripeObjectId((charge as Stripe.Charge & { invoice?: unknown }).invoice);
+  const stripeChargeId = charge.id;
+  const userId = await findBillingEventUserByStripeRefs(tx, {
+    stripePaymentIntentId,
+    stripeInvoiceId,
+    stripeChargeId,
+  });
+
+  if (!userId) return;
+
+  const refund = charge.refunds?.data?.[0];
+  await recordBillingEvent(tx, {
+    userId,
+    stripeEventId: eventId,
+    stripeInvoiceId,
+    stripePaymentIntentId,
+    stripeChargeId,
+    stripeRefundId: refund?.id ?? null,
+    type: "refund_created",
+    status: "refunded",
+    amountCents: stripeAmountToCents(charge.amount_refunded),
+    currency: charge.currency,
+    description: billingEventLabel("refund_created"),
+    occurredAt: refund ? (stripeDate(refund.created) ?? new Date()) : new Date(),
+    metadata: {
+      source: "charge.refunded",
+      chargeId: charge.id,
+    },
+  });
+}
+
+async function processRefundCreated(tx: Prisma.TransactionClient, refund: Stripe.Refund, eventId: string) {
+  const stripePaymentIntentId = stripeObjectId(refund.payment_intent);
+  const stripeChargeId = stripeObjectId(refund.charge);
+  const userId = await findBillingEventUserByStripeRefs(tx, {
+    stripePaymentIntentId,
+    stripeChargeId,
+  });
+
+  if (!userId) return;
+
+  await recordBillingEvent(tx, {
+    userId,
+    stripeEventId: eventId,
+    stripePaymentIntentId,
+    stripeChargeId,
+    stripeRefundId: refund.id,
+    type: "refund_created",
+    status: "refunded",
+    amountCents: stripeAmountToCents(refund.amount),
+    currency: refund.currency,
+    description: billingEventLabel("refund_created"),
+    occurredAt: stripeDate(refund.created) ?? new Date(),
+    metadata: {
+      source: "refund.created",
+      reason: refund.reason,
+    },
   });
 }
 
@@ -554,14 +833,20 @@ export async function POST(req: NextRequest) {
           event.type === "checkout.session.completed" ||
           event.type === "checkout.session.async_payment_succeeded"
         ) {
-          await processCheckoutSessionCompleted(tx, event.data.object as Stripe.Checkout.Session);
+          await processCheckoutSessionCompleted(tx, event.data.object as Stripe.Checkout.Session, event.id);
         } else if (event.type === "invoice.paid") {
-          await processInvoicePaid(tx, event.data.object as Stripe.Invoice);
+          await processInvoicePaid(tx, event.data.object as Stripe.Invoice, event.id);
+        } else if (event.type === "invoice.payment_failed") {
+          await processInvoicePaymentFailed(tx, event.data.object as Stripe.Invoice, event.id);
         } else if (
           event.type === "customer.subscription.updated" ||
           event.type === "customer.subscription.deleted"
         ) {
           await processSubscriptionStatusUpdate(tx, event.data.object as Stripe.Subscription);
+        } else if (event.type === "charge.refunded") {
+          await processChargeRefunded(tx, event.data.object as Stripe.Charge, event.id);
+        } else if (event.type === "refund.created") {
+          await processRefundCreated(tx, event.data.object as Stripe.Refund, event.id);
         }
       });
     }
