@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { CheckoutSessionRefresh } from "@/components/CheckoutSessionRefresh";
 import { SubscriptionPlanCheckout } from "@/components/SubscriptionPlanCheckout";
 import { GENERATION_CREDIT_COST_ROWS } from "@/lib/generation-credit-cost";
 import { isPaidCreditsEnabled } from "@/lib/pricing-mode";
@@ -37,10 +38,12 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
   const checkoutStatus = Array.isArray(resolvedSearchParams?.checkout)
     ? resolvedSearchParams.checkout[0]
     : resolvedSearchParams?.checkout;
+  const checkoutSucceeded = checkoutStatus === "success";
   const subscriptionPlans = paidCreditsEnabled ? getConfiguredSubscriptionPlans() : [];
 
   return (
     <div className="bg-white">
+      <CheckoutSessionRefresh active={checkoutSucceeded} />
       <section className="max-w-[860px] mx-auto px-5 py-20 sm:py-28">
         <div className="text-[14px] text-[#6E6E73] mb-3">
           {t("kicker")}
@@ -60,7 +63,7 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
             <h2 className="display text-[34px] sm:text-[44px] text-[#1D1D1F] mb-4">
               {t("subscriptionTitle")}
             </h2>
-            {checkoutStatus === "success" ? (
+            {checkoutSucceeded ? (
               <div className="mb-6 rounded-[8px] border border-[#B7E4C7] bg-[#F1FFF6] px-4 py-3 text-[14px] text-[#17633A]">
                 {t("checkoutSuccess")}
               </div>

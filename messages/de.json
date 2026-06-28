@@ -230,7 +230,9 @@
     "uploaderNotImage": "{name} ist kein Bild.",
     "uploaderFailed": "Upload fehlgeschlagen",
     "uploaderHint": "Max. {max} · jpg, png, webp · bis 20 MB",
-    "estimatedCredits": "Geschätzte Kosten: {credits} Credits"
+    "estimatedCredits": "Geschätzte Kosten: {credits} Credits",
+    "errorInsufficientCredits": "Nicht genügend Credits für diese Generierung. Wählen Sie einen Plan, um weiter zu erstellen.",
+    "pricingCta": "Pläne ansehen"
   },
   "prompt": {
     "tryOne": "Probier eines",

@@ -230,7 +230,9 @@
     "uploaderNotImage": "{name} 不是图片。",
     "uploaderFailed": "上传失败",
     "uploaderHint": "最多 {max} 张 · jpg、png、webp · 最大 20MB",
-    "estimatedCredits": "预计消耗：{credits} 积分"
+    "estimatedCredits": "预计消耗：{credits} 积分",
+    "errorInsufficientCredits": "积分不足，当前额度不够完成这次生成。请选择一个套餐后再继续创作。",
+    "pricingCta": "查看套餐"
   },
   "prompt": {
     "tryOne": "试试这些",

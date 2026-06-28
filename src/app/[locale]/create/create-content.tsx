@@ -48,6 +48,7 @@ export function CreateContent() {
   const [output, setOutput] = useState<GenerationOutput | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [insufficientCredits, setInsufficientCredits] = useState(false);
 
   const modelInfo = MODELS[modelId];
   const normalizedParams = useMemo(
@@ -203,10 +204,12 @@ export function CreateContent() {
     if (!prompt.trim()) return;
     if (isImageToImageModel(modelId) && images.length === 0) {
       setError(t("errorRequiresImage"));
+      setInsufficientCredits(false);
       return;
     }
     setLoading(true);
     setError(null);
+    setInsufficientCredits(false);
     setOutput(null);
     const submittedModelId = modelId;
     const submittedHasReferenceImage = isImageToImageModel(submittedModelId) && images.length > 0;
@@ -252,11 +255,13 @@ export function CreateContent() {
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : tCommon("error");
+      const failureReason = classifyGenerationFailure(message);
       trackEvent("generation_failed", {
         ...commonAnalyticsParams("failed", submittedModelId, submittedHasReferenceImage),
-        failure_reason: classifyGenerationFailure(message),
+        failure_reason: failureReason,
       });
-      setError(message);
+      setInsufficientCredits(failureReason === "insufficient_credits");
+      setError(failureReason === "insufficient_credits" ? t("errorInsufficientCredits") : message);
     } finally {
       setLoading(false);
     }
@@ -368,6 +373,11 @@ export function CreateContent() {
               output={output}
               loading={loading}
               error={error}
+              errorAction={
+                insufficientCredits
+                  ? { href: "/pricing", label: t("pricingCta") }
+                  : undefined
+              }
               prompt={prompt}
               model={modelId}
               onRegenerate={canSubmit ? handleSubmit : undefined}

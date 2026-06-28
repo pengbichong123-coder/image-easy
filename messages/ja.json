@@ -230,7 +230,9 @@
     "uploaderNotImage": "{name} は画像ではありません。",
     "uploaderFailed": "アップロードに失敗しました",
     "uploaderHint": "最大 {max} 枚 · jpg、png、webp · 最大20 MB",
-    "estimatedCredits": "推定コスト: {credits} クレジット"
+    "estimatedCredits": "推定コスト: {credits} クレジット",
+    "errorInsufficientCredits": "この生成に必要なクレジットが不足しています。プランを選択して作成を続けてください。",
+    "pricingCta": "プランを見る"
   },
   "prompt": {
     "tryOne": "例を試す",

@@ -230,7 +230,9 @@
     "uploaderNotImage": "{name} is geen afbeelding.",
     "uploaderFailed": "Upload mislukt",
     "uploaderHint": "Max. {max} · jpg, png, webp · tot 20 MB",
-    "estimatedCredits": "Geschatte kosten: {credits} credits"
+    "estimatedCredits": "Geschatte kosten: {credits} credits",
+    "errorInsufficientCredits": "Niet genoeg credits voor deze generatie. Kies een plan om verder te maken.",
+    "pricingCta": "Plannen bekijken"
   },
   "prompt": {
     "tryOne": "Probeer er een",

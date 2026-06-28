@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,10 @@ interface Props {
   output: GenerationOutput | null;
   loading: boolean;
   error: string | null;
+  errorAction?: {
+    href: "/pricing";
+    label: string;
+  };
   prompt: string;
   model: string;
   createdAt?: Date | string;
@@ -29,6 +34,7 @@ export function GenerationResult({
   output,
   loading,
   error,
+  errorAction,
   prompt,
   model,
   onRegenerate,
@@ -54,7 +60,7 @@ export function GenerationResult({
       {/* Content */}
       <div className="flex-1 p-5 sm:p-6 flex items-center justify-center">
         {loading && <LoadingState />}
-        {error && <ErrorState error={error} onRegenerate={onRegenerate} />}
+        {error && <ErrorState error={error} action={errorAction} onRegenerate={onRegenerate} />}
         {output && output.resultUrls.length > 0 && (
           <ResultDisplay
             output={output}
@@ -105,9 +111,19 @@ function LoadingState() {
   );
 }
 
-function ErrorState({ error, onRegenerate }: { error: string; onRegenerate?: () => void }) {
+function ErrorState({
+  error,
+  action,
+  onRegenerate,
+}: {
+  error: string;
+  action?: {
+    href: "/pricing";
+    label: string;
+  };
+  onRegenerate?: () => void;
+}) {
   const t = useTranslations("result");
-  const tCommon = useTranslations("common");
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-5 w-full text-center">
       <div className="text-[14px] text-[#D70015] font-medium">
@@ -116,11 +132,18 @@ function ErrorState({ error, onRegenerate }: { error: string; onRegenerate?: () 
       <p className="text-[17px] text-[#1D1D1F] max-w-md leading-[1.4]">
         {error}
       </p>
-      {onRegenerate && (
-        <button onClick={onRegenerate} className="btn btn-secondary">
-          {t("tryAgain")}
-        </button>
-      )}
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {action ? (
+          <Link href={action.href} className="btn btn-primary">
+            {action.label}
+          </Link>
+        ) : null}
+        {onRegenerate && (
+          <button onClick={onRegenerate} className="btn btn-secondary">
+            {t("tryAgain")}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

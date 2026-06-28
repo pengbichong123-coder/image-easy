@@ -230,7 +230,9 @@
     "uploaderNotImage": "{name} n’est pas une image.",
     "uploaderFailed": "Échec du téléversement",
     "uploaderHint": "{max} max · jpg, png, webp · jusqu’à 20 Mo",
-    "estimatedCredits": "Coût estimé : {credits} crédits"
+    "estimatedCredits": "Coût estimé : {credits} crédits",
+    "errorInsufficientCredits": "Crédits insuffisants pour cette génération. Choisissez un plan pour continuer à créer.",
+    "pricingCta": "Voir les plans"
   },
   "prompt": {
     "tryOne": "Essayer un exemple",
