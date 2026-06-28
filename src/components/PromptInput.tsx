@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -36,13 +36,46 @@ export function PromptInput({
   const tCreate = useTranslations("create");
   const tCommon = useTranslations("common");
   const [focused, setFocused] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const isOverLimit = value.length > maxLength;
+  const syncTextareaValue = useCallback(
+    (nextValue: string) => {
+      if (nextValue !== value) {
+        onChange(nextValue);
+      }
+    },
+    [onChange, value],
+  );
+
+  useEffect(() => {
+    if (!focused || disabled) return;
+
+    const interval = window.setInterval(() => {
+      const nextValue = textareaRef.current?.value;
+      if (typeof nextValue === "string") {
+        syncTextareaValue(nextValue);
+      }
+    }, 250);
+
+    return () => window.clearInterval(interval);
+  }, [disabled, focused, syncTextareaValue]);
 
   return (
     <div>
       <textarea
+        ref={textareaRef}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => syncTextareaValue(e.currentTarget.value)}
+        onInput={(e) => syncTextareaValue(e.currentTarget.value)}
+        onCompositionEnd={(e) => syncTextareaValue(e.currentTarget.value)}
+        onPaste={() => {
+          window.setTimeout(() => {
+            const nextValue = textareaRef.current?.value;
+            if (typeof nextValue === "string") {
+              syncTextareaValue(nextValue);
+            }
+          }, 0);
+        }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={placeholder}
