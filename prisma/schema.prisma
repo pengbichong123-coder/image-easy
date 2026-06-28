@@ -63,6 +63,7 @@ model User {
   creditTransactions CreditTransaction[]
   payments    Payment[]
   subscriptions UserSubscription[]
+  billingEvents BillingEvent[]
 }
 
 model Upload {
@@ -197,6 +198,35 @@ model Payment {
   @@index([status])
 }
 
+model BillingEvent {
+  id                    String   @id @default(cuid())
+  userId                String
+  subscriptionId        String?
+  stripeEventId         String   @unique
+  stripeInvoiceId       String?
+  stripePaymentIntentId String?
+  stripeChargeId        String?
+  stripeRefundId        String?
+  type                  String   // checkout_completed, invoice_paid, invoice_payment_failed, refund_created
+  status                String   // paid, failed, refunded, informational
+  amountCents           Int?
+  currency              String?
+  description           String?
+  hostedInvoiceUrl      String?
+  invoicePdf            String?
+  occurredAt            DateTime
+  metadata              String?
+  createdAt             DateTime @default(now())
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription UserSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@index([subscriptionId])
+  @@index([type])
+  @@index([status])
+}
+
 model UserSubscription {
   id                      String   @id @default(cuid())
   userId                  String
@@ -220,6 +250,7 @@ model UserSubscription {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   creditTransactions CreditTransaction[]
+  billingEvents BillingEvent[]
 
   @@index([userId])
   @@index([status])
