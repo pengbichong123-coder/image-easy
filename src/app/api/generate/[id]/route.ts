@@ -154,12 +154,20 @@ export async function GET(_req: Request, { params }: Props) {
         : error instanceof Error
         ? error.message
         : "Generation failed";
+    const activeStorageStartedAfter = new Date(Date.now() - STORAGE_LOCK_STALE_MS);
 
-    const failed = await prisma.$transaction(async (tx) => {
+    const { current, markedFailed } = await prisma.$transaction(async (tx) => {
       const write = await tx.generation.updateMany({
         where: {
           id: generation.id,
           status: { notIn: ["completed", "failed"] },
+          NOT: {
+            storageStatus: "processing",
+            OR: [
+              { storageStartedAt: null },
+              { storageStartedAt: { gte: activeStorageStartedAfter } },
+            ],
+          },
         },
         data: { status: "failed", errorMessage: message },
       });
@@ -173,7 +181,7 @@ export async function GET(_req: Request, { params }: Props) {
         });
       }
 
-      return tx.generation.findUniqueOrThrow({
+      const currentGeneration = await tx.generation.findUniqueOrThrow({
         where: { id: generation.id },
         select: {
           id: true,
@@ -185,9 +193,21 @@ export async function GET(_req: Request, { params }: Props) {
           errorMessage: true,
         },
       });
+
+      return {
+        current: currentGeneration,
+        markedFailed: write.count === 1,
+      };
     });
 
-    return NextResponse.json(await toDto(failed), { status: 500 });
+    if (!markedFailed && current.status !== "completed" && current.status !== "failed") {
+      return NextResponse.json({
+        ...(await toDto(current)),
+        status: "processing",
+      });
+    }
+
+    return NextResponse.json(await toDto(current), { status: markedFailed ? 500 : 200 });
   }
 
   const { record, result } = taskResult;
@@ -342,7 +362,7 @@ export async function GET(_req: Request, { params }: Props) {
       const write = await tx.generation.updateMany({
         where: {
           id: generation.id,
-          status: { not: "completed" },
+          status: { notIn: ["completed", "failed"] },
           storageStatus: "processing",
           storageStartedAt,
           storageAttemptId: attemptId,
