@@ -117,6 +117,8 @@ model Generation {
   errorMessage   String?
   resultUrls     String? // JSON array of image URLs
   resultAssetKeys String? // JSON array of generated R2 asset keys
+  storageStatus  String? // processing, completed, failed
+  storageStartedAt DateTime?
   uploadId       String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

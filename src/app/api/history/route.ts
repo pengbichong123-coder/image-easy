@@ -1,8 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getSignedAssetUrl } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
+
+function parseJsonStringArray(value: string | null) {
+  if (!value) {
+    return [];
+  }
+
+  const parsed = JSON.parse(value) as unknown;
+  if (!Array.isArray(parsed)) {
+    return [];
+  }
+
+  return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
+}
+
+async function getGenerationResultUrls(generation: {
+  resultUrls: string | null;
+  resultAssetKeys: string | null;
+}) {
+  const persistedResultUrls = parseJsonStringArray(generation.resultUrls);
+  if (persistedResultUrls.length > 0) {
+    return persistedResultUrls;
+  }
+
+  return Promise.all(parseJsonStringArray(generation.resultAssetKeys).map((key) => getSignedAssetUrl(key)));
+}
 
 // GET /api/history?limit=30&cursor=xxx
 export async function GET(req: NextRequest) {
@@ -34,22 +60,24 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({
-    items: items.map((g) => ({
-      id: g.id,
-      model: g.model,
-      prompt: g.prompt,
-      aspectRatio: g.aspectRatio,
-      resolution: g.resolution,
-      quality: g.quality,
-      outputFormat: g.outputFormat,
-      status: g.status,
-      resultUrls: g.resultUrls ? JSON.parse(g.resultUrls) : [],
-      errorMessage: g.errorMessage,
-      createdAt: g.createdAt,
-      upload: g.upload
-        ? { id: g.upload.id, url: g.upload.url, filename: g.upload.filename }
-        : null,
-    })),
+    items: await Promise.all(
+      items.map(async (g) => ({
+        id: g.id,
+        model: g.model,
+        prompt: g.prompt,
+        aspectRatio: g.aspectRatio,
+        resolution: g.resolution,
+        quality: g.quality,
+        outputFormat: g.outputFormat,
+        status: g.status,
+        resultUrls: await getGenerationResultUrls(g),
+        errorMessage: g.errorMessage,
+        createdAt: g.createdAt,
+        upload: g.upload
+          ? { id: g.upload.id, url: g.upload.url, filename: g.upload.filename }
+          : null,
+      })),
+    ),
     nextCursor,
   });
 }

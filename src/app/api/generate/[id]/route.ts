@@ -3,29 +3,50 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getGenerationTaskResult, KieError } from "@/lib/kie";
 import { generatedImageKey } from "@/lib/storage/keys";
-import { copyRemoteImageToR2, deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
+import { deleteObjectFromR2, fetchRemoteImageForR2, getSignedAssetUrl, putObjectToR2 } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
 const STORAGE_FAILED_MESSAGE = "Image generated but storage failed. Please retry.";
+const STORAGE_LOCK_STALE_MS = 10 * 60 * 1000;
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 
-function toDto(generation: {
+function parseJsonStringArray(value: string | null) {
+  if (!value) {
+    return [];
+  }
+
+  const parsed = JSON.parse(value) as unknown;
+  if (!Array.isArray(parsed)) {
+    return [];
+  }
+
+  return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
+}
+
+async function toDto(generation: {
   id: string;
   model: string;
   taskId: string | null;
   status: string;
   resultUrls: string | null;
+  resultAssetKeys: string | null;
   errorMessage: string | null;
 }) {
+  const persistedResultUrls = parseJsonStringArray(generation.resultUrls);
+  const resultUrls =
+    persistedResultUrls.length > 0
+      ? persistedResultUrls
+      : await Promise.all(parseJsonStringArray(generation.resultAssetKeys).map((key) => getSignedAssetUrl(key)));
+
   return {
     id: generation.id,
     model: generation.model,
     taskId: generation.taskId,
     status: generation.status,
-    resultUrls: generation.resultUrls ? JSON.parse(generation.resultUrls) : [],
+    resultUrls,
     errorMessage: generation.errorMessage,
   };
 }
@@ -43,19 +64,6 @@ function extensionFromMimeType(mimeType: string | undefined) {
       return "gif";
     default:
       return "png";
-  }
-}
-
-async function getRemoteImageExtension(sourceUrl: string) {
-  try {
-    const response = await fetch(sourceUrl, { method: "HEAD" });
-    if (!response.ok) {
-      return "png";
-    }
-
-    return extensionFromMimeType(response.headers.get("content-type")?.split(";")[0]?.trim());
-  } catch {
-    return "png";
   }
 }
 
@@ -78,33 +86,23 @@ async function copyGeneratedImage(input: {
   index: number;
   copiedKeys: string[];
 }) {
-  const initialExtension = await getRemoteImageExtension(input.sourceUrl);
-  let key = generatedImageKey(input.userId, input.generationId, input.index, initialExtension);
-  let copied = await copyRemoteImageToR2({ sourceUrl: input.sourceUrl, key });
-  input.copiedKeys.push(copied.key);
-
-  const copiedExtension = extensionFromMimeType(copied.mimeType);
-  if (copiedExtension !== initialExtension) {
-    await deleteObjectFromR2(copied.key);
-    const copiedKeyIndex = input.copiedKeys.indexOf(copied.key);
-    if (copiedKeyIndex !== -1) {
-      input.copiedKeys.splice(copiedKeyIndex, 1);
-    }
-
-    key = generatedImageKey(input.userId, input.generationId, input.index, copiedExtension);
-    copied = await copyRemoteImageToR2({ sourceUrl: input.sourceUrl, key });
-    input.copiedKeys.push(copied.key);
-  }
-
-  const url = copied.url ?? (await getSignedAssetUrl(copied.key));
+  const remoteImage = await fetchRemoteImageForR2({ sourceUrl: input.sourceUrl });
+  const extension = extensionFromMimeType(remoteImage.mimeType);
+  const key = generatedImageKey(input.userId, input.generationId, input.index, extension);
+  const upload = await putObjectToR2({
+    key,
+    body: remoteImage.body,
+    contentType: remoteImage.mimeType,
+  });
+  input.copiedKeys.push(upload.key);
 
   return {
-    bucket: copied.bucket,
-    key: copied.key,
-    url,
-    filename: `${input.generationId}-${input.index}.${copiedExtension}`,
-    mimeType: copied.mimeType,
-    size: copied.size,
+    bucket: upload.bucket,
+    key: upload.key,
+    url: upload.url,
+    filename: `${input.generationId}-${input.index}.${extension}`,
+    mimeType: remoteImage.mimeType,
+    size: remoteImage.size,
   };
 }
 
@@ -134,7 +132,7 @@ export async function GET(_req: Request, { params }: Props) {
   }
 
   if (!generation.taskId || generation.status === "completed" || generation.status === "failed") {
-    return NextResponse.json(toDto(generation));
+    return NextResponse.json(await toDto(generation));
   }
 
   let taskResult: Awaited<ReturnType<typeof getGenerationTaskResult>>;
@@ -165,24 +163,27 @@ export async function GET(_req: Request, { params }: Props) {
           taskId: true,
           status: true,
           resultUrls: true,
+          resultAssetKeys: true,
           errorMessage: true,
         },
       });
     });
 
-    return NextResponse.json(toDto(failed), { status: 500 });
+    return NextResponse.json(await toDto(failed), { status: 500 });
   }
 
   const { record, result } = taskResult;
   if (!result) {
     return NextResponse.json({
-      ...toDto(generation),
+      ...(await toDto(generation)),
       status: "processing",
       taskState: record.state,
     });
   }
 
   const copiedKeys: string[] = [];
+  const storageStartedAt = new Date();
+  const staleStorageStartedBefore = new Date(storageStartedAt.getTime() - STORAGE_LOCK_STALE_MS);
 
   try {
     const storageLock = await prisma.generation.updateMany({
@@ -190,10 +191,18 @@ export async function GET(_req: Request, { params }: Props) {
         id: generation.id,
         userId: generation.userId,
         status: { notIn: ["completed", "failed"] },
-        resultAssetKeys: null,
+        OR: [
+          { storageStatus: null },
+          { storageStatus: "failed" },
+          {
+            storageStatus: "processing",
+            storageStartedAt: { lt: staleStorageStartedBefore },
+          },
+        ],
       },
       data: {
-        resultAssetKeys: JSON.stringify([]),
+        storageStatus: "processing",
+        storageStartedAt,
       },
     });
 
@@ -206,16 +215,17 @@ export async function GET(_req: Request, { params }: Props) {
           taskId: true,
           status: true,
           resultUrls: true,
+          resultAssetKeys: true,
           errorMessage: true,
         },
       });
 
       if (current.status === "completed" || current.status === "failed") {
-        return NextResponse.json(toDto(current));
+        return NextResponse.json(await toDto(current));
       }
 
       return NextResponse.json({
-        ...toDto(current),
+        ...(await toDto(current)),
         status: "processing",
         taskState: record.state,
       });
@@ -237,18 +247,21 @@ export async function GET(_req: Request, { params }: Props) {
 
     const resultUrls = generatedAssets.map((asset) => asset.url);
     const resultAssetKeys = generatedAssets.map((asset) => asset.key);
+    const publicResultUrls = resultUrls.filter((url): url is string => Boolean(url));
 
     const updated = await prisma.$transaction(async (tx) => {
       const write = await tx.generation.updateMany({
         where: {
           id: generation.id,
           status: { notIn: ["completed", "failed"] },
-          resultAssetKeys: JSON.stringify([]),
+          storageStatus: "processing",
+          storageStartedAt,
         },
         data: {
           status: "completed",
-          resultUrls: JSON.stringify(resultUrls),
+          resultUrls: publicResultUrls.length > 0 ? JSON.stringify(publicResultUrls) : null,
           resultAssetKeys: JSON.stringify(resultAssetKeys),
+          storageStatus: "completed",
           errorMessage: null,
         },
       });
@@ -264,7 +277,7 @@ export async function GET(_req: Request, { params }: Props) {
             kind: "generated",
             bucket: asset.bucket,
             key: asset.key,
-            url: asset.url,
+            url: asset.url ?? null,
             filename: asset.filename,
             mimeType: asset.mimeType,
             size: asset.size,
@@ -285,13 +298,14 @@ export async function GET(_req: Request, { params }: Props) {
           taskId: true,
           status: true,
           resultUrls: true,
+          resultAssetKeys: true,
           errorMessage: true,
         },
       });
     });
 
     return NextResponse.json({
-      ...toDto(updated),
+      ...(await toDto(updated)),
       costTime: result.costTime,
       creditsConsumed: creditsToConsume,
     });
@@ -299,20 +313,22 @@ export async function GET(_req: Request, { params }: Props) {
     await cleanupCopiedObjects(copiedKeys);
 
     console.error("Generated image storage failed:", error);
-    const failed = await prisma.$transaction(async (tx) => {
-      await tx.generation.updateMany({
+    const { current, markedFailed } = await prisma.$transaction(async (tx) => {
+      const write = await tx.generation.updateMany({
         where: {
           id: generation.id,
           status: { not: "completed" },
+          storageStatus: "processing",
+          storageStartedAt,
         },
         data: {
           status: "failed",
           errorMessage: STORAGE_FAILED_MESSAGE,
-          resultAssetKeys: null,
+          storageStatus: "failed",
         },
       });
 
-      return tx.generation.findUniqueOrThrow({
+      const currentGeneration = await tx.generation.findUniqueOrThrow({
         where: { id: generation.id },
         select: {
           id: true,
@@ -320,11 +336,25 @@ export async function GET(_req: Request, { params }: Props) {
           taskId: true,
           status: true,
           resultUrls: true,
+          resultAssetKeys: true,
           errorMessage: true,
         },
       });
+
+      return {
+        current: currentGeneration,
+        markedFailed: write.count === 1,
+      };
     });
 
-    return NextResponse.json(toDto(failed), { status: 500 });
+    if (!markedFailed && current.status !== "completed" && current.status !== "failed") {
+      return NextResponse.json({
+        ...(await toDto(current)),
+        status: "processing",
+        taskState: record.state,
+      });
+    }
+
+    return NextResponse.json(await toDto(current), { status: current.status === "completed" ? 200 : 500 });
   }
 }

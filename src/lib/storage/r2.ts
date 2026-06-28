@@ -6,6 +6,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 const DEFAULT_SIGNED_URL_TTL_SECONDS = 3600;
 const MAX_SIGNED_URL_TTL_SECONDS = 604800;
 const TTL_ERROR_MESSAGE = `R2_SIGNED_URL_TTL_SECONDS must be a positive safe integer no greater than ${MAX_SIGNED_URL_TTL_SECONDS}`;
+const UNSUPPORTED_REMOTE_IMAGE_MESSAGE = "Remote image data is unsupported or invalid";
 
 type R2Config = {
   accountId: string;
@@ -89,6 +90,79 @@ function sanitizedRemoteImageUrl(value: string) {
   }
 }
 
+export function sniffSupportedImageMimeType(buffer: Buffer): string | undefined {
+  if (
+    buffer.byteLength >= 8 &&
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47 &&
+    buffer[4] === 0x0d &&
+    buffer[5] === 0x0a &&
+    buffer[6] === 0x1a &&
+    buffer[7] === 0x0a
+  ) {
+    return "image/png";
+  }
+
+  if (
+    buffer.byteLength >= 3 &&
+    buffer[0] === 0xff &&
+    buffer[1] === 0xd8 &&
+    buffer[2] === 0xff
+  ) {
+    return "image/jpeg";
+  }
+
+  if (
+    buffer.byteLength >= 12 &&
+    buffer.subarray(0, 4).toString("ascii") === "RIFF" &&
+    buffer.subarray(8, 12).toString("ascii") === "WEBP"
+  ) {
+    return "image/webp";
+  }
+
+  if (buffer.byteLength >= 6) {
+    const signature = buffer.subarray(0, 6).toString("ascii");
+    if (signature === "GIF87a" || signature === "GIF89a") {
+      return "image/gif";
+    }
+  }
+
+  return undefined;
+}
+
+export async function fetchRemoteImageForR2(input: {
+  sourceUrl: string;
+}): Promise<{ body: Buffer; size: number; mimeType: string }> {
+  const sanitizedSourceUrl = sanitizedRemoteImageUrl(input.sourceUrl);
+  let response: Response;
+
+  try {
+    response = await fetch(input.sourceUrl);
+  } catch {
+    throw new Error(`Failed to fetch remote image from ${sanitizedSourceUrl}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch remote image from ${sanitizedSourceUrl}: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const body = Buffer.from(await response.arrayBuffer());
+  const mimeType = sniffSupportedImageMimeType(body);
+  if (!mimeType) {
+    throw new Error(UNSUPPORTED_REMOTE_IMAGE_MESSAGE);
+  }
+
+  return {
+    body,
+    size: body.byteLength,
+    mimeType,
+  };
+}
+
 export async function putObjectToR2(input: {
   key: string;
   body: Buffer | Uint8Array;
@@ -135,33 +209,17 @@ export async function copyRemoteImageToR2(input: {
   sourceUrl: string;
   key: string;
 }): Promise<{ bucket: string; key: string; url?: string; size: number; mimeType: string }> {
-  const sanitizedSourceUrl = sanitizedRemoteImageUrl(input.sourceUrl);
-  let response: Response;
-
-  try {
-    response = await fetch(input.sourceUrl);
-  } catch {
-    throw new Error(`Failed to fetch remote image from ${sanitizedSourceUrl}`);
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch remote image from ${sanitizedSourceUrl}: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const mimeType = response.headers.get("content-type")?.split(";")[0]?.trim() || "application/octet-stream";
-  const body = Buffer.from(await response.arrayBuffer());
+  const remoteImage = await fetchRemoteImageForR2({ sourceUrl: input.sourceUrl });
   const upload = await putObjectToR2({
     key: input.key,
-    body,
-    contentType: mimeType,
+    body: remoteImage.body,
+    contentType: remoteImage.mimeType,
   });
 
   return {
     ...upload,
-    size: body.byteLength,
-    mimeType,
+    size: remoteImage.size,
+    mimeType: remoteImage.mimeType,
   };
 }
 
