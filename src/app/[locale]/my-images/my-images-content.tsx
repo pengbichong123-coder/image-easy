@@ -5,6 +5,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { HistoryGrid, type HistoryItem } from "@/components/HistoryGrid";
+import {
+  getHistoryItemsNeedingStatusRefresh,
+  mergeHistoryItemStatusRefresh,
+} from "@/lib/history-status-refresh";
 import { MODEL_GROUPS } from "@/lib/models";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +21,34 @@ export function MyImagesContent() {
   const [loading, setLoading] = useState(true);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [modelFilter, setModelFilter] = useState<string | "all">("all");
+
+  const refreshProcessingItems = useCallback(async (historyItems: HistoryItem[]) => {
+    const ids = getHistoryItemsNeedingStatusRefresh(historyItems);
+    if (ids.length === 0) return;
+
+    const results = await Promise.allSettled(
+      ids.map(async (id) => {
+        const res = await fetch(`/api/generate/${id}`, { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok && data.status !== "failed") {
+          throw new Error(data.error || "Failed to refresh generation status");
+        }
+
+        return data as Partial<HistoryItem> & { id: string };
+      }),
+    );
+
+    const refreshedItems = results
+      .filter((result): result is PromiseFulfilledResult<Partial<HistoryItem> & { id: string }> => result.status === "fulfilled")
+      .map((result) => result.value);
+
+    if (refreshedItems.length === 0) return;
+
+    setItems((currentItems) => refreshedItems.reduce(
+      (nextItems, refreshedItem) => mergeHistoryItemStatusRefresh(nextItems, refreshedItem),
+      currentItems,
+    ));
+  }, []);
 
   const load = useCallback(
     async (cursor?: string) => {
@@ -36,13 +68,14 @@ export function MyImagesContent() {
           setItems((prev) => [...prev, ...data.items]);
         } else {
           setItems(data.items);
+          void refreshProcessingItems(data.items);
         }
         setNextCursor(data.nextCursor);
       } finally {
         setLoading(false);
       }
     },
-    [router, modelFilter],
+    [router, modelFilter, refreshProcessingItems],
   );
 
   useEffect(() => {
