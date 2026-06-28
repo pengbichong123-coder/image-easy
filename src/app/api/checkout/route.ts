@@ -14,13 +14,13 @@ const checkoutSchema = z.object({
   locale: z.string().optional(),
 });
 
-function getAppUrl() {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-  if (!appUrl) {
-    throw new Error("Missing NEXT_PUBLIC_APP_URL environment variable");
+function getAppUrl(req: NextRequest) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (appUrl) {
+    return appUrl.replace(/\/$/, "");
   }
 
-  return appUrl.replace(/\/$/, "");
+  return req.nextUrl.origin;
 }
 
 export async function POST(req: NextRequest) {
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   }
 
   const stripe = getStripeClient();
-  const { successUrl, cancelUrl } = buildCheckoutReturnUrls(getAppUrl(), body.locale);
+  const { successUrl, cancelUrl } = buildCheckoutReturnUrls(getAppUrl(req), body.locale);
 
   try {
     const subscriptionPlan = findSubscriptionPlanByStripePriceId(body.priceId);
