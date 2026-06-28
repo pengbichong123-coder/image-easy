@@ -44,6 +44,9 @@ cp .env.example .env
 - `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET_NAME`: Cloudflare R2 存储桶配置
 - `R2_PUBLIC_BASE_URL`: R2 自定义域名或公开访问基础 URL；如果使用私有桶和签名 URL，可以留空
 - `R2_SIGNED_URL_TTL_SECONDS`: R2 签名下载 URL 的有效期，默认 `3600`
+- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`: Stripe Checkout 和 webhook 服务端密钥
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe 前端 publishable key
+- `NEXT_PUBLIC_APP_URL`: 站点公开 URL，生产环境使用 `https://www.image-easy.com`
 
 ### 3. 初始化数据库
 
@@ -161,6 +164,10 @@ R2_BUCKET_NAME=
 R2_PUBLIC_BASE_URL=
 R2_SIGNED_URL_TTL_SECONDS=3600
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_APP_URL=https://www.image-easy.com
 ```
 
 - `R2_ACCOUNT_ID`: Cloudflare 账户 ID，用于拼接 R2 S3 API endpoint。
@@ -169,6 +176,10 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 - `R2_PUBLIC_BASE_URL`: 如果 bucket 绑定了公开域名，填完整基础 URL；私有 bucket 或只使用签名 URL 时可以留空。
 - `R2_SIGNED_URL_TTL_SECONDS`: 私有资源签名 URL 的有效期秒数，未配置时默认 `3600`。
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID`: Google Analytics 4 Measurement ID；缺省时前端不会注入 GA 脚本。
+- `STRIPE_SECRET_KEY`: Stripe secret key，用于服务端创建 Checkout Session。
+- `STRIPE_WEBHOOK_SECRET`: Stripe webhook endpoint secret，用于 `/api/stripe/webhook` 验签。
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe publishable key，供前端 Stripe 集成使用。
+- `NEXT_PUBLIC_APP_URL`: Checkout success/cancel 回跳的公开站点 URL，生产环境设置为 `https://www.image-easy.com`。
 
 ## License
 
