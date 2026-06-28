@@ -867,7 +867,10 @@ export async function POST(req: NextRequest) {
           event.type === "checkout.session.async_payment_succeeded"
         ) {
           await processCheckoutSessionCompleted(tx, event.data.object as Stripe.Checkout.Session, event.id);
-        } else if (event.type === "invoice.paid") {
+        } else if (
+          event.type === "invoice.paid" ||
+          event.type === "invoice.payment_succeeded"
+        ) {
           await processInvoicePaid(tx, event.data.object as Stripe.Invoice, event.id);
         } else if (event.type === "invoice.payment_failed") {
           await processInvoicePaymentFailed(tx, event.data.object as Stripe.Invoice, event.id);
