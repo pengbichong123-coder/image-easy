@@ -67,6 +67,13 @@ export interface ModelGroup {
   capabilities: ModelInfo[];
 }
 
+export interface ModelParamsState {
+  aspectRatio?: AspectRatio;
+  resolution?: Resolution;
+  quality?: Quality;
+  outputFormat?: OutputFormat;
+}
+
 export const MODELS: Record<ModelId, ModelInfo> = {
   "gpt-image-2-text-to-image": {
     id: "gpt-image-2-text-to-image",
@@ -296,4 +303,24 @@ export function getModelGroupByModelId(id: ModelId): ModelGroup {
 
 export function getModel(id: ModelId): ModelInfo {
   return MODELS[id];
+}
+
+function normalizeOption<T extends string>(
+  supported: boolean,
+  options: readonly T[],
+  current: T | undefined,
+) {
+  if (!supported) return undefined;
+  return current && options.includes(current) ? current : options[0];
+}
+
+export function normalizeModelParams(modelId: ModelId, params: ModelParamsState): ModelParamsState {
+  const model = MODELS[modelId];
+
+  return {
+    aspectRatio: normalizeOption(model.supportsAspectRatio, model.aspectRatioOptions, params.aspectRatio),
+    resolution: normalizeOption(model.supportsResolution, model.resolutionOptions, params.resolution),
+    quality: normalizeOption(model.supportsQuality, model.qualityOptions, params.quality),
+    outputFormat: normalizeOption(model.supportsOutputFormat, model.outputFormatOptions, params.outputFormat),
+  };
 }

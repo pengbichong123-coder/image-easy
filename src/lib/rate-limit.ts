@@ -1,5 +1,6 @@
 import { refundGenerationCreditInTransaction } from "./credits";
 import { prisma } from "./db";
+import { getGenerationCreditCostForRecord } from "./generation-credit-cost";
 
 const UPLOADS_PER_HOUR_LIMIT = 60;
 const GENERATIONS_PER_HOUR_LIMIT = 20;
@@ -50,6 +51,11 @@ export async function assertCanGenerate(userId: string): Promise<void> {
       },
       select: {
         id: true,
+        model: true,
+        aspectRatio: true,
+        resolution: true,
+        quality: true,
+        outputFormat: true,
       },
     });
 
@@ -71,7 +77,7 @@ export async function assertCanGenerate(userId: string): Promise<void> {
         await refundGenerationCreditInTransaction(tx, {
           userId,
           generationId: generation.id,
-          amount: 1,
+          amount: getGenerationCreditCostForRecord(generation),
           reason: "Refund reserved credit after generation timed out",
         });
       }

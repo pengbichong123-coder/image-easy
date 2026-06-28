@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { refundGenerationCreditInTransaction } from "@/lib/credits";
+import { getGenerationCreditCostForRecord } from "@/lib/generation-credit-cost";
 import { prisma } from "@/lib/db";
 import {
-  GENERATION_CREDIT_COST,
   generationToDto,
   processGenerationProviderResult,
 } from "@/lib/generation-processing";
@@ -36,6 +36,10 @@ export async function GET(_req: Request, { params }: Props) {
       resultAssetKeys: true,
       errorMessage: true,
       providerPollErrorCount: true,
+      aspectRatio: true,
+      resolution: true,
+      quality: true,
+      outputFormat: true,
       createdAt: true,
     },
   });
@@ -67,7 +71,7 @@ export async function GET(_req: Request, { params }: Props) {
           await refundGenerationCreditInTransaction(tx, {
             userId: generation.userId,
             generationId: generation.id,
-            amount: GENERATION_CREDIT_COST,
+            amount: getGenerationCreditCostForRecord(generation),
             reason: "Refund reserved credit after generation start timed out",
           });
         }
@@ -82,6 +86,10 @@ export async function GET(_req: Request, { params }: Props) {
             resultUrls: true,
             resultAssetKeys: true,
             errorMessage: true,
+            aspectRatio: true,
+            resolution: true,
+            quality: true,
+            outputFormat: true,
           },
         });
 

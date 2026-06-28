@@ -7,13 +7,13 @@ import {
 } from "@/lib/credits";
 import { KieError, submitGenerationTask } from "@/lib/kie";
 import { prisma } from "@/lib/db";
+import { getGenerationCreditCost } from "@/lib/generation-credit-cost";
 import { buildKieCallbackUrl } from "@/lib/kie-callback";
 import { assertCanGenerate, RateLimitError } from "@/lib/rate-limit";
 import { MODELS, type ModelId, type AspectRatio, type Resolution, type Quality, type OutputFormat } from "@/lib/models";
 import { z } from "zod";
 
 export const runtime = "nodejs";
-const GENERATION_CREDIT_COST = 1;
 
 const generateSchema = z.object({
   model: z.enum([
@@ -36,6 +36,7 @@ const generateSchema = z.object({
 async function markGenerationFailedAndRefund(input: {
   userId: string;
   generationId: string;
+  creditCost: number;
   message: string;
 }) {
   try {
@@ -56,7 +57,7 @@ async function markGenerationFailedAndRefund(input: {
         await refundGenerationCreditInTransaction(tx, {
           userId: input.userId,
           generationId: input.generationId,
-          amount: GENERATION_CREDIT_COST,
+          amount: input.creditCost,
           reason: "Refund reserved credit after generation task creation failed",
         });
       }
@@ -134,6 +135,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const creditCost = getGenerationCreditCost({
+    model: body.model,
+    aspectRatio: body.aspectRatio as AspectRatio | undefined,
+    resolution: body.resolution,
+    quality: body.quality,
+    outputFormat: body.outputFormat,
+  });
+
   try {
     await assertCanGenerate(session.user.id);
   } catch (error) {
@@ -184,7 +193,7 @@ export async function POST(req: NextRequest) {
       await reserveGenerationCreditInTransaction(tx, {
         userId: session.user.id,
         generationId: pendingGeneration.id,
-        amount: GENERATION_CREDIT_COST,
+        amount: creditCost,
         reason: "Reserve credit for image generation",
       });
 
@@ -263,6 +272,7 @@ export async function POST(req: NextRequest) {
     await markGenerationFailedAndRefund({
       userId: session.user.id,
       generationId: generation.id,
+      creditCost,
       message,
     });
 

@@ -92,11 +92,16 @@ export default async function HomePage({
       <section className="px-3 sm:px-5 pb-20">
         <div className="max-w-[1280px] mx-auto bg-gradient-to-b from-[#F5F5F7] to-white rounded-[24px] px-5 py-20 sm:py-24 text-center">
           <h2 className="display text-[48px] sm:text-[64px] text-[#1D1D1F] mb-4">
-            {t("section1TitleA")} <span className="display-em text-[#0066CC]">{t("section1TitleEm")}</span>
-            {t("section1TitleB")}
+            {t("limitedTitleA")} <span className="display-em text-[#0066CC]">{t("limitedTitleEm")}</span>
+            {t("limitedTitleB")}
           </h2>
           <div className="text-[19px] text-[#6E6E73] max-w-[580px] mx-auto leading-[1.4]">
-            {t("section1Body", { em: t("section1BodyEm") })}
+            {t("limitedBody")}
+          </div>
+          <div className="mt-7">
+            <Link href="/pricing" className="btn btn-link">
+              {t("limitedLink")} ›
+            </Link>
           </div>
         </div>
       </section>
@@ -107,11 +112,11 @@ export default async function HomePage({
       <section className="max-w-[1280px] mx-auto px-3 sm:px-5 pb-20">
         <div className="text-center mb-12">
           <h2 className="display text-[40px] sm:text-[56px] text-[#1D1D1F] mb-3">
-            {t("section1TitleA")} <span className="display-em text-[#0066CC]">{t("section1BodyEm")}</span>
-            {t("section1TitleB")}
+            {t("modelCompareTitleA")} <span className="display-em text-[#0066CC]">{t("modelCompareTitleEm")}</span>
+            {t("modelCompareTitleB")}
           </h2>
           <div className="text-[19px] text-[#6E6E73] max-w-[520px] mx-auto leading-[1.4]">
-            {t("section1Body", { em: t("section1BodyEm") })}
+            {t("modelCompareBody")}
           </div>
         </div>
 
@@ -172,10 +177,46 @@ export default async function HomePage({
             {t("section2Body", { em: t("section2BodyEm") })}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 bg-white rounded-[24px] overflow-hidden text-left">
-            <ProcessStep num="1." title={tNav("expose")} text={t("section1Body", { em: t("section1BodyEm") })} />
-            <ProcessStep num="2." title={t("section2BodyEm")} text={t("section2Body", { em: t("section2BodyEm") })} />
-            <ProcessStep num="3." title={tNav("archive")} text={t("section2Body", { em: t("section2BodyEm") })} />
+            <ProcessStep num="1." title={tNav("expose")} text={t("step1Text")} />
+            <ProcessStep num="2." title={t("section2BodyEm")} text={t("step2Text")} />
+            <ProcessStep num="3." title={tNav("archive")} text={t("step3Text")} />
           </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          USE CASES
+          ============================================ */}
+      <section className="max-w-[1180px] mx-auto px-5 py-20">
+        <div className="mb-10 max-w-[720px]">
+          <div className="text-[14px] text-[#6E6E73] mb-3">
+            {t("useCasesKicker")}
+          </div>
+          <h2 className="display text-[40px] sm:text-[56px] text-[#1D1D1F] mb-3">
+            {t("useCasesTitle")}
+          </h2>
+          <p className="text-[19px] text-[#6E6E73] leading-[1.4]">
+            {t("useCasesLead")}
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <UseCase title={t("useCase1Title")} body={t("useCase1Body")} />
+          <UseCase title={t("useCase2Title")} body={t("useCase2Body")} />
+          <UseCase title={t("useCase3Title")} body={t("useCase3Body")} />
+        </div>
+      </section>
+
+      {/* ============================================
+          FAQ
+          ============================================ */}
+      <section className="max-w-[980px] mx-auto px-5 py-20">
+        <h2 className="display text-[40px] sm:text-[56px] text-[#1D1D1F] mb-8">
+          {t("faqTitle")}
+        </h2>
+        <div className="divide-y divide-[#D2D2D7]">
+          <FaqItem question={t("faq1Q")} answer={t("faq1A")} />
+          <FaqItem question={t("faq2Q")} answer={t("faq2A")} />
+          <FaqItem question={t("faq3Q")} answer={t("faq3A")} />
         </div>
       </section>
 
@@ -257,6 +298,44 @@ export default async function HomePage({
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function UseCase({
+  title,
+  body,
+}: {
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="bg-[#F5F5F7] rounded-[24px] p-8 min-h-[220px]">
+      <h3 className="text-[22px] sm:text-[24px] font-semibold tracking-[-0.01em] mb-4 text-[#1D1D1F]">
+        {title}
+      </h3>
+      <p className="text-[15px] leading-[1.5] text-[#6E6E73]">
+        {body}
+      </p>
+    </div>
+  );
+}
+
+function FaqItem({
+  question,
+  answer,
+}: {
+  question: string;
+  answer: string;
+}) {
+  return (
+    <div className="py-6 grid gap-3 md:grid-cols-[0.9fr_1.1fr]">
+      <h3 className="text-[19px] font-semibold text-[#1D1D1F]">
+        {question}
+      </h3>
+      <p className="text-[16px] leading-[1.6] text-[#6E6E73]">
+        {answer}
+      </p>
     </div>
   );
 }

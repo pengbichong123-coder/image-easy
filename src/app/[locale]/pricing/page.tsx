@@ -3,6 +3,8 @@ import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CreditPackageCheckout } from "@/components/CreditPackageCheckout";
 import { prisma } from "@/lib/db";
+import { GENERATION_CREDIT_COST_ROWS } from "@/lib/generation-credit-cost";
+import { isPaidCreditsEnabled } from "@/lib/pricing-mode";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -31,24 +33,27 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
   setRequestLocale(locale);
   const t = await getTranslations("trust.pricing");
   const resolvedSearchParams = await searchParams;
+  const paidCreditsEnabled = isPaidCreditsEnabled(process.env.ENABLE_PAID_CREDITS);
   const checkoutStatus = Array.isArray(resolvedSearchParams?.checkout)
     ? resolvedSearchParams.checkout[0]
     : resolvedSearchParams?.checkout;
-  const creditPackages = await prisma.creditPackage.findMany({
-    where: { active: true },
-    orderBy: [
-      { priceCents: "asc" },
-      { credits: "asc" },
-    ],
-    select: {
-      id: true,
-      name: true,
-      credits: true,
-      priceCents: true,
-      currency: true,
-      stripePriceId: true,
-    },
-  });
+  const creditPackages = paidCreditsEnabled
+    ? await prisma.creditPackage.findMany({
+        where: { active: true },
+        orderBy: [
+          { priceCents: "asc" },
+          { credits: "asc" },
+        ],
+        select: {
+          id: true,
+          name: true,
+          credits: true,
+          priceCents: true,
+          currency: true,
+          stripePriceId: true,
+        },
+      })
+    : [];
 
   return (
     <div className="bg-white">
@@ -115,6 +120,37 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
           <div className="space-y-4 text-[16px] leading-[1.6] text-[#6E6E73]">
             <p>{t("detailsBody1")}</p>
             <p>{t("detailsBody2")}</p>
+          </div>
+        </div>
+
+        <div className="mt-10 border-t border-[#E5E5E7] pt-10">
+          <h2 className="text-[24px] font-semibold text-[#1D1D1F] mb-4">
+            {t("costTableTitle")}
+          </h2>
+          <p className="text-[16px] leading-[1.6] text-[#6E6E73] mb-6">
+            {t("costTableLead")}
+          </p>
+          <div className="overflow-hidden rounded-[8px] border border-[#E5E5E7]">
+            <table className="w-full text-left text-[14px]">
+              <thead className="bg-[#F5F5F7] text-[#6E6E73]">
+                <tr>
+                  <th className="px-4 py-3 font-medium">{t("costTableModel")}</th>
+                  <th className="px-4 py-3 font-medium">{t("costTableSpec")}</th>
+                  <th className="px-4 py-3 font-medium text-right">{t("costTableCredits")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {GENERATION_CREDIT_COST_ROWS.map((row) => (
+                  <tr key={`${row.model}-${row.spec}`} className="border-t border-[#E5E5E7]">
+                    <td className="px-4 py-3 text-[#1D1D1F]">{row.model}</td>
+                    <td className="px-4 py-3 text-[#6E6E73]">{row.spec}</td>
+                    <td className="px-4 py-3 text-[#1D1D1F] text-right tabular">
+                      {t("costTableCreditValue", { credits: row.credits })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

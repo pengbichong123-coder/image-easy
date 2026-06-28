@@ -59,6 +59,10 @@ async function loadGeneration(input: {
       resultAssetKeys: true,
       errorMessage: true,
       providerPollErrorCount: true,
+      aspectRatio: true,
+      resolution: true,
+      quality: true,
+      outputFormat: true,
     },
   });
 
@@ -95,6 +99,10 @@ async function loadGeneration(input: {
         resultAssetKeys: true,
         errorMessage: true,
         providerPollErrorCount: true,
+        aspectRatio: true,
+        resolution: true,
+        quality: true,
+        outputFormat: true,
       },
     });
   }

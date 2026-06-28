@@ -1,12 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { consumeReservedCreditInTransaction, refundGenerationCreditInTransaction } from "@/lib/credits";
 import { prisma } from "@/lib/db";
+import { getGenerationCreditCostForRecord } from "@/lib/generation-credit-cost";
 import { resolveGenerationResultUrls } from "@/lib/generation-results";
 import { getGenerationTaskResult, KieError } from "@/lib/kie";
 import { generatedImageKey } from "@/lib/storage/keys";
 import { deleteObjectFromR2, fetchRemoteImageForR2, getSignedAssetUrl, putObjectToR2 } from "@/lib/storage/r2";
-
-export const GENERATION_CREDIT_COST = 1;
 
 const STORAGE_FAILED_MESSAGE = "Image generated but storage failed. Please retry.";
 const STORAGE_LOCK_STALE_MS = 10 * 60 * 1000;
@@ -22,6 +21,10 @@ export type GenerationForProcessing = {
   resultAssetKeys: string | null;
   errorMessage: string | null;
   providerPollErrorCount: number;
+  aspectRatio?: string | null;
+  resolution?: string | null;
+  quality?: string | null;
+  outputFormat?: string | null;
 };
 
 export function canMarkGenerationFailedWithStorageState(input: {
@@ -146,7 +149,7 @@ async function markGenerationFailed(input: {
       await refundGenerationCreditInTransaction(tx, {
         userId: input.generation.userId,
         generationId: input.generation.id,
-        amount: GENERATION_CREDIT_COST,
+        amount: getGenerationCreditCostForRecord(input.generation),
         reason: input.reason,
       });
     }
@@ -240,7 +243,7 @@ async function handleTransientProviderError(input: {
         await refundGenerationCreditInTransaction(tx, {
           userId: input.generation.userId,
           generationId: input.generation.id,
-          amount: GENERATION_CREDIT_COST,
+          amount: getGenerationCreditCostForRecord(input.generation),
           reason: "Refund reserved credit after provider transient errors exceeded retry limit",
         });
       }
@@ -499,7 +502,7 @@ export async function processGenerationProviderResult(generation: GenerationForP
       await consumeReservedCreditInTransaction(tx, {
         userId: generation.userId,
         generationId: generation.id,
-        amount: GENERATION_CREDIT_COST,
+        amount: getGenerationCreditCostForRecord(generation),
         reason: "Consume reserved credit after generation completed",
       });
 
@@ -521,7 +524,7 @@ export async function processGenerationProviderResult(generation: GenerationForP
       body: {
         ...(await generationToDto(updated)),
         costTime: result.costTime,
-        creditsConsumed: GENERATION_CREDIT_COST,
+        creditsConsumed: getGenerationCreditCostForRecord(generation),
       },
       status: 200,
     };

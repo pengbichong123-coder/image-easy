@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { PromptInput } from "@/components/PromptInput";
 import { ImageUploader, type UploadedImage } from "@/components/ImageUploader";
 import { GenerationResult, type GenerationOutput } from "@/components/GenerationResult";
 import { trackEvent, type AnalyticsParams } from "@/lib/analytics";
+import { getGenerationCreditCost } from "@/lib/generation-credit-cost";
 import {
   MODELS,
   type ModelId,
@@ -19,6 +20,7 @@ import {
   type Quality,
   type OutputFormat,
   isImageToImageModel,
+  normalizeModelParams,
 } from "@/lib/models";
 
 export function CreateContent() {
@@ -48,6 +50,23 @@ export function CreateContent() {
   const [error, setError] = useState<string | null>(null);
 
   const modelInfo = MODELS[modelId];
+  const normalizedParams = useMemo(
+    () =>
+      normalizeModelParams(modelId, {
+        aspectRatio,
+        resolution,
+        quality,
+        outputFormat,
+      }),
+    [aspectRatio, modelId, outputFormat, quality, resolution],
+  );
+  const estimatedCredits = getGenerationCreditCost({
+    model: modelId,
+    aspectRatio: normalizedParams.aspectRatio,
+    resolution: normalizedParams.resolution,
+    quality: normalizedParams.quality,
+    outputFormat: normalizedParams.outputFormat,
+  });
 
   function commonAnalyticsParams(
     status: string,
@@ -139,13 +158,13 @@ export function CreateContent() {
     };
   }, [reuseId, locale]);
 
-  // Reset params not supported by current model
+  // Keep model-specific params valid as users switch between providers.
   useEffect(() => {
-    if (!modelInfo.supportsAspectRatio) setAspectRatio(undefined);
-    if (!modelInfo.supportsResolution) setResolution(undefined);
-    if (!modelInfo.supportsQuality) setQuality(undefined);
-    if (!modelInfo.supportsOutputFormat) setOutputFormat(undefined);
-  }, [modelId, modelInfo]);
+    if (normalizedParams.aspectRatio !== aspectRatio) setAspectRatio(normalizedParams.aspectRatio);
+    if (normalizedParams.resolution !== resolution) setResolution(normalizedParams.resolution);
+    if (normalizedParams.quality !== quality) setQuality(normalizedParams.quality);
+    if (normalizedParams.outputFormat !== outputFormat) setOutputFormat(normalizedParams.outputFormat);
+  }, [aspectRatio, modelId, normalizedParams, outputFormat, quality, resolution]);
 
   if (status === "loading") {
     return (
@@ -202,10 +221,10 @@ export function CreateContent() {
         body: JSON.stringify({
           model: modelId,
           prompt: prompt.trim(),
-          aspectRatio: aspectRatio,
-          resolution: resolution,
-          quality: quality,
-          outputFormat: outputFormat,
+          aspectRatio: normalizedParams.aspectRatio,
+          resolution: normalizedParams.resolution,
+          quality: normalizedParams.quality,
+          outputFormat: normalizedParams.outputFormat,
           uploadIds: images.filter((i) => i.uploadId).map((i) => i.uploadId!),
           imageUrls: images.filter((i) => !i.uploadId).map((i) => i.url),
           nsfwChecker: nsfwChecker || undefined,
@@ -312,6 +331,9 @@ export function CreateContent() {
               canSubmit={canSubmit}
               submitting={loading}
             />
+            <p className="mt-3 text-[12px] text-[#86868B]">
+              {t("estimatedCredits", { credits: estimatedCredits })}
+            </p>
           </section>
 
           {/* 04 — Settings */}
@@ -323,10 +345,10 @@ export function CreateContent() {
             <div className="bg-[#F5F5F7] rounded-[18px] p-5">
               <ModelParams
                 modelId={modelId}
-                aspectRatio={aspectRatio}
-                resolution={resolution}
-                quality={quality}
-                outputFormat={outputFormat}
+                aspectRatio={normalizedParams.aspectRatio}
+                resolution={normalizedParams.resolution}
+                quality={normalizedParams.quality}
+                outputFormat={normalizedParams.outputFormat}
                 nsfwChecker={nsfwChecker}
                 onAspectRatioChange={setAspectRatio}
                 onResolutionChange={setResolution}

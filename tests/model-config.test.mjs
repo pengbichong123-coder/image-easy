@@ -54,3 +54,31 @@ test("models keep stable app ids separate from Kie model names", () => {
     assert.ok(model.kieModel.length > 0);
   }
 });
+
+test("model params are normalized with required defaults for the selected model", () => {
+  const { normalizeModelParams } = loadModelsModule();
+
+  const restoredDefaults = normalizeModelParams("seedream-4-5-text-to-image", {
+    aspectRatio: "1:1",
+    resolution: undefined,
+    quality: undefined,
+    outputFormat: undefined,
+  });
+
+  assert.equal(restoredDefaults.aspectRatio, "1:1");
+  assert.equal(restoredDefaults.resolution, undefined);
+  assert.equal(restoredDefaults.quality, "basic");
+  assert.equal(restoredDefaults.outputFormat, undefined);
+
+  const clearedUnsupportedParams = normalizeModelParams("seedream-4-5-text-to-image", {
+    aspectRatio: "auto",
+    resolution: "4K",
+    quality: "high",
+    outputFormat: "png",
+  });
+
+  assert.equal(clearedUnsupportedParams.aspectRatio, "1:1");
+  assert.equal(clearedUnsupportedParams.resolution, undefined);
+  assert.equal(clearedUnsupportedParams.quality, "high");
+  assert.equal(clearedUnsupportedParams.outputFormat, undefined);
+});
