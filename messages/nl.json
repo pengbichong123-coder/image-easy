@@ -1,8 +1,8 @@
 {
   "metadata": {
     "siteName": "Image Easy",
-    "title": "Image Easy — AI-afbeeldingsgenerator met meerdere modellen en abonnementen",
-    "description": "Image Easy is een AI-afbeeldingsgenerator met meerdere modellen, actieve abonnementen en tijdelijke gratis credits bij registratie.",
+    "title": "Image Easy — AI-afbeeldingsgenerator met meerdere modellen en registratiecredits",
+    "description": "Image Easy is een AI-afbeeldingsgenerator met meerdere modellen, maand- en jaarplannen en tijdelijke gratis credits bij registratie.",
     "ogDescription": "AI-afbeeldingsgenerator met abonnementen en registratiecredits."
   },
   "common": {
@@ -72,10 +72,10 @@
     "footerLegal": "Juridisch",
     "footerCopyright": "Copyright © 2026 Image Easy Inc. Alle rechten voorbehouden.",
     "footerPrivacyPolicy": "Privacybeleid",
-    "limitedTitleA": "Abonnementen live,",
-    "limitedTitleEm": "credits",
-    "limitedTitleB": "bij registratie.",
-    "limitedBody": "Image Easy abonnementen zijn live. Nieuwe gebruikers kunnen tijdelijke gratis credits claimen; modellen en resoluties gebruiken verschillende credits en mislukte generaties worden terugbetaald.",
+    "limitedTitleA": "Registratiecredits,",
+    "limitedTitleEm": "plannen",
+    "limitedTitleB": "wanneer nodig.",
+    "limitedBody": "Nieuwe gebruikers kunnen tijdelijke gratis credits claimen. Modellen en resoluties gebruiken verschillende credits, mislukte generaties worden terugbetaald en maand- of jaarplannen zijn beschikbaar voor meer capaciteit.",
     "limitedLink": "Bekijk plannen en credits",
     "modelCompareTitleA": "Kies het",
     "modelCompareTitleEm": "model",
@@ -95,7 +95,7 @@
     "useCase3Body": "Upload referenties voor lokale aanpassingen, restyling, scènewijzigingen of preciezere correcties.",
     "faqTitle": "Veelgestelde vragen",
     "faq1Q": "Hoe werkt de prijs van Image Easy?",
-    "faq1A": "Abonnementen zijn live. Nieuwe gebruikers kunnen tijdelijke gratis credits claimen; generaties gebruiken credits op basis van model en resolutie.",
+    "faq1A": "Nieuwe gebruikers kunnen tijdelijke gratis credits claimen; generaties gebruiken credits op basis van model en resolutie. Kies maandelijks of jaarlijks voor meer capaciteit.",
     "faq2Q": "Wat gebeurt er als gratis credits op zijn?",
     "faq2A": "Je kunt doorgaan met een maandelijks of jaarlijks abonnement. Elk plan geeft maandelijks credits.",
     "faq3Q": "Welke AI-afbeeldingsmodellen kan ik gebruiken?",
@@ -104,10 +104,10 @@
   "trust": {
     "pricing": {
       "metaTitle": "Prijzen",
-      "metaDescription": "Image Easy abonnementen zijn live. Meld je aan voor tijdelijke gratis credits en transparant creditgebruik.",
+      "metaDescription": "Meld je aan voor tijdelijke gratis credits en transparant creditgebruik per model en resolutie. Maand- en jaarplannen zijn beschikbaar.",
       "kicker": "Prijzen",
       "title": "Kies het plan voor je creatieve werk.",
-      "lead": "Abonnementen zijn live. Nieuwe gebruikers kunnen tijdelijke gratis credits claimen; kies maandelijks of jaarlijks voor meer capaciteit.",
+      "lead": "Nieuwe gebruikers kunnen tijdelijke gratis credits claimen; kies maandelijks of jaarlijks voor meer capaciteit.",
       "planEyebrow": "Huidig plan",
       "planLabel": "Gratis credits bij registratie",
       "planLine1": "Nieuwe gebruikers kunnen gratis credits claimen om multimodel beeldgeneratie te proberen.",

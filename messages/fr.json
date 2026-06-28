@@ -1,8 +1,8 @@
 {
   "metadata": {
     "siteName": "Image Easy",
-    "title": "Image Easy — Générateur d’images IA multimodèle avec abonnements",
-    "description": "Image Easy est un générateur d’images IA multimodèle avec abonnements actifs et crédits gratuits limités à l’inscription.",
+    "title": "Image Easy — Générateur d’images IA multimodèle avec crédits d’inscription",
+    "description": "Image Easy est un générateur d’images IA multimodèle avec plans mensuels et annuels, ainsi que des crédits gratuits limités à l’inscription.",
     "ogDescription": "Générateur IA multimodèle avec abonnements et crédits d’inscription."
   },
   "common": {
@@ -72,10 +72,10 @@
     "footerLegal": "Mentions légales",
     "footerCopyright": "Copyright © 2026 Image Easy Inc. Tous droits réservés.",
     "footerPrivacyPolicy": "Politique de confidentialité",
-    "limitedTitleA": "Abonnements actifs,",
-    "limitedTitleEm": "crédits",
-    "limitedTitleB": "à l’inscription.",
-    "limitedBody": "Les abonnements Image Easy sont actifs. Les nouveaux utilisateurs peuvent obtenir des crédits gratuits limités; les modèles et résolutions consomment des crédits différents et les échecs sont remboursés.",
+    "limitedTitleA": "Crédits à l’inscription,",
+    "limitedTitleEm": "plans",
+    "limitedTitleB": "si besoin.",
+    "limitedBody": "Les nouveaux utilisateurs peuvent obtenir des crédits gratuits limités. Les modèles et résolutions consomment des crédits différents, les échecs sont remboursés et des plans mensuels ou annuels sont disponibles pour plus de capacité.",
     "limitedLink": "Voir les plans et crédits",
     "modelCompareTitleA": "Choisissez le",
     "modelCompareTitleEm": "modèle",
@@ -95,7 +95,7 @@
     "useCase3Body": "Importez des références pour retouches locales, restylisation, changements de scène ou corrections précises.",
     "faqTitle": "FAQ",
     "faq1Q": "Comment Image Easy est-il facturé ?",
-    "faq1A": "Les abonnements sont actifs. Les nouveaux utilisateurs peuvent obtenir des crédits gratuits limités; les générations consomment des crédits selon le modèle et la résolution.",
+    "faq1A": "Les nouveaux utilisateurs peuvent obtenir des crédits gratuits limités; les générations consomment des crédits selon le modèle et la résolution. Choisissez un plan mensuel ou annuel pour plus de capacité.",
     "faq2Q": "Que se passe-t-il quand les crédits gratuits sont épuisés ?",
     "faq2A": "Vous pouvez continuer avec un abonnement mensuel ou annuel. Chaque plan attribue des crédits chaque mois.",
     "faq3Q": "Quels modèles d’images IA puis-je utiliser ?",
@@ -104,10 +104,10 @@
   "trust": {
     "pricing": {
       "metaTitle": "Tarifs",
-      "metaDescription": "Les abonnements Image Easy sont actifs. Inscrivez-vous pour obtenir des crédits gratuits limités et une utilisation transparente des crédits.",
+      "metaDescription": "Inscrivez-vous pour obtenir des crédits gratuits limités et voir l’utilisation des crédits par modèle et résolution. Des plans mensuels et annuels sont disponibles.",
       "kicker": "Tarifs",
       "title": "Choisissez le plan adapté à votre création.",
-      "lead": "Les abonnements sont actifs. Les nouveaux utilisateurs peuvent obtenir des crédits gratuits limités; choisissez un plan mensuel ou annuel pour plus de capacité.",
+      "lead": "Les nouveaux utilisateurs peuvent obtenir des crédits gratuits limités; choisissez un plan mensuel ou annuel pour plus de capacité.",
       "planEyebrow": "Offre actuelle",
       "planLabel": "Crédits gratuits à l’inscription",
       "planLine1": "Les nouveaux utilisateurs peuvent obtenir des crédits gratuits pour essayer la génération multimodèle.",

@@ -1,8 +1,8 @@
 {
   "metadata": {
     "siteName": "Image Easy",
-    "title": "Image Easy — Generatore di immagini IA multimodello con abbonamenti",
-    "description": "Image Easy è un generatore di immagini IA multimodello con piani in abbonamento attivi e crediti gratuiti a tempo limitato alla registrazione.",
+    "title": "Image Easy — Generatore di immagini IA multimodello con crediti di registrazione",
+    "description": "Image Easy è un generatore di immagini IA multimodello con piani mensili e annuali, più crediti gratuiti a tempo limitato alla registrazione.",
     "ogDescription": "Generatore IA multimodello con abbonamenti e crediti di registrazione."
   },
   "common": {
@@ -72,10 +72,10 @@
     "footerLegal": "Note legali",
     "footerCopyright": "Copyright © 2026 Image Easy Inc. Tutti i diritti riservati.",
     "footerPrivacyPolicy": "Informativa sulla privacy",
-    "limitedTitleA": "Piani attivi,",
-    "limitedTitleEm": "crediti",
-    "limitedTitleB": "alla registrazione.",
-    "limitedBody": "I piani Image Easy sono attivi. I nuovi utenti possono ottenere crediti gratuiti a tempo limitato; modelli e risoluzioni consumano crediti diversi e gli errori vengono rimborsati.",
+    "limitedTitleA": "Crediti alla registrazione,",
+    "limitedTitleEm": "piani",
+    "limitedTitleB": "quando servono.",
+    "limitedBody": "I nuovi utenti possono ottenere crediti gratuiti a tempo limitato. Modelli e risoluzioni consumano crediti diversi, gli errori vengono rimborsati e sono disponibili piani mensili o annuali per più capacità.",
     "limitedLink": "Vedi piani e crediti",
     "modelCompareTitleA": "Scegli il",
     "modelCompareTitleEm": "modello",
@@ -95,7 +95,7 @@
     "useCase3Body": "Carica riferimenti per ritocchi locali, restyling, cambi scena o correzioni più precise.",
     "faqTitle": "FAQ",
     "faq1Q": "Come funziona il prezzo di Image Easy?",
-    "faq1A": "I piani in abbonamento sono attivi. I nuovi utenti possono ottenere crediti gratuiti a tempo limitato; le generazioni consumano crediti in base a modello e risoluzione.",
+    "faq1A": "I nuovi utenti possono ottenere crediti gratuiti a tempo limitato; le generazioni consumano crediti in base a modello e risoluzione. Scegli mensile o annuale per più capacità.",
     "faq2Q": "Cosa succede quando finiscono i crediti gratuiti?",
     "faq2A": "Puoi continuare con un piano mensile o annuale. Ogni piano assegna crediti ogni mese.",
     "faq3Q": "Quali modelli IA posso usare?",
@@ -104,10 +104,10 @@
   "trust": {
     "pricing": {
       "metaTitle": "Prezzi",
-      "metaDescription": "I piani Image Easy sono attivi. Registrati per crediti gratuiti a tempo limitato e uso trasparente dei crediti.",
+      "metaDescription": "Registrati per crediti gratuiti a tempo limitato e uso trasparente dei crediti per modello e risoluzione. Sono disponibili piani mensili e annuali.",
       "kicker": "Prezzi",
       "title": "Scegli il piano per il tuo lavoro creativo.",
-      "lead": "I piani in abbonamento sono attivi. I nuovi utenti possono ottenere crediti gratuiti a tempo limitato; scegli mensile o annuale per più capacità.",
+      "lead": "I nuovi utenti possono ottenere crediti gratuiti a tempo limitato; scegli mensile o annuale per più capacità.",
       "planEyebrow": "Piano attuale",
       "planLabel": "Crediti gratuiti alla registrazione",
       "planLine1": "I nuovi utenti possono ottenere crediti gratuiti per provare la generazione multimodello.",

@@ -1,9 +1,9 @@
 {
   "metadata": {
     "siteName": "Image Easy",
-    "title": "Image Easy — 多模型 AI 图片生成器，订阅套餐已上线",
-    "description": "Image Easy 是多模型 AI 图片生成器，支持 GPT Image 2、Seedream 4.5、Nano Banana Pro。订阅套餐已上线，注册限时赠送免费积分。",
-    "ogDescription": "多模型 AI 图片生成器，订阅套餐已上线，注册限时送免费积分。"
+    "title": "Image Easy — 多模型 AI 图片生成器，注册限时送积分",
+    "description": "Image Easy 是多模型 AI 图片生成器，支持 GPT Image 2、Seedream 4.5、Nano Banana Pro。注册限时赠送免费积分，订阅套餐支持月付和年付。",
+    "ogDescription": "多模型 AI 图片生成器，注册限时送免费积分。"
   },
   "common": {
     "loading": "加载中…",
@@ -72,10 +72,10 @@
     "footerLegal": "法律",
     "footerCopyright": "版权所有 © 2026 Image Easy Inc. 保留所有权利。",
     "footerPrivacyPolicy": "隐私政策",
-    "limitedTitleA": "套餐上线，",
-    "limitedTitleEm": "注册",
-    "limitedTitleB": "送积分。",
-    "limitedBody": "Image Easy 已上线订阅套餐。新用户注册可限时领取免费积分，不同模型和分辨率会消耗不同积分，生成失败会自动退回。",
+    "limitedTitleA": "注册送积分，",
+    "limitedTitleEm": "套餐",
+    "limitedTitleB": "可选。",
+    "limitedBody": "新用户注册可限时领取免费积分。不同模型和分辨率会消耗不同积分，生成失败会自动退回；需要更多额度时可选择月付或年付套餐。",
     "limitedLink": "查看套餐与积分",
     "modelCompareTitleA": "按任务选择",
     "modelCompareTitleEm": "模型",
@@ -95,7 +95,7 @@
     "useCase3Body": "上传参考图后做局部重绘、风格化、场景替换或更精细的视觉修正。",
     "faqTitle": "常见问题",
     "faq1Q": "Image Easy 现在怎么收费？",
-    "faq1A": "订阅套餐已上线。新用户注册可限时领取免费积分，生成会按模型和分辨率消耗积分。",
+    "faq1A": "新用户注册可限时领取免费积分，生成会按模型和分辨率消耗积分；需要更多额度时可选择月付或年付套餐。",
     "faq2Q": "免费积分用完后怎么办？",
     "faq2A": "可以选择月付或年付订阅套餐继续生成。所有套餐都会按月发放积分。",
     "faq3Q": "我可以用哪些 AI 图片模型？",
@@ -104,15 +104,15 @@
   "trust": {
     "pricing": {
       "metaTitle": "价格",
-      "metaDescription": "Image Easy 订阅套餐已上线。注册可限时领取免费积分，并按模型和分辨率透明显示积分消耗。",
+      "metaDescription": "Image Easy 注册可限时领取免费积分，并按模型和分辨率透明显示积分消耗。订阅套餐支持月付和年付。",
       "kicker": "价格",
       "title": "选择适合你的创作套餐。",
-      "lead": "订阅套餐已上线。新用户注册可限时领取免费积分；需要更多生成额度时，可选择月付或年付套餐。",
+      "lead": "新用户注册可限时领取免费积分；需要更多生成额度时，可选择月付或年付套餐。",
       "planEyebrow": "当前方案",
       "planLabel": "注册限时送免费积分",
       "planLine1": "新用户注册可领取免费积分，用于体验多模型图片生成。",
       "planLine2": "套餐未配置或支付暂未开启时，页面会先展示免费积分和消耗规则。",
-      "detailsTitle": "当前说明",
+      "detailsTitle": "说明",
       "detailsBody1": "订阅套餐可用于当前多模型 AI 图像生成工作区。",
       "detailsBody2": "生成会根据所选模型和分辨率消耗积分；生成失败会自动退回积分。",
       "checkoutSuccess": "付款已收到。Stripe 确认后，额度会显示在你的账户中。",

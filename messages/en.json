@@ -1,9 +1,9 @@
 {
   "metadata": {
     "siteName": "Image Easy",
-    "title": "Image Easy — Multi-model AI image generator with live subscription plans",
-    "description": "Image Easy is a multi-model AI image generator with GPT Image 2, Seedream 4.5, Nano Banana Pro, live subscription plans, and limited-time signup credits.",
-    "ogDescription": "Multi-model AI image generator with live subscription plans and limited-time signup credits."
+    "title": "Image Easy — Multi-model AI image generator with signup credits",
+    "description": "Image Easy is a multi-model AI image generator with GPT Image 2, Seedream 4.5, Nano Banana Pro, monthly and annual plans, and limited-time signup credits.",
+    "ogDescription": "Multi-model AI image generator with limited-time signup credits."
   },
   "common": {
     "loading": "Loading…",
@@ -72,10 +72,10 @@
     "footerLegal": "Legal",
     "footerCopyright": "Copyright © 2026 Image Easy Inc. All rights reserved.",
     "footerPrivacyPolicy": "Privacy Policy",
-    "limitedTitleA": "Plans are live,",
-    "limitedTitleEm": "signup",
-    "limitedTitleB": "credits included.",
-    "limitedBody": "Image Easy subscription plans are live. New users can claim limited-time free credits; different models and resolutions use different credits, and failed generations are refunded automatically.",
+    "limitedTitleA": "Signup credits,",
+    "limitedTitleEm": "plans",
+    "limitedTitleB": "when needed.",
+    "limitedBody": "New users can claim limited-time free credits. Different models and resolutions use different credits, failed generations are refunded automatically, and monthly or annual plans are available when you need more capacity.",
     "limitedLink": "View plans and credits",
     "modelCompareTitleA": "Choose the",
     "modelCompareTitleEm": "model",
@@ -95,7 +95,7 @@
     "useCase3Body": "Upload references for local redraws, restyling, scene changes, or more precise visual corrections.",
     "faqTitle": "FAQ",
     "faq1Q": "How is Image Easy priced?",
-    "faq1A": "Subscription plans are live. New users can claim limited-time free credits, and generation uses credits based on model and resolution.",
+    "faq1A": "New users can claim limited-time free credits, and generation uses credits based on model and resolution. Choose a monthly or annual plan when you need more capacity.",
     "faq2Q": "What happens when free credits run out?",
     "faq2A": "You can continue with a monthly or annual subscription plan. Each plan grants credits monthly.",
     "faq3Q": "Which AI image models can I use?",
@@ -104,10 +104,10 @@
   "trust": {
     "pricing": {
       "metaTitle": "Pricing",
-      "metaDescription": "Image Easy subscription plans are live. Sign up for limited-time free credits and see transparent credit usage by model and resolution.",
+      "metaDescription": "Sign up for limited-time free credits and see transparent credit usage by model and resolution. Monthly and annual plans are available.",
       "kicker": "Pricing",
       "title": "Choose the plan for your creative work.",
-      "lead": "Subscription plans are live. New users can claim limited-time free credits; choose monthly or annual plans when you need more generation capacity.",
+      "lead": "New users can claim limited-time free credits; choose monthly or annual plans when you need more generation capacity.",
       "planEyebrow": "Current plan",
       "planLabel": "Limited-time signup credits",
       "planLine1": "New users can claim free credits to try multi-model image generation.",

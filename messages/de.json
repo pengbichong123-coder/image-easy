@@ -1,8 +1,8 @@
 {
   "metadata": {
     "siteName": "Image Easy",
-    "title": "Image Easy — KI-Bildgenerator mit mehreren Modellen und Abonnements",
-    "description": "Image Easy ist ein KI-Bildgenerator mit mehreren Modellen, aktiven Abonnements und zeitlich begrenzten kostenlosen Credits zur Registrierung.",
+    "title": "Image Easy — KI-Bildgenerator mit mehreren Modellen und Start-Credits",
+    "description": "Image Easy ist ein KI-Bildgenerator mit mehreren Modellen, Monats- und Jahresabos sowie zeitlich begrenzten kostenlosen Credits zur Registrierung.",
     "ogDescription": "KI-Bildgenerator mit Abonnements und kostenlosen Credits zur Registrierung."
   },
   "common": {
@@ -72,10 +72,10 @@
     "footerLegal": "Rechtliches",
     "footerCopyright": "Copyright © 2026 Image Easy Inc. Alle Rechte vorbehalten.",
     "footerPrivacyPolicy": "Datenschutzerklärung",
-    "limitedTitleA": "Abos sind live,",
-    "limitedTitleEm": "Registrierung",
-    "limitedTitleB": "bringt Credits.",
-    "limitedBody": "Die Image Easy Abonnements sind live. Neue Nutzer erhalten zeitlich begrenzte kostenlose Credits; Modelle und Auflösungen verbrauchen unterschiedliche Credits, fehlgeschlagene Generierungen werden erstattet.",
+    "limitedTitleA": "Credits zur Registrierung,",
+    "limitedTitleEm": "Pläne",
+    "limitedTitleB": "bei Bedarf.",
+    "limitedBody": "Neue Nutzer erhalten zeitlich begrenzte kostenlose Credits. Modelle und Auflösungen verbrauchen unterschiedliche Credits, fehlgeschlagene Generierungen werden erstattet; für mehr Kapazität gibt es Monats- und Jahrespläne.",
     "limitedLink": "Pläne und Credits ansehen",
     "modelCompareTitleA": "Wählen Sie das",
     "modelCompareTitleEm": "Modell",
@@ -95,7 +95,7 @@
     "useCase3Body": "Laden Sie Referenzen für lokale Neuzeichnung, Restyling, Szenenwechsel oder präzisere Korrekturen hoch.",
     "faqTitle": "FAQ",
     "faq1Q": "Wie wird Image Easy abgerechnet?",
-    "faq1A": "Abonnements sind live. Neue Nutzer erhalten zeitlich begrenzte kostenlose Credits; Generierungen verbrauchen Credits je nach Modell und Auflösung.",
+    "faq1A": "Neue Nutzer erhalten zeitlich begrenzte kostenlose Credits; Generierungen verbrauchen Credits je nach Modell und Auflösung. Für mehr Kapazität gibt es Monats- und Jahrespläne.",
     "faq2Q": "Was passiert, wenn kostenlose Credits aufgebraucht sind?",
     "faq2A": "Sie können mit einem Monats- oder Jahresabo weitermachen. Jedes Abo vergibt monatlich Credits.",
     "faq3Q": "Welche KI-Bildmodelle kann ich nutzen?",
@@ -104,10 +104,10 @@
   "trust": {
     "pricing": {
       "metaTitle": "Preise",
-      "metaDescription": "Image Easy Abonnements sind live. Registrieren Sie sich für zeitlich begrenzte kostenlose Credits und transparente Credit-Nutzung.",
+      "metaDescription": "Registrieren Sie sich für zeitlich begrenzte kostenlose Credits und transparente Credit-Nutzung nach Modell und Auflösung. Monats- und Jahrespläne sind verfügbar.",
       "kicker": "Preise",
       "title": "Wählen Sie den passenden Kreativplan.",
-      "lead": "Abonnements sind live. Neue Nutzer erhalten zeitlich begrenzte kostenlose Credits; für mehr Generierungen gibt es Monats- und Jahrespläne.",
+      "lead": "Neue Nutzer erhalten zeitlich begrenzte kostenlose Credits; für mehr Generierungen gibt es Monats- und Jahrespläne.",
       "planEyebrow": "Aktueller Plan",
       "planLabel": "Kostenlose Credits zur Registrierung",
       "planLine1": "Neue Nutzer erhalten kostenlose Credits zum Testen der Multi-Modell-Bildgenerierung.",
