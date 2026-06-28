@@ -11,6 +11,8 @@ export const runtime = "nodejs";
 const GENERATION_CREDIT_COST = 1;
 const STORAGE_FAILED_MESSAGE = "Image generated but storage failed. Please retry.";
 const STORAGE_LOCK_STALE_MS = 10 * 60 * 1000;
+const PENDING_START_STALE_MS = 10 * 60 * 1000;
+const PENDING_START_TIMEOUT_MESSAGE = "Generation did not start in time. Please try again.";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -133,6 +135,7 @@ export async function GET(_req: Request, { params }: Props) {
       resultUrls: true,
       resultAssetKeys: true,
       errorMessage: true,
+      createdAt: true,
     },
   });
 
@@ -140,8 +143,71 @@ export async function GET(_req: Request, { params }: Props) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  if (!generation.taskId || generation.status === "completed" || generation.status === "failed") {
+  if (generation.status === "pending" && !generation.taskId) {
+    const stalePendingStartedBefore = new Date(Date.now() - PENDING_START_STALE_MS);
+
+    if (generation.createdAt <= stalePendingStartedBefore) {
+      const { current, markedFailed } = await prisma.$transaction(async (tx) => {
+        const write = await tx.generation.updateMany({
+          where: {
+            id: generation.id,
+            userId: generation.userId,
+            status: "pending",
+            taskId: null,
+            createdAt: { lte: stalePendingStartedBefore },
+          },
+          data: {
+            status: "failed",
+            errorMessage: PENDING_START_TIMEOUT_MESSAGE,
+          },
+        });
+
+        if (write.count === 1) {
+          await refundGenerationCreditInTransaction(tx, {
+            userId: generation.userId,
+            generationId: generation.id,
+            amount: GENERATION_CREDIT_COST,
+            reason: "Refund reserved credit after generation start timed out",
+          });
+        }
+
+        const currentGeneration = await tx.generation.findUniqueOrThrow({
+          where: { id: generation.id },
+          select: {
+            id: true,
+            model: true,
+            taskId: true,
+            status: true,
+            resultUrls: true,
+            resultAssetKeys: true,
+            errorMessage: true,
+          },
+        });
+
+        return {
+          current: currentGeneration,
+          markedFailed: write.count === 1,
+        };
+      });
+
+      return NextResponse.json(await toDto(current), { status: markedFailed ? 500 : 200 });
+    }
+
+    return NextResponse.json({
+      ...(await toDto(generation)),
+      taskState: "pending",
+    });
+  }
+
+  if (generation.status === "completed" || generation.status === "failed") {
     return NextResponse.json(await toDto(generation));
+  }
+
+  if (!generation.taskId) {
+    return NextResponse.json({
+      ...(await toDto(generation)),
+      status: "processing",
+    });
   }
 
   let taskResult: Awaited<ReturnType<typeof getGenerationTaskResult>>;
@@ -154,6 +220,16 @@ export async function GET(_req: Request, { params }: Props) {
         : error instanceof Error
         ? error.message
         : "Generation failed";
+
+    if (!(error instanceof KieError && error.terminal)) {
+      return NextResponse.json({
+        ...(await toDto(generation)),
+        status: "processing",
+        errorMessage: message,
+        taskState: "polling_error",
+      });
+    }
+
     const activeStorageStartedAfter = new Date(Date.now() - STORAGE_LOCK_STALE_MS);
 
     const { current, markedFailed } = await prisma.$transaction(async (tx) => {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { refundGenerationCreditInTransaction } from "@/lib/credits";
 import { prisma } from "@/lib/db";
 import { deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
 
@@ -108,6 +109,7 @@ export async function DELETE(req: NextRequest) {
     where: { id, userId: session.user.id },
     select: {
       id: true,
+      status: true,
       resultAssetKeys: true,
     },
   });
@@ -118,6 +120,15 @@ export async function DELETE(req: NextRequest) {
 
   const resultAssetKeys = parseJsonStringArray(generation.resultAssetKeys);
   await prisma.$transaction(async (tx) => {
+    if (generation.status !== "completed" && generation.status !== "failed") {
+      await refundGenerationCreditInTransaction(tx, {
+        userId: session.user.id,
+        generationId: generation.id,
+        amount: 1,
+        reason: "Refund reserved credit after deleting unfinished generation",
+      });
+    }
+
     if (resultAssetKeys.length > 0) {
       await tx.asset.deleteMany({
         where: {

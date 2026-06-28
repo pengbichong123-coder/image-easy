@@ -56,9 +56,12 @@ interface UploadResult {
 }
 
 export class KieError extends Error {
-  constructor(public code: number | string, message: string) {
+  terminal: boolean;
+
+  constructor(public code: number | string, message: string, options: { terminal?: boolean } = {}) {
     super(message);
     this.name = "KieError";
+    this.terminal = options.terminal ?? false;
   }
 }
 
@@ -171,6 +174,7 @@ function parseSuccessfulTask(record: TaskRecord): GenerationResult {
       throw new KieError(
         "parse",
         `Failed to parse resultJson: ${(e as Error).message}`,
+        { terminal: true },
       );
     }
   }
@@ -207,6 +211,7 @@ export async function getGenerationTaskResult(taskId: string): Promise<{
     throw new KieError(
       record.failCode || "fail",
       record.failMsg || "Generation failed",
+      { terminal: true },
     );
   }
 
@@ -252,6 +257,7 @@ export async function waitForTask(
         throw new KieError(
           record.failCode || "fail",
           record.failMsg || "Generation failed",
+          { terminal: true },
         );
       }
       return parseSuccessfulTask(record);

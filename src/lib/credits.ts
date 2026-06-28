@@ -77,6 +77,7 @@ export async function reserveGenerationCreditInTransaction(
 
   await tx.creditTransaction.updateMany({
     where: {
+      userId: input.userId,
       generationId: input.generationId,
       type: "reserve",
     },
@@ -125,6 +126,27 @@ export async function refundGenerationCreditInTransaction(
   input: GenerationCreditInput,
 ): Promise<void> {
   const amount = normalizeAmount(input.amount);
+  const reserved = await tx.creditTransaction.findFirst({
+    where: {
+      userId: input.userId,
+      generationId: input.generationId,
+      type: "reserve",
+    },
+    select: { id: true },
+  });
+  const consumed = await tx.creditTransaction.findFirst({
+    where: {
+      userId: input.userId,
+      generationId: input.generationId,
+      type: "consume",
+    },
+    select: { id: true },
+  });
+
+  if (!reserved || consumed) {
+    return;
+  }
+
   const refund = await tx.creditTransaction.createMany({
     data: {
       userId: input.userId,
@@ -149,6 +171,7 @@ export async function refundGenerationCreditInTransaction(
 
   await tx.creditTransaction.updateMany({
     where: {
+      userId: input.userId,
       generationId: input.generationId,
       type: "refund",
     },
