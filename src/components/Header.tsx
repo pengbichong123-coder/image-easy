@@ -38,6 +38,7 @@ export function Header() {
         <nav className="hidden md:flex items-center">
           <NavItem href="/" label={tNav("atelier")} pathname={pathname} />
           <NavItem href="/create" label={tNav("expose")} pathname={pathname} />
+          <NavItem href="/pricing" label={tNav("pricing")} pathname={pathname} />
           <NavItem href="/my-images" label={tNav("archive")} pathname={pathname} />
         </nav>
 
@@ -131,6 +132,13 @@ export function Header() {
                     >
                       {tNav("expose")}
                     </Link>
+                    <Link
+                      href="/pricing"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
+                    >
+                      {tNav("pricing")}
+                    </Link>
                   </div>
                   <div className="border-t border-[#E5E5E7] p-1">
                     <button
@@ -162,7 +170,7 @@ function NavItem({
   label,
   pathname,
 }: {
-  href: "/" | "/create" | "/my-images";
+  href: "/" | "/create" | "/pricing" | "/my-images";
   label: string;
   pathname: string;
 }) {
