@@ -358,8 +358,8 @@ export async function GET(_req: Request, { params }: Props) {
     await cleanupCopiedObjects(copiedKeys);
 
     console.error("Generated image storage failed:", error);
-    const { current, markedFailed } = await prisma.$transaction(async (tx) => {
-      const write = await tx.generation.updateMany({
+    const current = await prisma.$transaction(async (tx) => {
+      await tx.generation.updateMany({
         where: {
           id: generation.id,
           status: { notIn: ["completed", "failed"] },
@@ -388,13 +388,10 @@ export async function GET(_req: Request, { params }: Props) {
         },
       });
 
-      return {
-        current: currentGeneration,
-        markedFailed: write.count === 1,
-      };
+      return currentGeneration;
     });
 
-    if (!markedFailed && current.status !== "completed" && current.status !== "failed") {
+    if (current.status !== "completed" && current.status !== "failed") {
       return NextResponse.json({
         ...(await toDto(current)),
         status: "processing",

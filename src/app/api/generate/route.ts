@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import {
   InsufficientCreditsError,
-  refundReservedCreditWithoutGeneration,
-  reserveGenerationCredit,
+  refundGenerationCreditInTransaction,
+  reserveGenerationCreditInTransaction,
 } from "@/lib/credits";
 import { KieError, submitGenerationTask } from "@/lib/kie";
 import { prisma } from "@/lib/db";
@@ -30,6 +30,39 @@ const generateSchema = z.object({
   uploadIds: z.array(z.string()).max(16).optional(),
   nsfwChecker: z.boolean().optional(),
 });
+
+async function markGenerationFailedAndRefund(input: {
+  userId: string;
+  generationId: string;
+  message: string;
+}) {
+  try {
+    await prisma.$transaction(async (tx) => {
+      const write = await tx.generation.updateMany({
+        where: {
+          id: input.generationId,
+          userId: input.userId,
+          status: { notIn: ["completed", "failed"] },
+        },
+        data: {
+          status: "failed",
+          errorMessage: input.message,
+        },
+      });
+
+      if (write.count === 1) {
+        await refundGenerationCreditInTransaction(tx, {
+          userId: input.userId,
+          generationId: input.generationId,
+          amount: GENERATION_CREDIT_COST,
+          reason: "Refund reserved credit after generation task creation failed",
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Failed to mark generation failed and refund reserved credit", error);
+  }
+}
 
 // POST /api/generate - create a kie.ai task and return immediately.
 export async function POST(req: NextRequest) {
@@ -99,15 +132,61 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let reservedCredit = false;
-  try {
-    await reserveGenerationCredit({
-      userId: session.user.id,
-      amount: GENERATION_CREDIT_COST,
-      reason: "Reserve credit for image generation",
-    });
-    reservedCredit = true;
+  let generation: {
+    id: string;
+    model: string;
+    taskId: string | null;
+    status: string;
+  };
 
+  try {
+    generation = await prisma.$transaction(async (tx) => {
+      const pendingGeneration = await tx.generation.create({
+        data: {
+          userId: session.user.id,
+          model: body.model,
+          prompt: body.prompt,
+          aspectRatio: body.aspectRatio,
+          resolution: body.resolution,
+          quality: body.quality,
+          outputFormat: body.outputFormat,
+          imageCount: 1,
+          status: "pending",
+          uploadId: primaryUploadId,
+        },
+        select: {
+          id: true,
+          model: true,
+          taskId: true,
+          status: true,
+        },
+      });
+
+      await reserveGenerationCreditInTransaction(tx, {
+        userId: session.user.id,
+        generationId: pendingGeneration.id,
+        amount: GENERATION_CREDIT_COST,
+        reason: "Reserve credit for image generation",
+      });
+
+      return pendingGeneration;
+    });
+  } catch (error) {
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json(
+        { error: "Not enough credits" },
+        { status: 402 },
+      );
+    }
+
+    console.error("Failed to create generation reservation", error);
+    return NextResponse.json(
+      { error: "Generation failed" },
+      { status: 500 },
+    );
+  }
+
+  try {
     const taskId = await submitGenerationTask({
       model: body.model as ModelId,
       prompt: body.prompt,
@@ -119,54 +198,54 @@ export async function POST(req: NextRequest) {
       nsfwChecker: body.nsfwChecker,
     });
 
-    const generation = await prisma.generation.create({
-      data: {
-        userId: session.user.id,
-        model: body.model,
-        prompt: body.prompt,
-        aspectRatio: body.aspectRatio,
-        resolution: body.resolution,
-        quality: body.quality,
-        outputFormat: body.outputFormat,
-        imageCount: 1,
-        taskId,
-        status: "processing",
-        uploadId: primaryUploadId,
-      },
+    const started = await prisma.$transaction(async (tx) => {
+      const write = await tx.generation.updateMany({
+        where: {
+          id: generation.id,
+          userId: session.user.id,
+          status: "pending",
+        },
+        data: {
+          taskId,
+          status: "processing",
+          errorMessage: null,
+        },
+      });
+
+      if (write.count !== 1) {
+        throw new Error("Generation start precondition failed");
+      }
+
+      return tx.generation.findUniqueOrThrow({
+        where: { id: generation.id },
+        select: {
+          id: true,
+          model: true,
+          taskId: true,
+          status: true,
+        },
+      });
     });
 
     return NextResponse.json({
-      id: generation.id,
-      model: body.model,
-      taskId,
-      status: generation.status,
+      id: started.id,
+      model: started.model,
+      taskId: started.taskId,
+      status: started.status,
     });
   } catch (error) {
-    if (error instanceof InsufficientCreditsError) {
-      return NextResponse.json(
-        { error: "Not enough credits" },
-        { status: 402 },
-      );
-    }
-
-    if (reservedCredit) {
-      try {
-        await refundReservedCreditWithoutGeneration({
-          userId: session.user.id,
-          amount: GENERATION_CREDIT_COST,
-          reason: "Refund reserved credit after generation task creation failed",
-        });
-      } catch (refundError) {
-        console.error("Failed to refund reserved generation credit", refundError);
-      }
-    }
-
     const message =
       error instanceof KieError
         ? error.message
         : error instanceof Error
         ? error.message
         : "Generation failed";
+    await markGenerationFailedAndRefund({
+      userId: session.user.id,
+      generationId: generation.id,
+      message,
+    });
+
     return NextResponse.json(
       { error: message },
       { status: 500 },

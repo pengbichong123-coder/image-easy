@@ -149,4 +149,5 @@ model CreditTransaction {
   @@index([userId])
   @@index([generationId])
   @@index([createdAt])
+  @@unique([generationId, type])
 }

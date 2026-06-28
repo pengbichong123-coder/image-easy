@@ -37,38 +37,57 @@ async function currentBalance(tx: TransactionClient, userId: string) {
   return user.credits;
 }
 
-export async function reserveGenerationCredit(input: CreditInput): Promise<{ balanceAfter: number }> {
+export async function reserveGenerationCreditInTransaction(
+  tx: TransactionClient,
+  input: GenerationCreditInput,
+): Promise<{ balanceAfter: number }> {
   const amount = normalizeAmount(input.amount);
 
-  return prisma.$transaction(async (tx) => {
-    const reservation = await tx.user.updateMany({
-      where: {
-        id: input.userId,
-        credits: { gte: amount },
-      },
-      data: {
-        credits: { decrement: amount },
-      },
-    });
-
-    if (reservation.count !== 1) {
-      throw new InsufficientCreditsError();
-    }
-
-    const balanceAfter = await currentBalance(tx, input.userId);
-
-    await tx.creditTransaction.create({
-      data: {
-        userId: input.userId,
-        type: "reserve",
-        amount: -amount,
-        balanceAfter,
-        reason: input.reason,
-      },
-    });
-
-    return { balanceAfter };
+  const reservationLedger = await tx.creditTransaction.createMany({
+    data: {
+      userId: input.userId,
+      generationId: input.generationId,
+      type: "reserve",
+      amount: -amount,
+      balanceAfter: 0,
+      reason: input.reason,
+    },
+    skipDuplicates: true,
   });
+
+  if (reservationLedger.count !== 1) {
+    return { balanceAfter: await currentBalance(tx, input.userId) };
+  }
+
+  const reservation = await tx.user.updateMany({
+    where: {
+      id: input.userId,
+      credits: { gte: amount },
+    },
+    data: {
+      credits: { decrement: amount },
+    },
+  });
+
+  if (reservation.count !== 1) {
+    throw new InsufficientCreditsError();
+  }
+
+  const balanceAfter = await currentBalance(tx, input.userId);
+
+  await tx.creditTransaction.updateMany({
+    where: {
+      generationId: input.generationId,
+      type: "reserve",
+    },
+    data: { balanceAfter },
+  });
+
+  return { balanceAfter };
+}
+
+export async function reserveGenerationCredit(input: GenerationCreditInput): Promise<{ balanceAfter: number }> {
+  return prisma.$transaction(async (tx) => reserveGenerationCreditInTransaction(tx, input));
 }
 
 export async function consumeReservedCreditInTransaction(
@@ -76,21 +95,8 @@ export async function consumeReservedCreditInTransaction(
   input: GenerationCreditInput,
 ): Promise<void> {
   const amount = normalizeAmount(input.amount);
-  const existing = await tx.creditTransaction.findFirst({
-    where: {
-      generationId: input.generationId,
-      type: "consume",
-    },
-    select: { id: true },
-  });
-
-  if (existing) {
-    return;
-  }
-
   const balanceAfter = await currentBalance(tx, input.userId);
-
-  await tx.creditTransaction.create({
+  const consumed = await tx.creditTransaction.createMany({
     data: {
       userId: input.userId,
       generationId: input.generationId,
@@ -100,7 +106,12 @@ export async function consumeReservedCreditInTransaction(
       reason: input.reason,
       metadata: JSON.stringify({ reservedAmount: amount }),
     },
+    skipDuplicates: true,
   });
+
+  if (consumed.count !== 1) {
+    return;
+  }
 }
 
 export async function consumeReservedCredit(input: GenerationCreditInput): Promise<void> {
@@ -114,15 +125,19 @@ export async function refundGenerationCreditInTransaction(
   input: GenerationCreditInput,
 ): Promise<void> {
   const amount = normalizeAmount(input.amount);
-  const existing = await tx.creditTransaction.findFirst({
-    where: {
+  const refund = await tx.creditTransaction.createMany({
+    data: {
+      userId: input.userId,
       generationId: input.generationId,
       type: "refund",
+      amount,
+      balanceAfter: 0,
+      reason: input.reason,
     },
-    select: { id: true },
+    skipDuplicates: true,
   });
 
-  if (existing) {
+  if (refund.count !== 1) {
     return;
   }
 
@@ -132,43 +147,17 @@ export async function refundGenerationCreditInTransaction(
     select: { credits: true },
   });
 
-  await tx.creditTransaction.create({
-    data: {
-      userId: input.userId,
+  await tx.creditTransaction.updateMany({
+    where: {
       generationId: input.generationId,
       type: "refund",
-      amount,
-      balanceAfter: user.credits,
-      reason: input.reason,
     },
+    data: { balanceAfter: user.credits },
   });
 }
 
 export async function refundGenerationCredit(input: GenerationCreditInput): Promise<void> {
   await prisma.$transaction(async (tx) => {
     await refundGenerationCreditInTransaction(tx, input);
-  });
-}
-
-export async function refundReservedCreditWithoutGeneration(input: CreditInput): Promise<void> {
-  const amount = normalizeAmount(input.amount);
-
-  await prisma.$transaction(async (tx) => {
-    const user = await tx.user.update({
-      where: { id: input.userId },
-      data: { credits: { increment: amount } },
-      select: { credits: true },
-    });
-
-    await tx.creditTransaction.create({
-      data: {
-        userId: input.userId,
-        type: "refund",
-        amount,
-        balanceAfter: user.credits,
-        reason: input.reason,
-        metadata: JSON.stringify({ generationId: null }),
-      },
-    });
   });
 }
