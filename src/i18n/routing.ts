@@ -58,6 +58,7 @@ export const pathnames = {
   "/my-images": "/my-images",
   "/login": "/login",
   "/pricing": "/pricing",
+  "/billing": "/billing",
   "/privacy": "/privacy",
   "/terms": "/terms",
   "/contact": "/contact",

@@ -126,6 +126,13 @@ export function Header() {
                       {tNav("pricing")}
                     </Link>
                     <Link
+                      href="/billing"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
+                    >
+                      {tNav("billing")}
+                    </Link>
+                    <Link
                       href="/create"
                       onClick={() => setMenuOpen(false)}
                       className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
@@ -170,7 +177,7 @@ function NavItem({
   label,
   pathname,
 }: {
-  href: "/" | "/create" | "/pricing" | "/my-images";
+  href: "/" | "/create" | "/pricing" | "/billing" | "/my-images";
   label: string;
   pathname: string;
 }) {
