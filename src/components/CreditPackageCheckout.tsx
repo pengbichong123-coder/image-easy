@@ -23,7 +23,13 @@ function formatPrice(priceCents: number, currency: string) {
   }).format(priceCents / 100);
 }
 
-export function CreditPackageCheckout({ packages }: { packages: CreditPackage[] }) {
+export function CreditPackageCheckout({
+  locale,
+  packages,
+}: {
+  locale: string;
+  packages: CreditPackage[];
+}) {
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -37,7 +43,7 @@ export function CreditPackageCheckout({ packages }: { packages: CreditPackage[] 
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ priceId, locale }),
       });
       const data = (await response.json()) as CheckoutResponse;
 

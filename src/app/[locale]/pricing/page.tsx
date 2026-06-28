@@ -81,7 +81,7 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
                 Checkout was canceled. No credits were added.
               </div>
             ) : null}
-            <CreditPackageCheckout packages={creditPackages} />
+            <CreditPackageCheckout locale={locale} packages={creditPackages} />
           </div>
         ) : (
           <div className="mt-14 border-t border-[#D2D2D7] pt-10">

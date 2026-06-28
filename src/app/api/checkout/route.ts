@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { buildCheckoutReturnUrls } from "@/lib/stripe-checkout";
 import { getStripeClient } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
 const checkoutSchema = z.object({
   priceId: z.string().min(1),
+  locale: z.string().optional(),
 });
 
 function getAppUrl() {
@@ -59,7 +61,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const stripe = getStripeClient();
-    const appUrl = getAppUrl();
+    const { successUrl, cancelUrl } = buildCheckoutReturnUrls(getAppUrl(), body.locale);
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [
@@ -68,8 +70,8 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}/pricing?checkout=success`,
-      cancel_url: `${appUrl}/pricing?checkout=cancel`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       client_reference_id: session.user.id,
       metadata: {
         userId: session.user.id,
