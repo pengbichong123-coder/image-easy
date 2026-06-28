@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getSignedAssetUrl } from "@/lib/storage/r2";
+import { deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
 
@@ -10,24 +10,34 @@ function parseJsonStringArray(value: string | null) {
     return [];
   }
 
-  const parsed = JSON.parse(value) as unknown;
-  if (!Array.isArray(parsed)) {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
+  } catch {
+    console.error("Failed to parse generation result metadata");
     return [];
   }
-
-  return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
 }
 
 async function getGenerationResultUrls(generation: {
   resultUrls: string | null;
   resultAssetKeys: string | null;
 }) {
-  const persistedResultUrls = parseJsonStringArray(generation.resultUrls);
-  if (persistedResultUrls.length > 0) {
-    return persistedResultUrls;
-  }
+  try {
+    const persistedResultUrls = parseJsonStringArray(generation.resultUrls);
+    if (persistedResultUrls.length > 0) {
+      return persistedResultUrls;
+    }
 
-  return Promise.all(parseJsonStringArray(generation.resultAssetKeys).map((key) => getSignedAssetUrl(key)));
+    return await Promise.all(parseJsonStringArray(generation.resultAssetKeys).map((key) => getSignedAssetUrl(key)));
+  } catch {
+    console.error("Failed to resolve generation result URLs");
+    return [];
+  }
 }
 
 // GET /api/history?limit=30&cursor=xxx
@@ -93,11 +103,44 @@ export async function DELETE(req: NextRequest) {
   if (!id) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
-  const result = await prisma.generation.deleteMany({
+
+  const generation = await prisma.generation.findFirst({
     where: { id, userId: session.user.id },
+    select: {
+      id: true,
+      resultAssetKeys: true,
+    },
   });
-  if (result.count === 0) {
+
+  if (!generation) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+
+  const resultAssetKeys = parseJsonStringArray(generation.resultAssetKeys);
+  await prisma.$transaction(async (tx) => {
+    if (resultAssetKeys.length > 0) {
+      await tx.asset.deleteMany({
+        where: {
+          userId: session.user.id,
+          key: { in: resultAssetKeys },
+        },
+      });
+    }
+
+    await tx.generation.delete({
+      where: { id: generation.id },
+    });
+  });
+
+  await Promise.all(
+    resultAssetKeys.map(async (key) => {
+      try {
+        await deleteObjectFromR2(key);
+      } catch {
+        console.error("Failed to delete generated R2 object");
+      }
+    }),
+  );
+
   return NextResponse.json({ success: true });
 }

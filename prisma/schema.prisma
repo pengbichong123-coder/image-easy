@@ -119,6 +119,7 @@ model Generation {
   resultAssetKeys String? // JSON array of generated R2 asset keys
   storageStatus  String? // processing, completed, failed
   storageStartedAt DateTime?
+  storageAttemptId String?
   uploadId       String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

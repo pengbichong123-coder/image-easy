@@ -146,7 +146,7 @@ docker-compose.yml                         # PostgreSQL
 
 把 `DATABASE_URL` 换成生产 PostgreSQL（Neon / Supabase / RDS 都行），跑 `npx prisma db push`。
 
-本项目当前用 `npx prisma db push` / `npm run db:push` 应用 schema 变更；生产环境必须先对生产数据库执行同步，再部署会写入新字段的路由（例如 `Upload.r2Key`、`Asset`）。
+本项目当前用 `npx prisma db push` / `npm run db:push` 应用 schema 变更；生产环境必须先对生产数据库执行同步，再部署会写入新字段的路由（例如 `Upload.r2Key`、`Asset`、`Generation.resultAssetKeys`、`Generation.storageStatus`、`Generation.storageStartedAt`、`Generation.storageAttemptId`）。
 
 ### 环境变量
 

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -18,12 +19,17 @@ function parseJsonStringArray(value: string | null) {
     return [];
   }
 
-  const parsed = JSON.parse(value) as unknown;
-  if (!Array.isArray(parsed)) {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
+  } catch {
+    console.error("Failed to parse generation result metadata");
     return [];
   }
-
-  return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
 }
 
 async function toDto(generation: {
@@ -83,12 +89,13 @@ async function copyGeneratedImage(input: {
   sourceUrl: string;
   userId: string;
   generationId: string;
+  attemptId: string;
   index: number;
   copiedKeys: string[];
 }) {
   const remoteImage = await fetchRemoteImageForR2({ sourceUrl: input.sourceUrl });
   const extension = extensionFromMimeType(remoteImage.mimeType);
-  const key = generatedImageKey(input.userId, input.generationId, input.index, extension);
+  const key = generatedImageKey(input.userId, `${input.generationId}-${input.attemptId}`, input.index, extension);
   const upload = await putObjectToR2({
     key,
     body: remoteImage.body,
@@ -184,6 +191,7 @@ export async function GET(_req: Request, { params }: Props) {
   const copiedKeys: string[] = [];
   const storageStartedAt = new Date();
   const staleStorageStartedBefore = new Date(storageStartedAt.getTime() - STORAGE_LOCK_STALE_MS);
+  const attemptId = randomUUID();
 
   try {
     const storageLock = await prisma.generation.updateMany({
@@ -203,6 +211,7 @@ export async function GET(_req: Request, { params }: Props) {
       data: {
         storageStatus: "processing",
         storageStartedAt,
+        storageAttemptId: attemptId,
       },
     });
 
@@ -239,6 +248,7 @@ export async function GET(_req: Request, { params }: Props) {
           sourceUrl,
           userId: generation.userId,
           generationId: generation.id,
+          attemptId,
           index,
           copiedKeys,
         }),
@@ -256,12 +266,14 @@ export async function GET(_req: Request, { params }: Props) {
           status: { notIn: ["completed", "failed"] },
           storageStatus: "processing",
           storageStartedAt,
+          storageAttemptId: attemptId,
         },
         data: {
           status: "completed",
           resultUrls: publicResultUrls.length > 0 ? JSON.stringify(publicResultUrls) : null,
           resultAssetKeys: JSON.stringify(resultAssetKeys),
           storageStatus: "completed",
+          storageAttemptId: attemptId,
           errorMessage: null,
         },
       });
@@ -320,11 +332,13 @@ export async function GET(_req: Request, { params }: Props) {
           status: { not: "completed" },
           storageStatus: "processing",
           storageStartedAt,
+          storageAttemptId: attemptId,
         },
         data: {
-          status: "failed",
+          status: "processing",
           errorMessage: STORAGE_FAILED_MESSAGE,
           storageStatus: "failed",
+          storageAttemptId: attemptId,
         },
       });
 

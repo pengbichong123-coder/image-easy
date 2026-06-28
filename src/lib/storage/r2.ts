@@ -6,7 +6,10 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 const DEFAULT_SIGNED_URL_TTL_SECONDS = 3600;
 const MAX_SIGNED_URL_TTL_SECONDS = 604800;
 const TTL_ERROR_MESSAGE = `R2_SIGNED_URL_TTL_SECONDS must be a positive safe integer no greater than ${MAX_SIGNED_URL_TTL_SECONDS}`;
+const MAX_REMOTE_IMAGE_BYTES = 30 * 1024 * 1024;
+const REMOTE_IMAGE_FETCH_TIMEOUT_MS = 30000;
 const UNSUPPORTED_REMOTE_IMAGE_MESSAGE = "Remote image data is unsupported or invalid";
+const REMOTE_IMAGE_TOO_LARGE_MESSAGE = "Remote image exceeds maximum size";
 
 type R2Config = {
   accountId: string;
@@ -90,6 +93,83 @@ function sanitizedRemoteImageUrl(value: string) {
   }
 }
 
+function createFetchTimeoutSignal(timeoutMs: number) {
+  const timeout = (AbortSignal as typeof AbortSignal & { timeout?: (milliseconds: number) => AbortSignal }).timeout;
+
+  if (timeout) {
+    return {
+      signal: timeout(timeoutMs),
+      cleanup: () => {},
+    };
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  return {
+    signal: controller.signal,
+    cleanup: () => clearTimeout(timeoutId),
+  };
+}
+
+function parseContentLength(response: Response) {
+  const rawContentLength = response.headers.get("content-length")?.trim();
+  if (!rawContentLength || !/^\d+$/.test(rawContentLength)) {
+    return undefined;
+  }
+
+  const contentLength = Number(rawContentLength);
+  if (!Number.isSafeInteger(contentLength)) {
+    return undefined;
+  }
+
+  return contentLength;
+}
+
+async function readResponseBodyWithLimit(response: Response) {
+  const contentLength = parseContentLength(response);
+  if (contentLength !== undefined && contentLength > MAX_REMOTE_IMAGE_BYTES) {
+    throw new Error(REMOTE_IMAGE_TOO_LARGE_MESSAGE);
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    const body = Buffer.from(await response.arrayBuffer());
+    if (body.byteLength > MAX_REMOTE_IMAGE_BYTES) {
+      throw new Error(REMOTE_IMAGE_TOO_LARGE_MESSAGE);
+    }
+
+    return body;
+  }
+
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      if (!value) {
+        continue;
+      }
+
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_REMOTE_IMAGE_BYTES) {
+        throw new Error(REMOTE_IMAGE_TOO_LARGE_MESSAGE);
+      }
+
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return Buffer.concat(chunks, totalBytes);
+}
+
 export function sniffSupportedImageMimeType(buffer: Buffer): string | undefined {
   if (
     buffer.byteLength >= 8 &&
@@ -136,21 +216,36 @@ export async function fetchRemoteImageForR2(input: {
   sourceUrl: string;
 }): Promise<{ body: Buffer; size: number; mimeType: string }> {
   const sanitizedSourceUrl = sanitizedRemoteImageUrl(input.sourceUrl);
+  const timeout = createFetchTimeoutSignal(REMOTE_IMAGE_FETCH_TIMEOUT_MS);
   let response: Response;
+  let body: Buffer;
 
   try {
-    response = await fetch(input.sourceUrl);
-  } catch {
-    throw new Error(`Failed to fetch remote image from ${sanitizedSourceUrl}`);
+    try {
+      response = await fetch(input.sourceUrl, { signal: timeout.signal });
+    } catch {
+      throw new Error(`Failed to fetch remote image from ${sanitizedSourceUrl}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch remote image from ${sanitizedSourceUrl}: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    try {
+      body = await readResponseBodyWithLimit(response);
+    } catch (error) {
+      if (error instanceof Error && error.message === REMOTE_IMAGE_TOO_LARGE_MESSAGE) {
+        throw error;
+      }
+
+      throw new Error(`Failed to fetch remote image from ${sanitizedSourceUrl}`);
+    }
+  } finally {
+    timeout.cleanup();
   }
 
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch remote image from ${sanitizedSourceUrl}: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const body = Buffer.from(await response.arrayBuffer());
   const mimeType = sniffSupportedImageMimeType(body);
   if (!mimeType) {
     throw new Error(UNSUPPORTED_REMOTE_IMAGE_MESSAGE);
