@@ -8,14 +8,46 @@ declare module "next-auth" {
     user: {
       id: string;
       credits: number;
+      planTier?: string | null;
+      planInterval?: string | null;
+      planStatus?: string | null;
     } & DefaultSession["user"];
+  }
+
+  interface JWT {
+    credits?: number;
+    planTier?: string | null;
+    planInterval?: string | null;
+    planStatus?: string | null;
   }
 }
 
-declare module "@auth/core/jwt" {
-  interface JWT {
-    credits?: number;
-  }
+async function getSessionAccountSummary(userId: string) {
+  const [user, subscription] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { credits: true },
+    }),
+    prisma.userSubscription.findFirst({
+      where: {
+        userId,
+        status: { in: ["active", "trialing", "past_due", "unpaid", "incomplete"] },
+      },
+      orderBy: [{ createdAt: "desc" }],
+      select: {
+        tier: true,
+        interval: true,
+        status: true,
+      },
+    }),
+  ]);
+
+  return {
+    credits: user?.credits ?? 10,
+    planTier: subscription?.tier ?? null,
+    planInterval: subscription?.interval ?? null,
+    planStatus: subscription?.status ?? null,
+  };
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -34,19 +66,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user, trigger }) {
       if (user) {
-        // On sign-in, fetch credits from DB
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id as string },
-          select: { credits: true },
-        });
-        token.credits = dbUser?.credits ?? 10;
+        const summary = await getSessionAccountSummary(user.id as string);
+        token.credits = summary.credits;
+        token.planTier = summary.planTier;
+        token.planInterval = summary.planInterval;
+        token.planStatus = summary.planStatus;
       }
       if (trigger === "update" && token.sub) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.sub },
-          select: { credits: true },
-        });
-        token.credits = dbUser?.credits ?? 10;
+        const summary = await getSessionAccountSummary(token.sub);
+        token.credits = summary.credits;
+        token.planTier = summary.planTier;
+        token.planInterval = summary.planInterval;
+        token.planStatus = summary.planStatus;
       }
       return token;
     },
@@ -57,6 +88,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (typeof token.credits === "number") {
         session.user.credits = token.credits;
       }
+      session.user.planTier = typeof token.planTier === "string" ? token.planTier : null;
+      session.user.planInterval =
+        typeof token.planInterval === "string" ? token.planInterval : null;
+      session.user.planStatus = typeof token.planStatus === "string" ? token.planStatus : null;
       return session;
     },
   },

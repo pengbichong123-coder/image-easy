@@ -36,6 +36,12 @@ export function Header() {
     });
   }
 
+  const accountPlanLabel = formatAccountPlanLabel({
+    interval: session?.user?.planInterval,
+    locale,
+    tier: session?.user?.planTier,
+  });
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-[#D2D2D7]/40">
       <div className="max-w-[980px] mx-auto px-5 h-12 flex items-center justify-between text-[12px]">
@@ -123,8 +129,13 @@ export function Header() {
                     <div className="text-[11px] text-[#6E6E73] truncate">
                       {session.user.email}
                     </div>
-                    <div className="text-[11px] text-[#1D1D1F] mt-2 tabular">
-                      {session.user.credits ?? 0} credits
+                    <div className="text-[11px] text-[#1D1D1F] mt-2 font-medium">
+                      {accountPlanLabel}
+                    </div>
+                    <div className="text-[11px] text-[#6E6E73] mt-1 tabular">
+                      {locale === "zh"
+                        ? `${session.user.credits ?? 0} 积分`
+                        : `${session.user.credits ?? 0} credits`}
                     </div>
                   </div>
                   <div className="p-1">
@@ -180,6 +191,27 @@ export function Header() {
       </div>
     </header>
   );
+}
+
+function formatAccountPlanLabel({
+  interval,
+  locale,
+  tier,
+}: {
+  interval?: string | null;
+  locale: string;
+  tier?: string | null;
+}) {
+  if (!tier) return locale === "zh" ? "免费套餐" : "Free";
+
+  const planName = tier.charAt(0).toUpperCase() + tier.slice(1);
+  if (interval === "month") {
+    return `${planName} · ${locale === "zh" ? "月付" : "Monthly"}`;
+  }
+  if (interval === "year") {
+    return `${planName} · ${locale === "zh" ? "年付" : "Annual"}`;
+  }
+  return planName;
 }
 
 function NavItem({

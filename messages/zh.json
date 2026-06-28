@@ -25,7 +25,7 @@
     "expose": "创建",
     "pricing": "价格",
     "archive": "我的图片",
-    "billing": "账单"
+    "billing": "账单与用量"
   },
   "header": {
     "signIn": "登录",
@@ -314,10 +314,10 @@
     "close": "关闭"
   },
   "billing": {
-    "metaTitle": "账单",
+    "metaTitle": "账单与用量",
     "kicker": "账户",
-    "title": "账单与积分",
-    "lead": "查看你的当前套餐、积分流水和付款记录。",
+    "title": "账单与用量",
+    "lead": "查看你的当前套餐、积分余额、用量记录和付款记录。",
     "currentCredits": "当前积分",
     "currentPlan": "当前套餐",
     "noPlan": "暂无订阅套餐",

@@ -25,7 +25,7 @@
     "expose": "Créer",
     "pricing": "Tarifs",
     "archive": "Mes images",
-    "billing": "Facturation"
+    "billing": "Facturation et usage"
   },
   "header": {
     "signIn": "Se connecter",
@@ -314,10 +314,10 @@
     "close": "Fermer"
   },
   "billing": {
-    "metaTitle": "Billing",
+    "metaTitle": "Billing & usage",
     "kicker": "Account",
-    "title": "Billing and credits",
-    "lead": "View your current plan, credit usage, and payment records.",
+    "title": "Billing & usage",
+    "lead": "View your current plan, credit balance, usage history, and payment records.",
     "currentCredits": "Current credits",
     "currentPlan": "Current plan",
     "noPlan": "No subscription plan",

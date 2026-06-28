@@ -25,7 +25,7 @@
     "expose": "만들기",
     "pricing": "가격",
     "archive": "내 이미지",
-    "billing": "결제"
+    "billing": "결제 및 사용량"
   },
   "header": {
     "signIn": "로그인",
@@ -314,10 +314,10 @@
     "close": "닫기"
   },
   "billing": {
-    "metaTitle": "Billing",
+    "metaTitle": "Billing & usage",
     "kicker": "Account",
-    "title": "Billing and credits",
-    "lead": "View your current plan, credit usage, and payment records.",
+    "title": "Billing & usage",
+    "lead": "View your current plan, credit balance, usage history, and payment records.",
     "currentCredits": "Current credits",
     "currentPlan": "Current plan",
     "noPlan": "No subscription plan",

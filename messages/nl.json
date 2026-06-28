@@ -25,7 +25,7 @@
     "expose": "Maken",
     "pricing": "Prijzen",
     "archive": "Mijn afbeeldingen",
-    "billing": "Facturering"
+    "billing": "Facturering en gebruik"
   },
   "header": {
     "signIn": "Inloggen",
@@ -314,10 +314,10 @@
     "close": "Sluiten"
   },
   "billing": {
-    "metaTitle": "Billing",
+    "metaTitle": "Billing & usage",
     "kicker": "Account",
-    "title": "Billing and credits",
-    "lead": "View your current plan, credit usage, and payment records.",
+    "title": "Billing & usage",
+    "lead": "View your current plan, credit balance, usage history, and payment records.",
     "currentCredits": "Current credits",
     "currentPlan": "Current plan",
     "noPlan": "No subscription plan",

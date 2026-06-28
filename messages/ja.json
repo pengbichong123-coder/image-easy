@@ -25,7 +25,7 @@
     "expose": "作成",
     "pricing": "料金",
     "archive": "マイ画像",
-    "billing": "請求"
+    "billing": "請求と使用量"
   },
   "header": {
     "signIn": "ログイン",
@@ -314,10 +314,10 @@
     "close": "閉じる"
   },
   "billing": {
-    "metaTitle": "Billing",
+    "metaTitle": "Billing & usage",
     "kicker": "Account",
-    "title": "Billing and credits",
-    "lead": "View your current plan, credit usage, and payment records.",
+    "title": "Billing & usage",
+    "lead": "View your current plan, credit balance, usage history, and payment records.",
     "currentCredits": "Current credits",
     "currentPlan": "Current plan",
     "noPlan": "No subscription plan",
