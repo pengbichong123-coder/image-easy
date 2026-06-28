@@ -46,7 +46,11 @@ export async function generateMetadata({
     },
     description: t("description"),
     icons: {
-      icon: "/icon.svg",
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon.svg", type: "image/svg+xml" },
+      ],
+      shortcut: "/favicon.ico",
     },
     openGraph: {
       type: "website",
