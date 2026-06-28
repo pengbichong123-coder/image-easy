@@ -1,6 +1,6 @@
 import "server-only";
 
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const DEFAULT_SIGNED_URL_TTL_SECONDS = 3600;
@@ -117,6 +117,18 @@ export async function putObjectToR2(input: {
   }
 
   return result;
+}
+
+export async function deleteObjectFromR2(key: string): Promise<void> {
+  const config = getR2Config();
+  const client = createR2Client(config);
+
+  await client.send(
+    new DeleteObjectCommand({
+      Bucket: config.bucketName,
+      Key: key,
+    }),
+  );
 }
 
 export async function copyRemoteImageToR2(input: {

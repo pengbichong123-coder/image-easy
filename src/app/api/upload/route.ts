@@ -2,12 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { uploadBase64, KieError } from "@/lib/kie";
 import { prisma } from "@/lib/db";
-import { putObjectToR2 } from "@/lib/storage/r2";
+import { deleteObjectFromR2, putObjectToR2 } from "@/lib/storage/r2";
 import { userUploadKey } from "@/lib/storage/keys";
 
 export const runtime = "nodejs";
 
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+const SUPPORTED_UPLOAD_MIME_TYPES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+]);
+
+function normalizeMimeType(value: string | undefined) {
+  return value?.split(";")[0]?.trim().toLowerCase() || undefined;
+}
+
+function estimateBase64DecodedByteLength(payload: string) {
+  const padding = payload.endsWith("==") ? 2 : payload.endsWith("=") ? 1 : 0;
+
+  return Math.floor((payload.length * 3) / 4) - padding;
+}
 
 function parseBase64Image(input: string | undefined, requestedMimeType: string | undefined) {
   if (typeof input !== "string") {
@@ -21,16 +37,35 @@ function parseBase64Image(input: string | undefined, requestedMimeType: string |
 
   let payloadBase64 = trimmedInput;
   let detectedMimeType: string | undefined;
+  let isDataUrl = false;
   const dataUrlMatch = /^data:([^;,]+)?(?:;[^,]*)?;base64,(.*)$/is.exec(trimmedInput);
 
   if (dataUrlMatch) {
-    detectedMimeType = dataUrlMatch[1]?.trim() || undefined;
+    isDataUrl = true;
+    detectedMimeType = normalizeMimeType(dataUrlMatch[1]);
     payloadBase64 = dataUrlMatch[2] ?? "";
+  }
+
+  const effectiveMimeType = detectedMimeType || normalizeMimeType(requestedMimeType) || "image/png";
+  if (!effectiveMimeType.startsWith("image/")) {
+    return { error: "Unsupported upload MIME type" } as const;
+  }
+
+  if (!SUPPORTED_UPLOAD_MIME_TYPES.has(effectiveMimeType)) {
+    return { error: "Unsupported image MIME type" } as const;
   }
 
   const normalizedPayload = payloadBase64.replace(/\s+/g, "");
   if (!normalizedPayload || !/^[A-Za-z0-9+/]*={0,2}$/.test(normalizedPayload)) {
     return { error: "Invalid base64Data" } as const;
+  }
+
+  if (normalizedPayload.length % 4 === 1) {
+    return { error: "Invalid base64Data" } as const;
+  }
+
+  if (estimateBase64DecodedByteLength(normalizedPayload) > MAX_UPLOAD_BYTES) {
+    return { error: "File too large (max 20MB)", status: 413 } as const;
   }
 
   const buffer = Buffer.from(normalizedPayload, "base64");
@@ -50,7 +85,8 @@ function parseBase64Image(input: string | undefined, requestedMimeType: string |
 
   return {
     buffer,
-    effectiveMimeType: detectedMimeType || requestedMimeType || "image/png",
+    effectiveMimeType,
+    providerBase64Data: isDataUrl ? `data:${effectiveMimeType};base64,${normalizedPayload}` : normalizedPayload,
   } as const;
 }
 
@@ -90,45 +126,56 @@ export async function POST(req: NextRequest) {
       body: parsed.buffer,
       contentType: parsed.effectiveMimeType,
     });
-    const result = await uploadBase64(base64Data, filename);
 
-    // Persist to DB for history tracking
-    const [, upload] = await prisma.$transaction([
-      prisma.asset.create({
-        data: {
-          userId: session.user.id,
-          kind: "upload",
-          bucket: r2Upload.bucket,
-          key: r2Upload.key,
-          url: r2Upload.url,
-          filename: result.fileName,
-          mimeType: parsed.effectiveMimeType,
-          size: parsed.buffer.byteLength,
-        },
-      }),
-      prisma.upload.create({
-        data: {
-          userId: session.user.id,
-          url: result.downloadUrl,
-          filename: result.fileName,
-          size: parsed.buffer.byteLength,
-          mimeType: parsed.effectiveMimeType,
-          r2Key: r2Upload.key,
-          r2Url: r2Upload.url,
-          providerUrl: result.downloadUrl,
-        },
-      }),
-    ]);
+    try {
+      const result = await uploadBase64(parsed.providerBase64Data, filename);
 
-    return NextResponse.json({
-      uploadId: upload.id,
-      url: result.downloadUrl,
-      r2Key: r2Upload.key,
-      r2Url: r2Upload.url,
-      providerUrl: result.downloadUrl,
-      fileName: result.fileName,
-      size: parsed.buffer.byteLength,
-    });
+      // Persist to DB for history tracking
+      const [, upload] = await prisma.$transaction([
+        prisma.asset.create({
+          data: {
+            userId: session.user.id,
+            kind: "upload",
+            bucket: r2Upload.bucket,
+            key: r2Upload.key,
+            url: r2Upload.url,
+            filename: result.fileName,
+            mimeType: parsed.effectiveMimeType,
+            size: parsed.buffer.byteLength,
+          },
+        }),
+        prisma.upload.create({
+          data: {
+            userId: session.user.id,
+            url: result.downloadUrl,
+            filename: result.fileName,
+            size: parsed.buffer.byteLength,
+            mimeType: parsed.effectiveMimeType,
+            r2Key: r2Upload.key,
+            r2Url: r2Upload.url,
+            providerUrl: result.downloadUrl,
+          },
+        }),
+      ]);
+
+      return NextResponse.json({
+        uploadId: upload.id,
+        url: result.downloadUrl,
+        r2Key: r2Upload.key,
+        r2Url: r2Upload.url,
+        providerUrl: result.downloadUrl,
+        fileName: result.fileName,
+        size: parsed.buffer.byteLength,
+      });
+    } catch (error) {
+      try {
+        await deleteObjectFromR2(r2Upload.key);
+      } catch (cleanupError) {
+        console.error("Failed to clean up R2 upload after upload failure", cleanupError);
+      }
+
+      throw error;
+    }
   } catch (error) {
     if (error instanceof KieError) {
       return NextResponse.json(
