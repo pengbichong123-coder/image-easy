@@ -141,6 +141,7 @@ model CreditTransaction {
   id           String   @id @default(cuid())
   userId       String
   generationId String?
+  paymentId    String?
   type         String   // grant, reserve, consume, refund, purchase, admin_adjust
   amount       Int
   balanceAfter Int
@@ -148,12 +149,15 @@ model CreditTransaction {
   metadata     String?
   createdAt    DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([generationId])
+  @@index([paymentId])
   @@index([createdAt])
   @@unique([generationId, type])
+  @@unique([paymentId, type])
 }
 
 model CreditPackage {
@@ -171,7 +175,7 @@ model Payment {
   id                      String   @id @default(cuid())
   userId                  String
   stripeCheckoutSessionId String   @unique
-  stripePaymentIntentId   String?
+  stripePaymentIntentId   String?  @unique
   amountCents             Int
   currency                String
   credits                 Int
@@ -179,7 +183,8 @@ model Payment {
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditTransactions CreditTransaction[]
 
   @@index([userId])
   @@index([status])
