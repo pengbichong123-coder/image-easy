@@ -63,6 +63,12 @@ export async function generatePageMetadata({
       : t("loginLead");
 
   const pathname = page === "home" ? "/" : `/${page}`;
+  const robots =
+    page === "login"
+      ? { index: false, follow: true }
+      : page === "my-images"
+      ? { index: false, follow: false }
+      : { index: true, follow: true };
 
   // hreflang block: this page in all 9 locales
   const languages: Record<string, string> = {};
@@ -74,6 +80,7 @@ export async function generatePageMetadata({
   return {
     title,
     description,
+    robots,
     alternates: {
       canonical: localizedUrl(currentLocale, pathname),
       languages,
