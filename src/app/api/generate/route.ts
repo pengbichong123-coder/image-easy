@@ -7,6 +7,7 @@ import {
 } from "@/lib/credits";
 import { KieError, submitGenerationTask } from "@/lib/kie";
 import { prisma } from "@/lib/db";
+import { buildKieCallbackUrl } from "@/lib/kie-callback";
 import { assertCanGenerate, RateLimitError } from "@/lib/rate-limit";
 import { MODELS, type ModelId, type AspectRatio, type Resolution, type Quality, type OutputFormat } from "@/lib/models";
 import { z } from "zod";
@@ -214,6 +215,7 @@ export async function POST(req: NextRequest) {
       outputFormat: body.outputFormat as OutputFormat | undefined,
       imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
       nsfwChecker: body.nsfwChecker,
+      callBackUrl: buildKieCallbackUrl(generation.id),
     });
 
     const started = await prisma.$transaction(async (tx) => {
