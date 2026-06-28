@@ -86,7 +86,14 @@
       "planLine2": "付费额度包即将推出。",
       "detailsTitle": "当前说明",
       "detailsBody1": "Beta 阶段包含当前多模型 AI 图片生成工作区的访问权限，同时我们会继续进行上线测试。",
-      "detailsBody2": "目前没有上线任何付费结账流程。付费额度开放前，我们会先更新此页面。"
+      "detailsBody2": "目前没有上线任何付费结账流程。付费额度开放前，我们会先更新此页面。",
+      "checkoutSuccess": "付款已收到。Stripe 确认后，额度会显示在你的账户中。",
+      "checkoutCancel": "结账已取消，未增加额度。",
+      "checkoutSignInRequired": "购买额度前请先登录。",
+      "checkoutFailed": "结账失败，请重试。",
+      "checkoutOpening": "正在打开…",
+      "checkoutBuy": "购买",
+      "creditsLabel": "额度"
     },
     "privacy": {
       "metaTitle": "隐私政策",

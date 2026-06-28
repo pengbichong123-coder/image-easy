@@ -86,7 +86,14 @@
       "planLine2": "Les packs de crédits payants arrivent bientôt.",
       "detailsTitle": "À quoi s’attendre",
       "detailsBody1": "La bêta inclut l’accès à l’espace de travail actuel de génération d’images multi-modèles pendant la poursuite des tests de lancement.",
-      "detailsBody2": "Aucun paiement n’est disponible aujourd’hui. Cette page sera mise à jour avant la disponibilité de crédits payants."
+      "detailsBody2": "Aucun paiement n’est disponible aujourd’hui. Cette page sera mise à jour avant la disponibilité de crédits payants.",
+      "checkoutSuccess": "Paiement reçu. Vos crédits apparaîtront après confirmation du paiement par Stripe.",
+      "checkoutCancel": "Le paiement a été annulé. Aucun crédit n’a été ajouté.",
+      "checkoutSignInRequired": "Connectez-vous avant d’acheter des crédits.",
+      "checkoutFailed": "Le paiement a échoué. Veuillez réessayer.",
+      "checkoutOpening": "Ouverture...",
+      "checkoutBuy": "Acheter",
+      "creditsLabel": "crédits"
     },
     "privacy": {
       "metaTitle": "Politique de confidentialité",

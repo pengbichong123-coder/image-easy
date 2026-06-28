@@ -86,7 +86,14 @@
       "planLine2": "유료 크레딧 팩은 곧 제공될 예정입니다.",
       "detailsTitle": "현재 안내",
       "detailsBody1": "베타에는 출시 테스트가 계속되는 동안 현재의 멀티 모델 이미지 생성 작업 공간 이용이 포함됩니다.",
-      "detailsBody2": "현재 유료 결제는 제공되지 않습니다. 유료 크레딧이 제공되기 전에 이 페이지를 업데이트하겠습니다."
+      "detailsBody2": "현재 유료 결제는 제공되지 않습니다. 유료 크레딧이 제공되기 전에 이 페이지를 업데이트하겠습니다.",
+      "checkoutSuccess": "결제가 접수되었습니다. Stripe 확인 후 크레딧이 계정에 표시됩니다.",
+      "checkoutCancel": "체크아웃이 취소되었습니다. 크레딧은 추가되지 않았습니다.",
+      "checkoutSignInRequired": "크레딧을 구매하기 전에 로그인해 주세요.",
+      "checkoutFailed": "체크아웃에 실패했습니다. 다시 시도해 주세요.",
+      "checkoutOpening": "여는 중...",
+      "checkoutBuy": "구매",
+      "creditsLabel": "크레딧"
     },
     "privacy": {
       "metaTitle": "개인정보 처리방침",

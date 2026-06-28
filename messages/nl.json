@@ -86,7 +86,14 @@
       "planLine2": "Betaalde creditpakketten komen binnenkort.",
       "detailsTitle": "Wat je kunt verwachten",
       "detailsBody1": "De beta biedt toegang tot de huidige multi-model werkruimte voor beeldgeneratie terwijl de lanceringstests doorgaan.",
-      "detailsBody2": "Er is vandaag geen betaalde checkout live. We werken deze pagina bij voordat betaalde credits beschikbaar komen."
+      "detailsBody2": "Er is vandaag geen betaalde checkout live. We werken deze pagina bij voordat betaalde credits beschikbaar komen.",
+      "checkoutSuccess": "Betaling ontvangen. Je credits verschijnen nadat Stripe de checkout bevestigt.",
+      "checkoutCancel": "De checkout is geannuleerd. Er zijn geen credits toegevoegd.",
+      "checkoutSignInRequired": "Log in voordat je credits koopt.",
+      "checkoutFailed": "Checkout mislukt. Probeer het opnieuw.",
+      "checkoutOpening": "Openen...",
+      "checkoutBuy": "Kopen",
+      "creditsLabel": "credits"
     },
     "privacy": {
       "metaTitle": "Privacybeleid",

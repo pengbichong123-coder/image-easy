@@ -73,15 +73,25 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
             </h2>
             {checkoutStatus === "success" ? (
               <div className="mb-6 rounded-[8px] border border-[#B7E4C7] bg-[#F1FFF6] px-4 py-3 text-[14px] text-[#17633A]">
-                Payment received. Your credits will appear after Stripe confirms the checkout.
+                {t("checkoutSuccess")}
               </div>
             ) : null}
             {checkoutStatus === "cancel" ? (
               <div className="mb-6 rounded-[8px] border border-[#F1D6A7] bg-[#FFF9EF] px-4 py-3 text-[14px] text-[#7A4E00]">
-                Checkout was canceled. No credits were added.
+                {t("checkoutCancel")}
               </div>
             ) : null}
-            <CreditPackageCheckout locale={locale} packages={creditPackages} />
+            <CreditPackageCheckout
+              labels={{
+                signInRequired: t("checkoutSignInRequired"),
+                failed: t("checkoutFailed"),
+                opening: t("checkoutOpening"),
+                buy: t("checkoutBuy"),
+                credits: t("creditsLabel"),
+              }}
+              locale={locale}
+              packages={creditPackages}
+            />
           </div>
         ) : (
           <div className="mt-14 border-t border-[#D2D2D7] pt-10">

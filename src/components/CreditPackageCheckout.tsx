@@ -16,6 +16,14 @@ type CheckoutResponse = {
   error?: string;
 };
 
+type CheckoutLabels = {
+  signInRequired: string;
+  failed: string;
+  opening: string;
+  buy: string;
+  credits: string;
+};
+
 function formatPrice(priceCents: number, currency: string) {
   return new Intl.NumberFormat(undefined, {
     style: "currency",
@@ -24,9 +32,11 @@ function formatPrice(priceCents: number, currency: string) {
 }
 
 export function CreditPackageCheckout({
+  labels,
   locale,
   packages,
 }: {
+  labels: CheckoutLabels;
   locale: string;
   packages: CreditPackage[];
 }) {
@@ -50,15 +60,15 @@ export function CreditPackageCheckout({
       if (!response.ok || !data.url) {
         setMessage(
           response.status === 401
-            ? "Please sign in before buying credits."
-            : data.error ?? "Checkout failed.",
+            ? labels.signInRequired
+            : data.error ?? labels.failed,
         );
         return;
       }
 
       window.location.href = data.url;
     } catch {
-      setMessage("Checkout failed. Please try again.");
+      setMessage(labels.failed);
     } finally {
       setPendingPriceId(null);
     }
@@ -85,7 +95,7 @@ export function CreditPackageCheckout({
               <div className="mt-3 text-[32px] font-semibold leading-none text-[#1D1D1F]">
                 {creditPackage.credits.toLocaleString()}
               </div>
-              <div className="mt-1 text-[14px] text-[#6E6E73]">credits</div>
+              <div className="mt-1 text-[14px] text-[#6E6E73]">{labels.credits}</div>
               <div className="mt-6 text-[20px] font-semibold text-[#1D1D1F]">
                 {formatPrice(creditPackage.priceCents, creditPackage.currency)}
               </div>
@@ -95,7 +105,7 @@ export function CreditPackageCheckout({
                 disabled={pendingPriceId !== null}
                 className="mt-5 h-11 w-full rounded-[8px] bg-[#1D1D1F] px-4 text-[15px] font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-[#86868B]"
               >
-                {isPending ? "Opening..." : "Buy"}
+                {isPending ? labels.opening : labels.buy}
               </button>
             </div>
           );

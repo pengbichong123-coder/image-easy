@@ -86,7 +86,14 @@
       "planLine2": "Kostenpflichtige Credit-Pakete kommen bald.",
       "detailsTitle": "Was Sie erwarten können",
       "detailsBody1": "Die Beta umfasst Zugriff auf den aktuellen Multi-Modell-Arbeitsbereich zur Bildgenerierung, während die Launch-Tests weiterlaufen.",
-      "detailsBody2": "Heute ist kein kostenpflichtiger Checkout verfügbar. Wir aktualisieren diese Seite, bevor bezahlte Credits verfügbar werden."
+      "detailsBody2": "Heute ist kein kostenpflichtiger Checkout verfügbar. Wir aktualisieren diese Seite, bevor bezahlte Credits verfügbar werden.",
+      "checkoutSuccess": "Zahlung erhalten. Ihre Credits erscheinen, sobald Stripe den Checkout bestätigt.",
+      "checkoutCancel": "Der Checkout wurde abgebrochen. Es wurden keine Credits hinzugefügt.",
+      "checkoutSignInRequired": "Bitte melden Sie sich an, bevor Sie Credits kaufen.",
+      "checkoutFailed": "Checkout fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "checkoutOpening": "Wird geöffnet...",
+      "checkoutBuy": "Kaufen",
+      "creditsLabel": "Credits"
     },
     "privacy": {
       "metaTitle": "Datenschutzerklärung",

@@ -86,7 +86,14 @@
       "planLine2": "I pacchetti di crediti a pagamento arriveranno presto.",
       "detailsTitle": "Cosa aspettarsi",
       "detailsBody1": "La beta include l’accesso all’attuale workspace multi-modello per la generazione di immagini mentre continuano i test di lancio.",
-      "detailsBody2": "Oggi non è attivo alcun checkout a pagamento. Aggiorneremo questa pagina prima che siano disponibili crediti a pagamento."
+      "detailsBody2": "Oggi non è attivo alcun checkout a pagamento. Aggiorneremo questa pagina prima che siano disponibili crediti a pagamento.",
+      "checkoutSuccess": "Pagamento ricevuto. I tuoi crediti appariranno dopo la conferma del checkout da parte di Stripe.",
+      "checkoutCancel": "Il checkout è stato annullato. Nessun credito è stato aggiunto.",
+      "checkoutSignInRequired": "Accedi prima di acquistare crediti.",
+      "checkoutFailed": "Checkout non riuscito. Riprova.",
+      "checkoutOpening": "Apertura...",
+      "checkoutBuy": "Acquista",
+      "creditsLabel": "crediti"
     },
     "privacy": {
       "metaTitle": "Informativa sulla privacy",

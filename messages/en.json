@@ -86,7 +86,14 @@
       "planLine2": "Paid credit packs are coming soon.",
       "detailsTitle": "What to expect",
       "detailsBody1": "The beta includes access to the current multi-model image generation workspace while launch testing continues.",
-      "detailsBody2": "No paid checkout is live today. We will update this page before any paid credits become available."
+      "detailsBody2": "No paid checkout is live today. We will update this page before any paid credits become available.",
+      "checkoutSuccess": "Payment received. Your credits will appear after Stripe confirms the checkout.",
+      "checkoutCancel": "Checkout was canceled. No credits were added.",
+      "checkoutSignInRequired": "Please sign in before buying credits.",
+      "checkoutFailed": "Checkout failed. Please try again.",
+      "checkoutOpening": "Opening...",
+      "checkoutBuy": "Buy",
+      "creditsLabel": "credits"
     },
     "privacy": {
       "metaTitle": "Privacy Policy",
