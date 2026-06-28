@@ -23,6 +23,22 @@ export type GenerationForProcessing = {
   providerPollErrorCount: number;
 };
 
+export function canMarkGenerationFailedWithStorageState(input: {
+  storageStatus: string | null;
+  storageStartedAt: Date | null;
+  staleStorageStartedBefore: Date;
+}) {
+  if (input.storageStatus !== "processing") {
+    return true;
+  }
+
+  if (!input.storageStartedAt) {
+    return false;
+  }
+
+  return input.storageStartedAt < input.staleStorageStartedBefore;
+}
+
 function parseJsonStringArray(value: string | null) {
   if (!value) {
     return [];
@@ -131,18 +147,20 @@ async function markGenerationFailed(input: {
   message: string;
   reason: string;
 }) {
+  const staleStorageStartedBefore = new Date(Date.now() - STORAGE_LOCK_STALE_MS);
   const { current, markedFailed } = await prisma.$transaction(async (tx) => {
     const write = await tx.generation.updateMany({
       where: {
         id: input.generation.id,
         status: { notIn: ["completed", "failed"] },
-        NOT: {
-          storageStatus: "processing",
-          OR: [
-            { storageStartedAt: null },
-            { storageStartedAt: { gte: new Date(Date.now() - STORAGE_LOCK_STALE_MS) } },
-          ],
-        },
+        OR: [
+          { storageStatus: null },
+          { storageStatus: { not: "processing" } },
+          {
+            storageStatus: "processing",
+            storageStartedAt: { lt: staleStorageStartedBefore },
+          },
+        ],
       },
       data: { status: "failed", errorMessage: input.message },
     });
