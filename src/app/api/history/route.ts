@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { refundGenerationCreditInTransaction } from "@/lib/credits";
 import { prisma } from "@/lib/db";
 import { deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
-const DELETED_BEFORE_COMPLETION_MESSAGE = "Generation deleted before completion.";
+const GENERATION_STILL_PROCESSING_MESSAGE = "Generation is still processing. Please wait before deleting it.";
 
 function parseJsonStringArray(value: string | null) {
   if (!value) {
@@ -106,38 +105,22 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
 
-  const { found, resultAssetKeys } = await prisma.$transaction(async (tx) => {
-    const terminalClaim = await tx.generation.updateMany({
-      where: {
-        id,
-        userId: session.user.id,
-        status: { notIn: ["completed", "failed"] },
-      },
-      data: {
-        status: "failed",
-        errorMessage: DELETED_BEFORE_COMPLETION_MESSAGE,
-      },
-    });
-
-    if (terminalClaim.count === 1) {
-      await refundGenerationCreditInTransaction(tx, {
-        userId: session.user.id,
-        generationId: id,
-        amount: 1,
-        reason: "Refund reserved credit after deleting unfinished generation",
-      });
-    }
-
+  const { found, isProcessing, resultAssetKeys } = await prisma.$transaction(async (tx) => {
     const generation = await tx.generation.findFirst({
       where: { id, userId: session.user.id },
       select: {
         id: true,
+        status: true,
         resultAssetKeys: true,
       },
     });
 
     if (!generation) {
-      return { found: false, resultAssetKeys: [] };
+      return { found: false, isProcessing: false, resultAssetKeys: [] };
+    }
+
+    if (generation.status === "pending" || generation.status === "processing") {
+      return { found: true, isProcessing: true, resultAssetKeys: [] };
     }
 
     const resultAssetKeys = parseJsonStringArray(generation.resultAssetKeys);
@@ -154,11 +137,18 @@ export async function DELETE(req: NextRequest) {
       where: { id: generation.id, userId: session.user.id },
     });
 
-    return { found: true, resultAssetKeys };
+    return { found: true, isProcessing: false, resultAssetKeys };
   });
 
   if (!found) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  if (isProcessing) {
+    return NextResponse.json(
+      { error: GENERATION_STILL_PROCESSING_MESSAGE },
+      { status: 409 },
+    );
   }
 
   await Promise.all(

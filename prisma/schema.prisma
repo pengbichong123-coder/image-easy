@@ -79,6 +79,7 @@ model Upload {
   generations Generation[]
 
   @@index([userId])
+  @@index([userId, createdAt])
 }
 
 model Asset {
@@ -131,6 +132,8 @@ model Generation {
   @@index([userId])
   @@index([taskId])
   @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([userId, status, createdAt])
 }
 
 model CreditTransaction {
