@@ -12,7 +12,7 @@ import {
 import { MODEL_GROUPS } from "@/lib/models";
 import { cn } from "@/lib/utils";
 
-export function MyImagesContent() {
+export function CreationsContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const t = useTranslations("archive");
@@ -60,7 +60,7 @@ export function MyImagesContent() {
         if (modelFilter !== "all") params.set("modelGroup", modelFilter);
         const res = await fetch("/api/history?" + params.toString());
         if (res.status === 401) {
-          router.push("/login?callbackUrl=/my-images");
+          router.push("/login?callbackUrl=/creations");
           return;
         }
         const data = await res.json();
@@ -81,7 +81,7 @@ export function MyImagesContent() {
   useEffect(() => {
     if (status === "loading") return;
     if (!session) {
-      router.push("/login?callbackUrl=/my-images");
+      router.push("/login?callbackUrl=/creations");
       return;
     }
     load();

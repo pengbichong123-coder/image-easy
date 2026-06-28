@@ -9,14 +9,14 @@ import {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://image-easy.app";
 
-type PageKey = "home" | "create" | "my-images" | "login";
+type PageKey = "home" | "create" | "creations" | "login";
 
 // Each page has its own dict namespace; titles/descriptions are read from
 // the page's own namespace so that lookups never cross namespaces.
 const NS: Record<PageKey, string> = {
   home: "home",
   create: "create",
-  "my-images": "archive",
+  creations: "archive",
   login: "auth",
 };
 
@@ -49,7 +49,7 @@ export async function generatePageMetadata({
       ? metaT("title")
       : page === "create"
       ? t("titleA") + " " + t("titleEm") + t("titleB")
-      : page === "my-images"
+      : page === "creations"
       ? t("titleA") + " " + t("titleEm") + t("titleB")
       : t("loginTitleA") + " " + t("loginTitleEm") + t("loginTitleB");
 
@@ -58,7 +58,7 @@ export async function generatePageMetadata({
       ? metaT("description")
       : page === "create"
       ? t("lead")
-      : page === "my-images"
+      : page === "creations"
       ? t("emptyText")
       : t("loginLead");
 
@@ -66,7 +66,7 @@ export async function generatePageMetadata({
   const robots =
     page === "login"
       ? { index: false, follow: true }
-      : page === "my-images"
+      : page === "creations"
       ? { index: false, follow: false }
       : { index: true, follow: true };
 

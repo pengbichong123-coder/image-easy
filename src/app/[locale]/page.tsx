@@ -78,7 +78,7 @@ export default async function HomePage({
           <Link href="/create" className="btn btn-primary">
             {t("section3Cta")}
           </Link>
-          <Link href="/my-images" className="btn btn-link">
+          <Link href="/creations" className="btn btn-link">
             {tNav("archive")} ›
           </Link>
         </div>

@@ -55,7 +55,7 @@ export const localeOgLocale: Record<Locale, string> = {
 export const pathnames = {
   "/": "/",
   "/create": "/create",
-  "/my-images": "/my-images",
+  "/creations": "/creations",
   "/login": "/login",
   "/pricing": "/pricing",
   "/billing": "/billing",

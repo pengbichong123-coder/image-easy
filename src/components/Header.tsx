@@ -75,7 +75,7 @@ export function Header() {
           <NavItem href="/" label={tNav("atelier")} pathname={pathname} />
           <NavItem href="/pricing" label={tNav("pricing")} pathname={pathname} />
           <NavItem href="/create" label={tNav("expose")} pathname={pathname} />
-          <NavItem href="/my-images" label={tNav("archive")} pathname={pathname} />
+          <NavItem href="/creations" label={tNav("archive")} pathname={pathname} />
         </nav>
 
         {/* Right */}
@@ -181,7 +181,7 @@ export function Header() {
                       {tNav("expose")}
                     </Link>
                     <Link
-                      href="/my-images"
+                      href="/creations"
                       onClick={() => setMenuOpen(false)}
                       className="block px-3 py-2 text-[13px] text-[#1D1D1F] hover:bg-[#F5F5F7] rounded-md"
                     >
@@ -239,7 +239,7 @@ function NavItem({
   label,
   pathname,
 }: {
-  href: "/" | "/create" | "/pricing" | "/billing" | "/my-images";
+  href: "/" | "/create" | "/pricing" | "/billing" | "/creations";
   label: string;
   pathname: string;
 }) {
