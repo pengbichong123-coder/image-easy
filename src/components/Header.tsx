@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { locales, localeLabels, type Locale } from "@/i18n/routing";
 
 export function Header() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const locale = useLocale();
@@ -23,6 +23,16 @@ export function Header() {
     setLangOpen(false);
     startTransition(() => {
       router.replace(pathname, { locale: next });
+    });
+  }
+
+  function toggleAccountMenu() {
+    setMenuOpen((open) => {
+      const nextOpen = !open;
+      if (nextOpen) {
+        update().catch(() => {});
+      }
+      return nextOpen;
     });
   }
 
@@ -85,7 +95,7 @@ export function Header() {
           ) : session?.user ? (
             <div className="relative">
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
+                onClick={toggleAccountMenu}
                 className="flex items-center gap-2 hover:opacity-70 transition-opacity"
               >
                 {session.user.image ? (
