@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Suspense } from "react";
 import { ModelSelector } from "@/components/ModelSelector";
 import { ModelParams } from "@/components/ModelParams";
 import { PromptInput } from "@/components/PromptInput";
 import { ImageUploader, type UploadedImage } from "@/components/ImageUploader";
 import { GenerationResult, type GenerationOutput } from "@/components/GenerationResult";
+import { trackEvent, type AnalyticsParams } from "@/lib/analytics";
 import {
   MODELS,
   type ModelId,
@@ -24,6 +25,7 @@ export function CreateContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
   const t = useTranslations("create");
   const tCommon = useTranslations("common");
   const tAuth = useTranslations("auth");
@@ -44,6 +46,42 @@ export function CreateContent() {
   const [error, setError] = useState<string | null>(null);
 
   const modelInfo = MODELS[modelId];
+
+  function commonAnalyticsParams(
+    status: string,
+    model: ModelId = modelId,
+    hasReferenceImage = images.length > 0,
+  ): AnalyticsParams {
+    return {
+      model,
+      capability: MODELS[model].capability,
+      locale,
+      has_reference_image: hasReferenceImage,
+      status,
+    };
+  }
+
+  function handleModelChange(nextModelId: ModelId) {
+    if (nextModelId !== modelId) {
+      trackEvent("select_model", commonAnalyticsParams("selected", nextModelId));
+    }
+    setModelId(nextModelId);
+  }
+
+  function handleUpload(uploaded: UploadedImage[]) {
+    trackEvent("upload_image", {
+      ...commonAnalyticsParams("uploaded", modelId, images.length + uploaded.length > 0),
+      image_count: uploaded.length,
+      total_image_count: images.length + uploaded.length,
+    });
+  }
+
+  function trackResultAction(name: "download_result" | "copy_result_url", index: number) {
+    trackEvent(name, {
+      ...commonAnalyticsParams(name === "download_result" ? "downloaded" : "copied"),
+      result_index: index,
+    });
+  }
 
   // Load model from query string
   useEffect(() => {
@@ -81,6 +119,14 @@ export function CreateContent() {
             },
           ]);
         }
+        trackEvent("reuse_prompt", {
+          ...commonAnalyticsParams(
+            "loaded",
+            item.model as ModelId,
+            isImageToImageModel(item.model as ModelId) && Boolean(item.resultUrls?.[0]),
+          ),
+          reuse_id: reuseId,
+        });
       })
       .catch(() => {});
   }, [searchParams]);
@@ -136,6 +182,7 @@ export function CreateContent() {
     setError(null);
     setOutput(null);
     try {
+      trackEvent("submit_generation", commonAnalyticsParams("submitted"));
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -157,6 +204,12 @@ export function CreateContent() {
       }
       const data = await res.json();
       const completed = await pollGeneration(data.id);
+      trackEvent("generation_completed", {
+        ...commonAnalyticsParams("completed"),
+        task_id: completed.taskId || data.id,
+        result_count: completed.resultUrls?.length || 0,
+        cost_time: completed.costTime,
+      });
       setOutput({
         resultUrls: completed.resultUrls || [],
         taskId: completed.taskId,
@@ -165,7 +218,12 @@ export function CreateContent() {
         model: modelId,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : tCommon("error"));
+      const message = e instanceof Error ? e.message : tCommon("error");
+      trackEvent("generation_failed", {
+        ...commonAnalyticsParams("failed"),
+        error_message: message,
+      });
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -196,7 +254,7 @@ export function CreateContent() {
           {/* 01 — Instrument */}
           <section>
             <SectionLabel num={t("section1Num")} label={t("section1Label")} />
-            <ModelSelector value={modelId} onChange={setModelId} />
+            <ModelSelector value={modelId} onChange={handleModelChange} />
           </section>
 
           {/* 02 — References (only for I2I) */}
@@ -209,6 +267,7 @@ export function CreateContent() {
                   onChange={setImages}
                   maxImages={modelInfo.maxInputImages}
                   disabled={loading}
+                  onUpload={handleUpload}
                 />
                 {images.length === 0 && (
                   <p className="text-[12px] text-[#86868B] mt-3 pt-3 border-t border-[#E5E5E7]">
@@ -276,6 +335,8 @@ export function CreateContent() {
               prompt={prompt}
               model={modelId}
               onRegenerate={canSubmit ? handleSubmit : undefined}
+              onDownloadResult={(index) => trackResultAction("download_result", index)}
+              onCopyResultUrl={(index) => trackResultAction("copy_result_url", index)}
             />
           </div>
         </div>
@@ -320,4 +381,3 @@ function SectionLabel({ num, label }: { num: string; label: string }) {
     </div>
   );
 }
-

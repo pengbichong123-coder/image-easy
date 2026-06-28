@@ -20,6 +20,8 @@ interface Props {
   model: string;
   createdAt?: Date | string;
   onRegenerate?: () => void;
+  onDownloadResult?: (index: number, url: string) => void;
+  onCopyResultUrl?: (index: number, url: string) => void;
 }
 
 export function GenerationResult({
@@ -29,6 +31,8 @@ export function GenerationResult({
   prompt,
   model,
   onRegenerate,
+  onDownloadResult,
+  onCopyResultUrl,
 }: Props) {
   const t = useTranslations("result");
   const tCommon = useTranslations("common");
@@ -51,7 +55,14 @@ export function GenerationResult({
         {loading && <LoadingState />}
         {error && <ErrorState error={error} onRegenerate={onRegenerate} />}
         {output && output.resultUrls.length > 0 && (
-          <ResultDisplay output={output} prompt={prompt} model={model} onRegenerate={onRegenerate} />
+          <ResultDisplay
+            output={output}
+            prompt={prompt}
+            model={model}
+            onRegenerate={onRegenerate}
+            onDownloadResult={onDownloadResult}
+            onCopyResultUrl={onCopyResultUrl}
+          />
         )}
         {!loading && !error && !output && <EmptyState />}
       </div>
@@ -132,11 +143,15 @@ function ResultDisplay({
   prompt,
   model,
   onRegenerate,
+  onDownloadResult,
+  onCopyResultUrl,
 }: {
   output: GenerationOutput;
   prompt: string;
   model: string;
   onRegenerate?: () => void;
+  onDownloadResult?: (index: number, url: string) => void;
+  onCopyResultUrl?: (index: number, url: string) => void;
 }) {
   const t = useTranslations("result");
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -167,6 +182,7 @@ function ResultDisplay({
                 rel="noreferrer"
                 className="bg-white/95 backdrop-blur text-[#1D1D1F] text-[13px] py-2 px-4 rounded-full hover:bg-white flex-1 text-center"
                 download
+                onClick={() => onDownloadResult?.(i, url)}
               >
                 {t("download")}
               </a>
@@ -174,6 +190,7 @@ function ResultDisplay({
                 onClick={(e) => {
                   e.stopPropagation();
                   navigator.clipboard.writeText(url);
+                  onCopyResultUrl?.(i, url);
                 }}
                 className="bg-white/95 backdrop-blur text-[#1D1D1F] text-[13px] py-2 px-4 rounded-full hover:bg-white"
               >
