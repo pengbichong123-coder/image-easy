@@ -63,13 +63,16 @@ model User {
 }
 
 model Upload {
-  id        String   @id @default(cuid())
-  userId    String
-  url       String
-  filename  String
-  size      Int
-  mimeType  String
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  url         String
+  filename    String
+  size        Int
+  mimeType    String
+  r2Key       String?
+  r2Url       String?
+  providerUrl String?
+  createdAt   DateTime @default(now())
 
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   generations Generation[]
