@@ -64,11 +64,32 @@ function invoiceMetadata(invoice: Stripe.Invoice) {
 }
 
 function invoiceSubscriptionId(invoice: Stripe.Invoice) {
-  return stripeObjectId((invoice as Stripe.Invoice & { subscription?: unknown }).subscription);
+  const rawInvoice = invoice as Stripe.Invoice & {
+    parent?: {
+      subscription_details?: {
+        subscription?: unknown;
+      } | null;
+    } | null;
+    subscription?: unknown;
+  };
+
+  return stripeObjectId(rawInvoice.subscription ?? rawInvoice.parent?.subscription_details?.subscription);
 }
 
 function invoiceCustomerId(invoice: Stripe.Invoice) {
-  return stripeObjectId(invoice.customer);
+  const rawInvoice = invoice as Stripe.Invoice & {
+    customer?: unknown;
+    parent?: {
+      subscription_details?: {
+        subscription?: { customer?: unknown } | string | null;
+      } | null;
+    } | null;
+  };
+
+  const parentSubscription = rawInvoice.parent?.subscription_details?.subscription;
+  const parentCustomer = typeof parentSubscription === "object" ? parentSubscription?.customer : null;
+
+  return stripeObjectId(rawInvoice.customer ?? parentCustomer);
 }
 
 function invoicePrimaryPriceId(invoice: Stripe.Invoice) {
@@ -110,11 +131,23 @@ function subscriptionPriceId(subscription: Stripe.Subscription) {
 }
 
 function subscriptionPeriodStart(subscription: Stripe.Subscription) {
-  return stripeDate((subscription as Stripe.Subscription & { current_period_start?: number }).current_period_start);
+  const rawSubscription = subscription as Stripe.Subscription & {
+    current_period_start?: number;
+    items?: { data?: Array<{ current_period_start?: number | null }> };
+  };
+
+  return stripeDate(rawSubscription.current_period_start)
+    ?? stripeDate(rawSubscription.items?.data?.[0]?.current_period_start);
 }
 
 function subscriptionPeriodEnd(subscription: Stripe.Subscription) {
-  return stripeDate((subscription as Stripe.Subscription & { current_period_end?: number }).current_period_end);
+  const rawSubscription = subscription as Stripe.Subscription & {
+    current_period_end?: number;
+    items?: { data?: Array<{ current_period_end?: number | null }> };
+  };
+
+  return stripeDate(rawSubscription.current_period_end)
+    ?? stripeDate(rawSubscription.items?.data?.[0]?.current_period_end);
 }
 
 function nextGrantForPlan(plan: SubscriptionPlan, grantAt: Date, currentPeriodEnd?: Date | null) {
