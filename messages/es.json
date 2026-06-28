@@ -64,6 +64,7 @@
     "footerChangelog": "Cambios",
     "footerStatus": "Estado",
     "footerCompany": "Empresa",
+    "footerAbout": "Acerca de",
     "footerPricing": "Precios",
     "footerContact": "Contacto",
     "footerPrivacy": "Privacidad",
@@ -71,6 +72,71 @@
     "footerLegal": "Legal",
     "footerCopyright": "Copyright © 2026 Image Easy Inc. Todos los derechos reservados.",
     "footerPrivacyPolicy": "Política de privacidad"
+  },
+  "trust": {
+    "pricing": {
+      "metaTitle": "Precios",
+      "metaDescription": "Precios actuales de la beta de Image Easy: beta gratuita, 10 generaciones gratis al registrarse y paquetes de créditos de pago próximamente.",
+      "kicker": "Precios",
+      "title": "Beta gratuita hoy. Créditos de pago pronto.",
+      "lead": "Image Easy está en beta, así que la experiencia de lanzamiento es intencionalmente simple y gratuita para probar.",
+      "planEyebrow": "Plan actual",
+      "planLabel": "Beta gratuita",
+      "planLine1": "10 generaciones gratis al registrarse.",
+      "planLine2": "Los paquetes de créditos de pago llegarán pronto.",
+      "detailsTitle": "Qué esperar",
+      "detailsBody1": "La beta incluye acceso al espacio de trabajo actual de generación de imágenes con varios modelos mientras continúan las pruebas de lanzamiento.",
+      "detailsBody2": "Hoy no hay checkout de pago activo. Actualizaremos esta página antes de que haya créditos de pago disponibles."
+    },
+    "privacy": {
+      "metaTitle": "Política de privacidad",
+      "metaDescription": "Un resumen claro de privacidad para la beta de Image Easy.",
+      "kicker": "Privacidad",
+      "title": "Privacidad en el lanzamiento",
+      "lead": "Esta página resume lo que Image Easy maneja mientras el producto está en beta.",
+      "summaryTitle": "Qué maneja Image Easy",
+      "summaryUpload": "Los usuarios suben imágenes y prompts a Image Easy.",
+      "summaryProvider": "Image Easy envía prompts y las URL de imagen necesarias a proveedores externos de modelos de IA a través de kie.ai.",
+      "summaryStorage": "Image Easy almacena datos de cuenta, historial de generación, prompts, imágenes subidas y URL de imágenes generadas.",
+      "betaTitle": "Nota de beta",
+      "betaBody1": "Las solicitudes de generación necesitan suficiente información de prompt e imagen para producir el resultado solicitado.",
+      "betaBody2": "No subas imágenes ni prompts que no quieras usar con este servicio beta."
+    },
+    "terms": {
+      "metaTitle": "Términos de uso",
+      "metaDescription": "Términos básicos de uso para la beta de Image Easy.",
+      "kicker": "Términos",
+      "title": "Términos de la beta",
+      "lead": "Usa Image Easy de forma responsable y solo con contenido que tienes derecho a usar.",
+      "summaryTitle": "Reglas principales",
+      "summaryRights": "Los usuarios son responsables de los derechos sobre las imágenes subidas y los resultados generados.",
+      "summaryProhibited": "Los usuarios no pueden generar contenido ilegal, abusivo o que infrinja derechos.",
+      "summaryRemoval": "Image Easy puede eliminar el acceso o el contenido que viole estos términos.",
+      "betaTitle": "Disponibilidad de la beta",
+      "betaBody": "Image Easy está actualmente en beta. Las funciones, límites, disponibilidad de modelos y políticas pueden cambiar antes del lanzamiento general."
+    },
+    "contact": {
+      "metaTitle": "Contacto",
+      "metaDescription": "Cómo contactar con el equipo de Image Easy durante la beta de lanzamiento.",
+      "kicker": "Contacto",
+      "title": "Contacta con el equipo de Image Easy",
+      "lead": "Mantenemos el soporte de lanzamiento directo mientras el producto está en beta.",
+      "supportTitle": "Soporte de lanzamiento",
+      "supportBody": "Para soporte de lanzamiento, contacta con el equipo de Image Easy a través del propietario del producto.",
+      "supportDetails": "Al reportar un problema de generación, incluye el correo de la cuenta, la hora aproximada, el nombre del modelo y una breve descripción de lo ocurrido."
+    },
+    "about": {
+      "metaTitle": "Acerca de",
+      "metaDescription": "Image Easy es un espacio de trabajo enfocado de generación de imágenes con IA y varios modelos, actualmente en beta.",
+      "kicker": "Acerca de",
+      "title": "Acerca de Image Easy",
+      "lead": "Image Easy es un espacio de trabajo enfocado de generación de imágenes con IA y varios modelos, actualmente en beta.",
+      "workspaceTitle": "Un espacio de trabajo para modelos de imagen",
+      "workspaceBody1": "El producto reúne modelos de texto a imagen e imagen a imagen en un flujo directo para prompts, imágenes de referencia y resultados guardados.",
+      "workspaceBody2": "El objetivo es simplificar la elección del modelo sin añadir paneles, jerga de tokens ni configuración innecesaria.",
+      "betaTitle": "Etapa actual",
+      "betaBody": "Image Easy se está preparando para el lanzamiento. La beta es intencionalmente pequeña, práctica y transparente sobre lo que está disponible hoy."
+    }
   },
   "auth": {
     "membersOnlyKicker": "Solo miembros",

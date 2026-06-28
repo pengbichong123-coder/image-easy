@@ -57,6 +57,11 @@ export const pathnames = {
   "/create": "/create",
   "/my-images": "/my-images",
   "/login": "/login",
+  "/pricing": "/pricing",
+  "/privacy": "/privacy",
+  "/terms": "/terms",
+  "/contact": "/contact",
+  "/about": "/about",
 } as const;
 
 export const routing = {

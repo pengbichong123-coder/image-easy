@@ -22,8 +22,8 @@
   },
   "nav": {
     "atelier": "首页",
-    "expose": "创作",
-    "archive": "我的作品"
+    "expose": "创建",
+    "archive": "我的图片"
   },
   "header": {
     "signIn": "登录",
@@ -56,14 +56,15 @@
     "section3Cta": "开始创作",
     "footerAtelier": "首页",
     "footerCompose": "概览",
-    "footerExpose": "创作",
-    "footerArchive": "我的作品",
+    "footerExpose": "创建",
+    "footerArchive": "我的图片",
     "footerModels": "模型",
     "footerResources": "资源",
     "footerJournal": "日志",
     "footerChangelog": "更新",
     "footerStatus": "状态",
     "footerCompany": "公司",
+    "footerAbout": "关于",
     "footerPricing": "价格",
     "footerContact": "联系我们",
     "footerPrivacy": "隐私",
@@ -71,6 +72,71 @@
     "footerLegal": "法律",
     "footerCopyright": "版权所有 © 2026 Image Easy Inc. 保留所有权利。",
     "footerPrivacyPolicy": "隐私政策"
+  },
+  "trust": {
+    "pricing": {
+      "metaTitle": "价格",
+      "metaDescription": "Image Easy 当前 Beta 价格：免费 Beta，注册后 10 次免费生成，付费额度包即将推出。",
+      "kicker": "价格",
+      "title": "当前免费 Beta。付费额度即将推出。",
+      "lead": "Image Easy 仍处于 Beta 阶段，所以上线初期体验会保持简单，并且可以免费试用。",
+      "planEyebrow": "当前方案",
+      "planLabel": "免费 Beta",
+      "planLine1": "注册后可获得 10 次免费生成。",
+      "planLine2": "付费额度包即将推出。",
+      "detailsTitle": "当前说明",
+      "detailsBody1": "Beta 阶段包含当前多模型 AI 图片生成工作区的访问权限，同时我们会继续进行上线测试。",
+      "detailsBody2": "目前没有上线任何付费结账流程。付费额度开放前，我们会先更新此页面。"
+    },
+    "privacy": {
+      "metaTitle": "隐私政策",
+      "metaDescription": "Image Easy Beta 阶段的简明隐私说明。",
+      "kicker": "隐私",
+      "title": "上线阶段的隐私说明",
+      "lead": "本页概述 Image Easy 在产品 Beta 阶段会处理哪些信息。",
+      "summaryTitle": "Image Easy 会处理的信息",
+      "summaryUpload": "用户会向 Image Easy 上传图片和提示词。",
+      "summaryProvider": "Image Easy 会通过 kie.ai 将提示词和所需图片 URL 发送给第三方 AI 模型提供商。",
+      "summaryStorage": "Image Easy 会存储账号数据、生成历史、提示词、上传的图片和生成图片 URL。",
+      "betaTitle": "Beta 说明",
+      "betaBody1": "生成请求需要足够的提示词和图片信息，才能生成用户请求的结果。",
+      "betaBody2": "请不要上传你不希望用于此 Beta 服务的图片或提示词。"
+    },
+    "terms": {
+      "metaTitle": "使用条款",
+      "metaDescription": "Image Easy Beta 阶段的基础使用条款。",
+      "kicker": "条款",
+      "title": "Beta 使用条款",
+      "lead": "请负责任地使用 Image Easy，并且只使用你有权使用的内容。",
+      "summaryTitle": "核心规则",
+      "summaryRights": "用户需自行负责上传图片和生成结果的相关权利。",
+      "summaryProhibited": "用户不得生成违法、滥用或侵犯权利的内容。",
+      "summaryRemoval": "Image Easy 可以移除违反这些条款的访问权限或内容。",
+      "betaTitle": "Beta 可用性",
+      "betaBody": "Image Easy 当前处于 Beta 阶段。功能、限制、模型可用性和政策可能会在正式上线前调整。"
+    },
+    "contact": {
+      "metaTitle": "联系我们",
+      "metaDescription": "Image Easy 上线 Beta 阶段的联系和支持方式。",
+      "kicker": "联系",
+      "title": "联系 Image Easy 团队",
+      "lead": "产品处于 Beta 阶段时，我们会保持直接的上线支持方式。",
+      "supportTitle": "上线支持",
+      "supportBody": "如需上线支持，请通过产品负责人联系 Image Easy 团队。",
+      "supportDetails": "报告生成问题时，请包含账号邮箱、大致时间、模型名称，以及对发生情况的简短描述。"
+    },
+    "about": {
+      "metaTitle": "关于",
+      "metaDescription": "Image Easy 是一个专注的多模型 AI 图片生成工作区，目前处于 Beta 阶段。",
+      "kicker": "关于",
+      "title": "关于 Image Easy",
+      "lead": "Image Easy 是一个专注的多模型 AI 图片生成工作区，目前处于 Beta 阶段。",
+      "workspaceTitle": "一个用于图片模型的工作区",
+      "workspaceBody1": "产品把文生图和图生图模型放进同一个直接的工作流，用于提示词、参考图片和已保存结果。",
+      "workspaceBody2": "目标是让模型选择更简单，不增加仪表盘、额度术语或不必要的设置。",
+      "betaTitle": "当前阶段",
+      "betaBody": "Image Easy 正在为上线做准备。Beta 阶段会保持小范围、实用，并清楚说明目前已经可用的内容。"
+    }
   },
   "auth": {
     "membersOnlyKicker": "会员专享",

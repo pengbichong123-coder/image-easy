@@ -64,6 +64,7 @@
     "footerChangelog": "Changelog",
     "footerStatus": "Status",
     "footerCompany": "Company",
+    "footerAbout": "About",
     "footerPricing": "Pricing",
     "footerContact": "Contact",
     "footerPrivacy": "Privacy",
@@ -71,6 +72,71 @@
     "footerLegal": "Legal",
     "footerCopyright": "Copyright © 2026 Image Easy Inc. All rights reserved.",
     "footerPrivacyPolicy": "Privacy Policy"
+  },
+  "trust": {
+    "pricing": {
+      "metaTitle": "Pricing",
+      "metaDescription": "Current Image Easy beta pricing: free beta access, 10 free generations on sign-up, and paid credit packs coming soon.",
+      "kicker": "Pricing",
+      "title": "Free beta today. Paid credits soon.",
+      "lead": "Image Easy is in beta, so the launch experience is intentionally simple and free to try.",
+      "planEyebrow": "Current plan",
+      "planLabel": "Free beta",
+      "planLine1": "10 free generations on sign-up.",
+      "planLine2": "Paid credit packs are coming soon.",
+      "detailsTitle": "What to expect",
+      "detailsBody1": "The beta includes access to the current multi-model image generation workspace while launch testing continues.",
+      "detailsBody2": "No paid checkout is live today. We will update this page before any paid credits become available."
+    },
+    "privacy": {
+      "metaTitle": "Privacy Policy",
+      "metaDescription": "A plain-language privacy summary for the Image Easy beta.",
+      "kicker": "Privacy",
+      "title": "Privacy at launch",
+      "lead": "This page summarizes what Image Easy handles while the product is in beta.",
+      "summaryTitle": "What Image Easy handles",
+      "summaryUpload": "Users upload images and prompts to Image Easy.",
+      "summaryProvider": "Image Easy sends prompts and required image URLs to third-party AI model providers through kie.ai.",
+      "summaryStorage": "Image Easy stores account data, generation history, prompts, uploaded images, and generated image URLs.",
+      "betaTitle": "Beta note",
+      "betaBody1": "Generation requests need enough prompt and image information to produce the requested output.",
+      "betaBody2": "Do not upload images or prompts that you are not comfortable using with this beta service."
+    },
+    "terms": {
+      "metaTitle": "Terms of Use",
+      "metaDescription": "Basic use terms for the Image Easy beta.",
+      "kicker": "Terms",
+      "title": "Terms for the beta",
+      "lead": "Use Image Easy responsibly and only with content you have the right to use.",
+      "summaryTitle": "Core rules",
+      "summaryRights": "Users are responsible for rights to uploaded images and generated outputs.",
+      "summaryProhibited": "Users may not generate illegal, abusive, or rights-infringing content.",
+      "summaryRemoval": "Image Easy may remove access or content that violates these terms.",
+      "betaTitle": "Beta availability",
+      "betaBody": "Image Easy is currently in beta. Features, limits, model availability, and policies may change before general launch."
+    },
+    "contact": {
+      "metaTitle": "Contact",
+      "metaDescription": "How to contact the Image Easy team during launch beta.",
+      "kicker": "Contact",
+      "title": "Contact the Image Easy team",
+      "lead": "We are keeping launch support direct while the product is in beta.",
+      "supportTitle": "Launch support",
+      "supportBody": "For launch support, contact the Image Easy team through the product owner.",
+      "supportDetails": "When reporting a generation issue, include the account email, approximate time, model name, and a short description of what happened."
+    },
+    "about": {
+      "metaTitle": "About",
+      "metaDescription": "Image Easy is a focused multi-model AI image generation workspace currently in beta.",
+      "kicker": "About",
+      "title": "About Image Easy",
+      "lead": "Image Easy is a focused multi-model AI image generation workspace, currently in beta.",
+      "workspaceTitle": "One workspace for image models",
+      "workspaceBody1": "The product brings text-to-image and image-to-image models into one direct workflow for prompts, reference images, and saved results.",
+      "workspaceBody2": "The goal is to make model choice simple without adding dashboards, token jargon, or unnecessary setup.",
+      "betaTitle": "Current stage",
+      "betaBody": "Image Easy is being prepared for launch. The beta is intentionally small, practical, and transparent about what is available today."
+    }
   },
   "auth": {
     "membersOnlyKicker": "Members only",

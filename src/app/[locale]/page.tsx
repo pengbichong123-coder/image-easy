@@ -220,17 +220,32 @@ export default async function HomePage({
             </div>
             <div>
               <h4 className="text-[#1D1D1F] font-medium mb-3">{t("footerCompany")}</h4>
-              <span className="block text-[#6E6E73] py-1">{t("footerPricing")}</span>
-              <span className="block text-[#6E6E73] py-1">{t("footerContact")}</span>
-              <span className="block text-[#6E6E73] py-1">{t("footerPrivacy")}</span>
+              <Link href="/about" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
+                {t("footerAbout")}
+              </Link>
+              <Link href="/pricing" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
+                {t("footerPricing")}
+              </Link>
+              <Link href="/contact" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
+                {t("footerContact")}
+              </Link>
+              <Link href="/privacy" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
+                {t("footerPrivacy")}
+              </Link>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row justify-between gap-3 pt-6 border-t border-[#D2D2D7] text-[12px] text-[#6E6E73]">
             <div>{t("footerCopyright")}</div>
             <div className="flex gap-4">
-              <span className="hover:text-[#1D1D1F]">{t("footerPrivacyPolicy")}</span>
-              <span className="hover:text-[#1D1D1F]">{t("footerTerms")}</span>
-              <span className="hover:text-[#1D1D1F]">{t("footerLegal")}</span>
+              <Link href="/privacy" className="hover:text-[#1D1D1F]">
+                {t("footerPrivacyPolicy")}
+              </Link>
+              <Link href="/terms" className="hover:text-[#1D1D1F]">
+                {t("footerTerms")}
+              </Link>
+              <Link href="/terms" className="hover:text-[#1D1D1F]">
+                {t("footerLegal")}
+              </Link>
             </div>
           </div>
         </div>
