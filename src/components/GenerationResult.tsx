@@ -10,6 +10,7 @@ export interface GenerationOutput {
   costTime?: number;
   prompt?: string;
   model?: string;
+  hasReferenceImage?: boolean;
 }
 
 interface Props {
@@ -187,10 +188,14 @@ function ResultDisplay({
                 {t("download")}
               </a>
               <button
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText(url);
-                  onCopyResultUrl?.(i, url);
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    onCopyResultUrl?.(i, url);
+                  } catch {
+                    // Keep the existing no-UI-error behavior, but do not report a success event.
+                  }
                 }}
                 className="bg-white/95 backdrop-blur text-[#1D1D1F] text-[13px] py-2 px-4 rounded-full hover:bg-white"
               >

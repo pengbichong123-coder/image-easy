@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -29,6 +29,8 @@ export function CreateContent() {
   const t = useTranslations("create");
   const tCommon = useTranslations("common");
   const tAuth = useTranslations("auth");
+  const reuseId = searchParams.get("reuse");
+  const trackedReuseIds = useRef<Set<string>>(new Set());
 
   // Form state
   const [modelId, setModelId] = useState<ModelId>("gpt-image-2-text-to-image");
@@ -52,13 +54,7 @@ export function CreateContent() {
     model: ModelId = modelId,
     hasReferenceImage = images.length > 0,
   ): AnalyticsParams {
-    return {
-      model,
-      capability: MODELS[model].capability,
-      locale,
-      has_reference_image: hasReferenceImage,
-      status,
-    };
+    return buildCommonAnalyticsParams(status, locale, model, hasReferenceImage);
   }
 
   function handleModelChange(nextModelId: ModelId) {
@@ -76,10 +72,18 @@ export function CreateContent() {
     });
   }
 
-  function trackResultAction(name: "download_result" | "copy_result_url", index: number) {
+  function trackResultAction(name: "download_result" | "copy_result_url", index: number, url: string) {
+    if (!output) return;
+    const outputModel = isModelId(output.model) ? output.model : modelId;
     trackEvent(name, {
-      ...commonAnalyticsParams(name === "download_result" ? "downloaded" : "copied"),
+      ...commonAnalyticsParams(
+        name === "download_result" ? "downloaded" : "copied",
+        outputModel,
+        output.hasReferenceImage ?? images.length > 0,
+      ),
+      task_id: output.taskId,
       result_index: index,
+      result_url: url,
     });
   }
 
@@ -91,24 +95,27 @@ export function CreateContent() {
 
   // Reuse from history
   useEffect(() => {
-    const reuseId = searchParams.get("reuse");
     if (!reuseId) return;
+    let cancelled = false;
     fetch("/api/history?limit=50")
       .then((r) => r.json())
       .then((data) => {
+        if (cancelled) return;
         const item = data.items?.find(
           (i: { id: string; model: string; prompt: string; aspectRatio?: string; resolution?: string; quality?: string; outputFormat?: string; resultUrls?: string[] }) =>
             i.id === reuseId,
         );
         if (!item) return;
-        setModelId(item.model as ModelId);
+        if (!isModelId(item.model)) return;
+        const hasReferenceImage = isImageToImageModel(item.model) && Boolean(item.resultUrls?.[0]);
+        setModelId(item.model);
         setPrompt(item.prompt);
         if (item.aspectRatio) setAspectRatio(item.aspectRatio as AspectRatio);
         if (item.resolution) setResolution(item.resolution as Resolution);
         if (item.quality) setQuality(item.quality as Quality);
         if (item.outputFormat) setOutputFormat(item.outputFormat as OutputFormat);
 
-        if (isImageToImageModel(item.model as ModelId) && item.resultUrls?.[0]) {
+        if (hasReferenceImage && item.resultUrls?.[0]) {
           const refUrl = item.resultUrls[0];
           setImages([
             {
@@ -119,17 +126,19 @@ export function CreateContent() {
             },
           ]);
         }
-        trackEvent("reuse_prompt", {
-          ...commonAnalyticsParams(
-            "loaded",
-            item.model as ModelId,
-            isImageToImageModel(item.model as ModelId) && Boolean(item.resultUrls?.[0]),
-          ),
-          reuse_id: reuseId,
-        });
+        if (!trackedReuseIds.current.has(reuseId)) {
+          trackedReuseIds.current.add(reuseId);
+          trackEvent("reuse_prompt", {
+            ...buildCommonAnalyticsParams("loaded", locale, item.model, hasReferenceImage),
+            reuse_id: reuseId,
+          });
+        }
       })
       .catch(() => {});
-  }, [searchParams]);
+    return () => {
+      cancelled = true;
+    };
+  }, [reuseId, locale]);
 
   // Reset params not supported by current model
   useEffect(() => {
@@ -181,8 +190,13 @@ export function CreateContent() {
     setLoading(true);
     setError(null);
     setOutput(null);
+    const submittedModelId = modelId;
+    const submittedHasReferenceImage = images.length > 0;
     try {
-      trackEvent("submit_generation", commonAnalyticsParams("submitted"));
+      trackEvent(
+        "submit_generation",
+        commonAnalyticsParams("submitted", submittedModelId, submittedHasReferenceImage),
+      );
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -205,7 +219,7 @@ export function CreateContent() {
       const data = await res.json();
       const completed = await pollGeneration(data.id);
       trackEvent("generation_completed", {
-        ...commonAnalyticsParams("completed"),
+        ...commonAnalyticsParams("completed", submittedModelId, submittedHasReferenceImage),
         task_id: completed.taskId || data.id,
         result_count: completed.resultUrls?.length || 0,
         cost_time: completed.costTime,
@@ -215,13 +229,14 @@ export function CreateContent() {
         taskId: completed.taskId,
         costTime: completed.costTime,
         prompt: prompt.trim(),
-        model: modelId,
+        model: submittedModelId,
+        hasReferenceImage: submittedHasReferenceImage,
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : tCommon("error");
       trackEvent("generation_failed", {
-        ...commonAnalyticsParams("failed"),
-        error_message: message,
+        ...commonAnalyticsParams("failed", submittedModelId, submittedHasReferenceImage),
+        failure_reason: classifyGenerationFailure(message),
       });
       setError(message);
     } finally {
@@ -335,14 +350,77 @@ export function CreateContent() {
               prompt={prompt}
               model={modelId}
               onRegenerate={canSubmit ? handleSubmit : undefined}
-              onDownloadResult={(index) => trackResultAction("download_result", index)}
-              onCopyResultUrl={(index) => trackResultAction("copy_result_url", index)}
+              onDownloadResult={(index, url) => trackResultAction("download_result", index, url)}
+              onCopyResultUrl={(index, url) => trackResultAction("copy_result_url", index, url)}
             />
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function buildCommonAnalyticsParams(
+  status: string,
+  locale: string,
+  model: ModelId,
+  hasReferenceImage: boolean,
+): AnalyticsParams {
+  return {
+    model,
+    capability: MODELS[model].capability,
+    locale,
+    has_reference_image: hasReferenceImage,
+    status,
+  };
+}
+
+function isModelId(value: unknown): value is ModelId {
+  return typeof value === "string" && value in MODELS;
+}
+
+function classifyGenerationFailure(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("timeout") || normalized.includes("timed out")) {
+    return "timeout";
+  }
+  if (
+    normalized.includes("rate limit") ||
+    normalized.includes("rate_limited") ||
+    normalized.includes("too many requests") ||
+    normalized.includes("429")
+  ) {
+    return "rate_limited";
+  }
+  if (
+    normalized.includes("insufficient") ||
+    normalized.includes("credit") ||
+    normalized.includes("balance") ||
+    normalized.includes("payment")
+  ) {
+    return "insufficient_credits";
+  }
+  if (
+    normalized.includes("validation") ||
+    normalized.includes("invalid") ||
+    normalized.includes("required") ||
+    normalized.includes("bad request") ||
+    normalized.includes("400")
+  ) {
+    return "validation_error";
+  }
+  if (
+    normalized.includes("provider") ||
+    normalized.includes("storage") ||
+    normalized.includes("upload") ||
+    normalized.includes("s3") ||
+    normalized.includes("kie")
+  ) {
+    return "provider_or_storage_error";
+  }
+
+  return "unknown";
 }
 
 async function pollGeneration(id: string) {
