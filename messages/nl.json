@@ -85,12 +85,15 @@
     "faq2A": "Je kunt doorgaan met een maandelijks of jaarlijks abonnement. Elk plan geeft maandelijks credits.",
     "faq3Q": "Welke AI-afbeeldingsmodellen kan ik gebruiken?",
     "faq3A": "Image Easy ondersteunt momenteel GPT Image 2, Seedream 4.5 en Nano Banana Pro, met meer modellen gepland.",
+    "limitedTitle": "Begin met gratis credits. Upgrade wanneer je meer nodig hebt.",
     "title": "Vijf AI-beeldmodellen in één workspace.",
     "section1Title": "De modellen die ertoe doen.",
     "section2Title": "Drie stappen. Eén workflow.",
     "section3Title": "Klaar om te genereren?",
     "modelCompareTitle": "Kies het model voor je taak.",
-    "limitedTitle": "Begin met gratis credits. Upgrade wanneer je meer nodig hebt."
+    "examplesTitle": "Bekijk wat Image Easy kan maken.",
+    "examplesLead": "Een gegenereerde galerij voor de scenario's op deze pagina: productbeelden, advertenties, portretten, interieurs, food en concept art.",
+    "examplesLink": "Voorbeelden bekijken"
   },
   "trust": {
     "pricing": {
@@ -129,30 +132,65 @@
     },
     "privacy": {
       "metaTitle": "Privacybeleid",
-      "metaDescription": "Een duidelijke privacy-samenvatting voor Image Easy.",
+      "metaDescription": "Hoe Image Easy account-, prompt-, beeld-, generatie-, betaal- en servicegegevens verzamelt, gebruikt, bewaart en beschermt.",
       "kicker": "Privacy",
-      "title": "Privacy bij de lancering",
-      "lead": "Deze pagina vat samen wat Image Easy verwerkt wanneer je de service gebruikt.",
-      "summaryTitle": "Wat Image Easy verwerkt",
-      "summaryUpload": "Gebruikers uploaden afbeeldingen en prompts naar Image Easy.",
-      "summaryProvider": "Image Easy stuurt prompts en vereiste afbeeldings-URL’s via kie.ai naar externe aanbieders van AI-modellen.",
-      "summaryStorage": "Image Easy bewaart accountgegevens, generatiegeschiedenis, prompts, geüploade afbeeldingen en URL’s van gegenereerde afbeeldingen.",
-      "betaTitle": "Servicenotitie",
-      "betaBody1": "Generatieverzoeken hebben voldoende prompt- en afbeeldingsinformatie nodig om de gevraagde output te maken.",
-      "betaBody2": "Upload geen afbeeldingen of prompts die je niet met deze service wilt gebruiken."
+      "title": "Privacybeleid",
+      "lead": "Dit beleid legt uit hoe Image Easy informatie verwerkt wanneer je een account maakt, beelden uploadt, prompts schrijft, resultaten genereert, credits koopt of support contacteert.",
+      "notice": "Ingangsdatum: 28 juni 2026. Deze pagina is een praktische privacyverklaring voor commercieel gebruik en moet samen met de Gebruiksvoorwaarden worden gelezen.",
+      "accountTitle": "Account- en contactgegevens",
+      "accountBody": "We kunnen je e-mailadres, authenticatie-ID’s, profielgegevens van inlogproviders, accountstatus, creditsaldo, abonnementsstatus, supportberichten en bijbehorende operationele gegevens verwerken.",
+      "contentTitle": "Prompts, uploads en gegenereerde beelden",
+      "contentBody": "Wanneer je Image Easy gebruikt, verwerken we prompts, geüploade referentiebeelden, modelinstellingen, generatieverzoeken, resultaten, resultaat-URL’s en geschiedenis zodat beelden kunnen worden gemaakt, opgeslagen, getoond en hergebruikt.",
+      "providersTitle": "Modelproviders en dienstverleners",
+      "providersBody": "Image Easy gebruikt derden voor AI-modellen, hosting, opslag, analytics, authenticatie, betalingen en operationele beveiliging. We delen alleen redelijk noodzakelijke informatie, zoals prompts, vereiste beeld-URL’s, checkoutmetadata of technische logs.",
+      "paymentsTitle": "Betalingen en facturatie",
+      "paymentsBody": "Betalingen worden verwerkt door Stripe of een andere provider. Image Easy bewaart transacties, abonnementsstatus, credittoekenningen, factuur- of betaal-ID’s en fraudepreventiegegevens, maar slaat niet bewust volledige kaartnummers op eigen servers op.",
+      "securityTitle": "Beveiliging",
+      "securityBody": "We gebruiken redelijke technische en organisatorische maatregelen om accountgegevens, uploads, resultaten, betalingen en logs te beschermen. Geen online dienst kan absolute veiligheid garanderen; bescherm daarom ook je inloggegevens.",
+      "retentionTitle": "Bewaring",
+      "retentionBody": "We bewaren informatie zolang nodig voor de dienst, generatiegeschiedenis, betalingen, misbruikpreventie, geschillen, wettelijke verplichtingen en betrouwbaarheid. Oudere gegevens kunnen worden verwijderd of geanonimiseerd.",
+      "rightsTitle": "Toegang, verwijdering en controle",
+      "rightsBody": "Je kunt ons vragen om toegang, correctie, export of verwijdering van persoonsgegevens bij je account. Sommige gegevens kunnen worden bewaard voor facturatie, beveiliging, fraudepreventie, naleving of legitieme bedrijfsadministratie.",
+      "childrenTitle": "Kinderen",
+      "childrenBody": "Image Easy is niet gericht op kinderen jonger dan 13 jaar en we verzamelen niet bewust hun persoonsgegevens. Als je denkt dat een kind gegevens heeft verstrekt, neem contact op zodat we dit kunnen beoordelen en waar passend verwijderen.",
+      "changesTitle": "Wijzigingen",
+      "changesBody": "We kunnen dit privacybeleid bijwerken wanneer Image Easy, modellen, leveranciers, prijzen, wettelijke eisen of bedrijfsprocessen veranderen. Belangrijke updates verschijnen op deze pagina; voortgezet gebruik betekent dat het bijgewerkte beleid geldt.",
+      "contactTitle": "Contact",
+      "contactBody": "Voor privacyvragen of verzoeken mail je support@image-easy.com met het e-mailadres van je Image Easy-account."
     },
     "terms": {
       "metaTitle": "Gebruiksvoorwaarden",
-      "metaDescription": "Basisvoorwaarden voor het gebruik van Image Easy.",
+      "metaDescription": "Commerciële voorwaarden voor Image Easy, waaronder accounts, credits, abonnementen, contentrechten, verboden gebruik, AI-output en prijswijzigingen.",
       "kicker": "Voorwaarden",
       "title": "Gebruiksvoorwaarden",
-      "lead": "Gebruik Image Easy verantwoordelijk en alleen met content waarvoor je gebruiksrechten hebt.",
-      "summaryTitle": "Kernregels",
-      "summaryRights": "Gebruikers zijn verantwoordelijk voor de rechten op geüploade afbeeldingen en gegenereerde output.",
-      "summaryProhibited": "Gebruikers mogen geen illegale, schadelijke of rechteninbreuk makende content genereren.",
-      "summaryRemoval": "Image Easy kan toegang of content verwijderen die deze voorwaarden schendt.",
-      "betaTitle": "Beschikbaarheid van de service",
-      "betaBody": "Functies, limieten, modelbeschikbaarheid en beleid kunnen veranderen terwijl Image Easy verbetert."
+      "lead": "Deze voorwaarden regelen je toegang tot Image Easy, inclusief beeldgeneratie, uploads, resultaten, credits, abonnementen en gerelateerde diensten.",
+      "notice": "Ingangsdatum: 28 juni 2026. Door Image Easy te gebruiken ga je akkoord met deze voorwaarden. Gebruik je de dienst voor een bedrijf of klant, dan bevestig je dat je bevoegd bent.",
+      "eligibilityTitle": "Geschiktheid",
+      "eligibilityBody": "Je moet een bindende overeenkomst kunnen aangaan en toepasselijke wetgeving naleven. Je mag Image Easy niet gebruiken als sancties, exportregels, lokale wetgeving of andere regels dat verbieden.",
+      "accountTitle": "Accountverantwoordelijkheid",
+      "accountBody": "Je bent verantwoordelijk voor je account, inloggegevens, prompts, uploads, resultaten, betalingen en elk gebruik via je account. Meld het snel als je denkt dat je account is gecompromitteerd.",
+      "creditsTitle": "Credits en gebruik",
+      "creditsBody": "Beeldgeneratie gebruikt credits op basis van model, resolutie, functie en actuele gebruiksregels. Gratis, promotionele, abonnements- en gekochte credits kunnen verschillende regels hebben voor beschikbaarheid, verval, terugbetaling, overdracht en misbruikpreventie.",
+      "priceChangesTitle": "Prijs- en creditaanpassingen",
+      "priceChangesBody": "Image Easy kan prijzen van abonnementen, creditpakketten, inbegrepen credits, creditkosten per model, gratis promoties, belastingen, kosten, kortingen en abonnementsvoordelen in de toekomst wijzigen omdat kosten van AI-modelproviders, infrastructuurkosten, wisselkoersen, belastingen, productomvang en zakelijke omstandigheden kunnen veranderen. Wijzigingen gelden vooruitkijkend tenzij de wet of checkout anders bepaalt.",
+      "contentRightsTitle": "Jouw content en rechten",
+      "contentRightsBody": "Je bent verantwoordelijk voor de nodige rechten en toestemmingen voor prompts, geüploade beelden, referentiemateriaal en gebruik van gegenereerde resultaten. Je geeft Image Easy de rechten die nodig zijn om de dienst te verwerken, verzenden, opslaan, tonen, troubleshooten, beveiligen en verbeteren.",
+      "prohibitedTitle": "Verboden gebruik",
+      "prohibitedBody": "Je mag Image Easy niet gebruiken voor illegale, misbruikende, misleidende, haatdragende, seksueel exploiterende, privacy-schendende, rechteninbreukmakende, malware-gerelateerde of schadelijke content, of om beveiligings-, limiet-, betaal- of toegangscontroles te omzeilen.",
+      "aiOutputsTitle": "AI-output",
+      "aiOutputsBody": "AI-output kan onnauwkeurig, onverwacht, vergelijkbaar met output van anderen of ongeschikt zijn voor commerciële, juridische, medische, financiële of professionele doeleinden. Je moet output beoordelen voordat je deze gebruikt, publiceert of erop vertrouwt.",
+      "subscriptionsTitle": "Abonnementen, facturatie en annulering",
+      "subscriptionsBody": "Betaalde plannen vernieuwen volgens de bij checkout getoonde periode tenzij geannuleerd. Abonnementscredits en voordelen gelden volgens de planvoorwaarden voor die periode. Toekomstige verlengingsprijzen, credits en voordelen kunnen wijzigen met kennisgeving of zoals getoond in checkout, onder toepasselijk recht.",
+      "terminationTitle": "Opschorting en beëindiging",
+      "terminationBody": "We kunnen toegang opschorten of beëindigen, content verwijderen, generatie beperken, promotiecredits achterhouden of dienst weigeren bij vermoed misbruik, fraude, betalingsrisico, veiligheidsrisico, juridisch risico of schending van deze voorwaarden.",
+      "disclaimersTitle": "Beschikbaarheid en disclaimers",
+      "disclaimersBody": "Image Easy wordt geleverd zoals het is en zoals beschikbaar. We garanderen geen ononderbroken beschikbaarheid, specifiek modelgedrag, outputkwaliteit, uniciteit, permanente opslag of geschiktheid voor elk zakelijk doel.",
+      "liabilityTitle": "Beperking van aansprakelijkheid",
+      "liabilityBody": "Voor zover wettelijk toegestaan zijn Image Easy en zijn operators niet aansprakelijk voor indirecte, incidentele, speciale, gevolg-, voorbeeld- of winstdervingsschade uit de dienst, AI-output, accountactiviteit, prijswijzigingen of derden.",
+      "changesTitle": "Wijzigingen in voorwaarden",
+      "changesBody": "We kunnen deze voorwaarden bijwerken wanneer dienst, prijzen, credits, modellen, wetten of bedrijfsprocessen veranderen. Voortgezet gebruik na een update betekent acceptatie van de herziene voorwaarden.",
+      "contactTitle": "Contact",
+      "contactBody": "Vragen over deze voorwaarden kun je sturen naar support@image-easy.com met je accountmail en een korte beschrijving."
     },
     "contact": {
       "metaTitle": "Contact",
@@ -160,8 +198,8 @@
       "kicker": "Contact",
       "title": "Neem contact op met het Image Easy-team",
       "lead": "We houden support direct zodat generatie- en accountvragen snel kunnen worden opgelost.",
-      "supportTitle": "Lanceringssupport",
-      "supportBody": "Mail voor lanceringssupport het Image Easy-team via support@image-easy.com.",
+      "supportTitle": "Online support",
+      "supportBody": "Mail voor online support het Image Easy-team via support@image-easy.com.",
       "supportDetails": "Vermeld bij een generatieprobleem het account-e-mailadres, het geschatte tijdstip, de modelnaam en een korte beschrijving van wat er gebeurde."
     },
     "about": {
@@ -175,6 +213,26 @@
       "workspaceBody2": "Het doel is modelkeuze eenvoudig te maken zonder dashboards, tokenjargon of onnodige setup toe te voegen.",
       "betaTitle": "Huidige focus",
       "betaBody": "Image Easy brengt modelkeuze, prompts, referentiebeelden en opgeslagen resultaten samen in één praktische workflow."
+    },
+    "legal": {
+      "metaTitle": "Juridisch",
+      "metaDescription": "Juridische kennisgevingen voor Image Easy, waaronder operator, intellectueel eigendom, rechtenklachten, derden, juridische verzoeken en contact.",
+      "kicker": "Juridisch",
+      "title": "Juridische kennisgeving",
+      "lead": "Deze pagina bundelt juridische kennisgevingen voor Image Easy, waaronder operatorcontact, intellectueel eigendom, rechtenklachten en diensten van derden.",
+      "notice": "Deze kennisgeving vult Privacybeleid en Gebruiksvoorwaarden aan. Bij conflict geldt de specifieke overeenkomst of wettelijk vereiste kennisgeving voor dat onderwerp.",
+      "operatorTitle": "Operator",
+      "operatorBody": "Image Easy wordt beheerd door Image Easy Inc. Voor juridische, privacy-, facturatie- of supportvragen mail je support@image-easy.com met genoeg details om het verzoek te routeren.",
+      "ipTitle": "Intellectueel eigendom",
+      "ipBody": "Image Easy, siteontwerp, productnamen, logo’s, software, teksten en servicematerialen zijn eigendom van Image Easy of licentiegevers en beschermd door intellectuele-eigendomswetgeving. Kopiëren, wijzigen, doorverkopen of misbruik is alleen toegestaan volgens de Gebruiksvoorwaarden.",
+      "copyrightTitle": "Copyright- en rechtenklachten",
+      "copyrightBody": "Als je denkt dat via Image Easy verwerkte content je rechten schendt, mail support@image-easy.com met contactgegevens, beschrijving van het werk, betwist materiaal, URL of accountgegevens en een verklaring dat je bevoegd bent.",
+      "thirdPartyTitle": "Diensten van derden",
+      "thirdPartyBody": "Image Easy gebruikt derden voor AI-modellen, hosting, opslag, authenticatie, analytics en betalingen. Die providers kunnen eigen voorwaarden, privacyverklaringen, beschikbaarheidslimieten, veiligheidsregels en prijswijzigingen hebben.",
+      "lawRequestsTitle": "Juridische en overheidsverzoeken",
+      "lawRequestsBody": "We beoordelen dagvaardingen, gerechtelijke bevelen, verzoeken van opsporingsinstanties, sanctievereisten en andere juridische verzoeken volgens toepasselijk recht. We kunnen informatie bewaren of delen wanneer dit wettelijk vereist of nodig is om gebruikers, de dienst of anderen te beschermen.",
+      "contactTitle": "Juridisch contact",
+      "contactBody": "Juridische kennisgevingen stuur je naar support@image-easy.com met naam, organisatie indien van toepassing, contactgegevens, accountmail en duidelijke beschrijving."
     }
   },
   "auth": {
@@ -345,5 +403,81 @@
     "statusIncomplete": "Incomplete",
     "statusExpired": "Expired",
     "statusUnknown": "Unknown"
+  },
+  "examples": {
+    "metaTitle": "AI-afbeeldingsvoorbeelden",
+    "metaDescription": "Bekijk Image Easy voorbeelden voor productbeelden, advertenties, portretten, interieurs, food en concept art.",
+    "kicker": "Voorbeelden",
+    "title": "Voorbeelden van gegenereerde afbeeldingen",
+    "lead": "Deze voorbeelden tonen wat Image Easy helpt maken, vergelijken, bewaren en hergebruiken met meerdere AI-beeldmodellen.",
+    "galleryTitle": "Voorbeeldgalerij",
+    "ctaTitle": "Maak uw eigen versie.",
+    "ctaBody": "Kies een model, beschrijf de scene en bewaar het resultaat bij uw creaties.",
+    "ctaButton": "Begin met maken",
+    "items": [
+      {
+        "title": "Minimalistische skincare-scene",
+        "category": "Productbeeld",
+        "model": "GPT Image 2",
+        "body": "Een schone commerciële setting met zacht licht, neutrale styling en ruimte voor merkrichting.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/minimal-skincare-product-scene.webp"
+      },
+      {
+        "title": "Running-schoen campagne close-up",
+        "category": "Advertentie",
+        "model": "Seedream 4.5",
+        "body": "Een dynamisch actieshot voor campagnemoodboards, social ads en performanceconcepten.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/running-shoe-campaign-close-up.webp"
+      },
+      {
+        "title": "Koffieverpakking still life",
+        "category": "Verpakking",
+        "model": "GPT Image 2",
+        "body": "Een eenvoudige productcompositie om materiaal, layout en campagnesfeer te testen.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/coffee-packaging-still-life.webp"
+      },
+      {
+        "title": "Filmisch astronautenportret",
+        "category": "Personage",
+        "model": "Nano Banana Pro",
+        "body": "Een gedetailleerde portretstijl voor personageonderzoek, verhaalwerelden en visuele richting.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/cinematic-astronaut-portrait.webp"
+      },
+      {
+        "title": "Modeportret met gekleurd licht",
+        "category": "Portret",
+        "model": "Seedream 4.5",
+        "body": "Een gestileerd redactioneel portret voor licht, styling en creatieve identiteit.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/color-lit-fashion-portrait.webp"
+      },
+      {
+        "title": "Geïllustreerd verhaalpersonage",
+        "category": "Illustratie",
+        "model": "Nano Banana Pro",
+        "body": "Een warme illustratiestijl voor verhaalconcepten, game-referenties en visual development.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/illustrated-story-character.webp"
+      },
+      {
+        "title": "Interieur redesign vergelijking",
+        "category": "Bewerking",
+        "model": "Seedream 4.5",
+        "body": "Een voor-na richting die referentiebeelden gebruikt voor interieurverkenning.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/interior-redesign-comparison.webp"
+      },
+      {
+        "title": "Gezonde maaltijd van boven",
+        "category": "Food",
+        "model": "GPT Image 2",
+        "body": "Een heldere food-compositie voor menu's, wellnesscontent, receptkaarten en social media.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/healthy-meal-overhead.webp"
+      },
+      {
+        "title": "Zwevende eilanden concept art",
+        "category": "Concept art",
+        "model": "Nano Banana Pro",
+        "body": "Een fantasy-omgeving voor worldbuilding, moodboards en fantasierijke prompts.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/floating-island-concept-art.webp"
+      }
+    ]
   }
 }

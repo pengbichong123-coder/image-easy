@@ -59,8 +59,10 @@ export const pathnames = {
   "/login": "/login",
   "/pricing": "/pricing",
   "/billing": "/billing",
+  "/examples": "/examples",
   "/privacy": "/privacy",
   "/terms": "/terms",
+  "/legal": "/legal",
   "/contact": "/contact",
   "/about": "/about",
 } as const;

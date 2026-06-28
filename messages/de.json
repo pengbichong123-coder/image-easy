@@ -85,12 +85,15 @@
     "faq2A": "Sie können mit einem Monats- oder Jahresabo weitermachen. Jedes Abo vergibt monatlich Credits.",
     "faq3Q": "Welche KI-Bildmodelle kann ich nutzen?",
     "faq3A": "Aktuell unterstützt Image Easy GPT Image 2, Seedream 4.5 und Nano Banana Pro; weitere Modelle sind geplant.",
+    "limitedTitle": "Starte mit kostenlosen Credits. Upgrade, wenn du mehr brauchst.",
     "title": "Fünf KI-Bildmodelle in einem Workspace.",
     "section1Title": "Die wichtigen Modelle an einem Ort.",
     "section2Title": "Drei Schritte. Ein Workflow.",
     "section3Title": "Bereit zum Generieren?",
     "modelCompareTitle": "Wählen Sie das passende Modell für die Aufgabe.",
-    "limitedTitle": "Starte mit kostenlosen Credits. Upgrade, wenn du mehr brauchst."
+    "examplesTitle": "Sehen Sie, was Image Easy erstellen kann.",
+    "examplesLead": "Eine generierte Galerie passend zu den Szenarien der Startseite: Produkte, Anzeigen, Porträts, Räume, Food und Concept Art.",
+    "examplesLink": "Beispiele ansehen"
   },
   "trust": {
     "pricing": {
@@ -129,30 +132,65 @@
     },
     "privacy": {
       "metaTitle": "Datenschutzerklärung",
-      "metaDescription": "Eine verständliche Datenschutzübersicht für Image Easy.",
+      "metaDescription": "Wie Image Easy Konto-, Prompt-, Bild-, Generierungs-, Zahlungs- und Servicedaten erhebt, nutzt, speichert und schützt.",
       "kicker": "Datenschutz",
-      "title": "Datenschutz zum Launch",
-      "lead": "Diese Seite fasst zusammen, welche Daten Image Easy verarbeitet, wenn Sie den Dienst nutzen.",
-      "summaryTitle": "Was Image Easy verarbeitet",
-      "summaryUpload": "Nutzer laden Bilder und Prompts zu Image Easy hoch.",
-      "summaryProvider": "Image Easy sendet Prompts und erforderliche Bild-URLs über kie.ai an Drittanbieter von KI-Modellen.",
-      "summaryStorage": "Image Easy speichert Kontodaten, Generierungsverlauf, Prompts, hochgeladene Bilder und URLs generierter Bilder.",
-      "betaTitle": "Servicehinweis",
-      "betaBody1": "Generierungsanfragen benötigen ausreichend Prompt- und Bildinformationen, um das gewünschte Ergebnis zu erzeugen.",
-      "betaBody2": "Laden Sie keine Bilder oder Prompts hoch, die Sie nicht mit diesem Dienst verwenden möchten."
+      "title": "Datenschutzerklärung",
+      "lead": "Diese Erklärung beschreibt, wie Image Easy Informationen verarbeitet, wenn Sie ein Konto erstellen, Bilder hochladen, Prompts eingeben, Ergebnisse erzeugen, Credits kaufen oder den Support kontaktieren.",
+      "notice": "Gültig ab: 28. Juni 2026. Diese Seite ist ein praktischer Datenschutzhinweis für die kommerzielle Nutzung und sollte zusammen mit den Nutzungsbedingungen gelesen werden.",
+      "accountTitle": "Konto- und Kontaktdaten",
+      "accountBody": "Wir können Ihre E-Mail-Adresse, Authentifizierungskennungen, Profildaten von Anmeldeanbietern, Kontostatus, Credit-Guthaben, Abostatus, Supportnachrichten und zugehörige Betriebsunterlagen verarbeiten.",
+      "contentTitle": "Prompts, Uploads und generierte Bilder",
+      "contentBody": "Bei der Nutzung von Image Easy verarbeiten wir Prompts, hochgeladene Referenzbilder, Modelleinstellungen, Generierungsanfragen, Ergebnisse, Ergebnis-URLs und Verlaufsdaten, damit Bilder erstellt, gespeichert, angezeigt und erneut genutzt werden können.",
+      "providersTitle": "Modellanbieter und Dienstleister",
+      "providersBody": "Image Easy nutzt Drittanbieter für KI-Modelle, Hosting, Speicher, Analyse, Authentifizierung, Zahlungen und operative Sicherheit. Wir teilen nur die Informationen, die dafür angemessen erforderlich sind, etwa Prompts, benötigte Bild-URLs, Checkout-Metadaten oder technische Protokolle.",
+      "paymentsTitle": "Zahlungen und Abrechnung",
+      "paymentsBody": "Zahlungen werden über Stripe oder andere Zahlungsanbieter verarbeitet. Image Easy speichert Transaktionsdaten, Abostatus, Credit-Gutschriften, Rechnungs- oder Zahlungskennungen und Betrugspräventionsdaten, speichert jedoch bewusst keine vollständigen Kartennummern auf eigenen Servern.",
+      "securityTitle": "Sicherheit",
+      "securityBody": "Wir verwenden angemessene technische und organisatorische Maßnahmen zum Schutz von Kontodaten, Uploads, Ergebnissen, Zahlungsunterlagen und Protokollen. Kein Onlinedienst kann absolute Sicherheit garantieren; schützen Sie daher auch Ihre Zugangsdaten.",
+      "retentionTitle": "Aufbewahrung",
+      "retentionBody": "Wir bewahren Informationen so lange auf, wie es für den Dienst, den Generierungsverlauf, Zahlungen, Missbrauchsprävention, Streitbeilegung, gesetzliche Pflichten und Zuverlässigkeit erforderlich ist. Ältere Daten können gelöscht oder anonymisiert werden.",
+      "rightsTitle": "Zugriff, Löschung und Kontrolle",
+      "rightsBody": "Sie können Zugriff, Berichtigung, Export oder Löschung personenbezogener Kontodaten anfragen. Bestimmte Unterlagen können für Abrechnung, Sicherheit, Betrugsprävention, Compliance oder berechtigte Geschäftsaufzeichnungen aufbewahrt werden.",
+      "childrenTitle": "Kinder",
+      "childrenBody": "Image Easy richtet sich nicht an Kinder unter 13 Jahren und erhebt wissentlich keine personenbezogenen Daten von Kindern. Wenn Sie glauben, dass ein Kind Daten bereitgestellt hat, kontaktieren Sie uns zur Prüfung und gegebenenfalls Löschung.",
+      "changesTitle": "Änderungen dieser Erklärung",
+      "changesBody": "Wir können diese Datenschutzerklärung aktualisieren, wenn sich Image Easy, Modelle, Anbieter, Preise, gesetzliche Anforderungen oder Geschäftsabläufe ändern. Wesentliche Änderungen erscheinen auf dieser Seite; die weitere Nutzung bedeutet, dass die aktualisierte Erklärung gilt.",
+      "contactTitle": "Kontakt",
+      "contactBody": "Für Datenschutzfragen oder Anfragen schreiben Sie an support@image-easy.com und nennen Sie die E-Mail-Adresse Ihres Image Easy Kontos."
     },
     "terms": {
       "metaTitle": "Nutzungsbedingungen",
-      "metaDescription": "Grundlegende Nutzungsbedingungen für Image Easy.",
+      "metaDescription": "Kommerzielle Bedingungen für Image Easy, einschließlich Konten, Credits, Abos, Inhaltsrechten, verbotener Nutzung, KI-Ausgaben und Preisänderungen.",
       "kicker": "Bedingungen",
       "title": "Nutzungsbedingungen",
-      "lead": "Nutzen Sie Image Easy verantwortungsvoll und nur mit Inhalten, zu deren Nutzung Sie berechtigt sind.",
-      "summaryTitle": "Kernregeln",
-      "summaryRights": "Nutzer sind für die Rechte an hochgeladenen Bildern und generierten Ergebnissen verantwortlich.",
-      "summaryProhibited": "Nutzer dürfen keine illegalen, missbräuchlichen oder rechtsverletzenden Inhalte generieren.",
-      "summaryRemoval": "Image Easy kann Zugriff oder Inhalte entfernen, die gegen diese Bedingungen verstoßen.",
-      "betaTitle": "Serviceverfügbarkeit",
-      "betaBody": "Funktionen, Limits, Modellverfügbarkeit und Richtlinien können sich weiterentwickeln."
+      "lead": "Diese Bedingungen regeln Ihren Zugriff auf Image Easy, einschließlich Bildgenerierung, Uploads, Ergebnisse, Credits, Abos und zugehöriger Dienste.",
+      "notice": "Gültig ab: 28. Juni 2026. Mit der Nutzung von Image Easy stimmen Sie diesen Bedingungen zu. Nutzen Sie den Dienst für ein Unternehmen oder einen Kunden, bestätigen Sie Ihre Vertretungsbefugnis.",
+      "eligibilityTitle": "Berechtigung",
+      "eligibilityBody": "Sie müssen einen verbindlichen Vertrag schließen können und geltendes Recht einhalten. Sie dürfen Image Easy nicht nutzen, wenn Sanktionen, Exportkontrollen, lokale Gesetze oder sonstige Vorschriften dies untersagen.",
+      "accountTitle": "Kontoverantwortung",
+      "accountBody": "Sie sind verantwortlich für Ihr Konto, Zugangsdaten, Prompts, Uploads, Ergebnisse, Zahlungen und jede Nutzung über Ihr Konto. Informieren Sie uns umgehend bei Verdacht auf Kompromittierung.",
+      "creditsTitle": "Credits und Nutzung",
+      "creditsBody": "Bildgenerierung verbraucht Credits nach Modell, Auflösung, Funktion und den jeweils geltenden Nutzungsregeln. Kostenlose, Werbe-, Abo- und gekaufte Credits können unterschiedliche Regeln zu Verfügbarkeit, Ablauf, Erstattung, Übertragung und Missbrauchsschutz haben.",
+      "priceChangesTitle": "Preis- und Credit-Anpassungen",
+      "priceChangesBody": "Image Easy kann Planpreise, Credit-Pakete, enthaltene Credits, Credit-Kosten je Modell, Gratisaktionen, Steuern, Gebühren, Rabatte und Abo-Vorteile künftig ändern, weil Kosten der KI-Modellanbieter, Infrastrukturkosten, Wechselkurse, Steuern, Produktumfang und Geschäftsbedingungen variieren können. Änderungen gelten grundsätzlich nur zukünftig, sofern das Gesetz oder der Checkout nichts anderes vorsieht.",
+      "contentRightsTitle": "Ihre Inhalte und Rechte",
+      "contentRightsBody": "Sie sind dafür verantwortlich, die nötigen Rechte und Erlaubnisse für Prompts, hochgeladene Bilder, Referenzmaterialien und die Nutzung generierter Ergebnisse zu besitzen. Sie gewähren Image Easy die Rechte, die für Verarbeitung, Übertragung, Speicherung, Anzeige, Fehlerbehebung, Sicherheit und Verbesserung des Dienstes erforderlich sind.",
+      "prohibitedTitle": "Verbotene Nutzung",
+      "prohibitedBody": "Sie dürfen Image Easy nicht für illegale, missbräuchliche, täuschende, hasserfüllte, sexuell ausbeuterische, datenschutzverletzende, rechtsverletzende, malwarebezogene oder sonst schädliche Inhalte nutzen und keine Sicherheits-, Raten-, Zahlungs- oder Zugriffskontrollen umgehen.",
+      "aiOutputsTitle": "KI-Ausgaben",
+      "aiOutputsBody": "KI-generierte Ergebnisse können ungenau, unerwartet, anderen Ergebnissen ähnlich oder für bestimmte kommerzielle, rechtliche, medizinische, finanzielle oder professionelle Zwecke ungeeignet sein. Sie müssen Ergebnisse vor Nutzung, Veröffentlichung oder Vertrauen darauf prüfen.",
+      "subscriptionsTitle": "Abos, Abrechnung und Kündigung",
+      "subscriptionsBody": "Kostenpflichtige Pläne verlängern sich entsprechend dem im Checkout angezeigten Abrechnungszeitraum, sofern sie nicht gekündigt werden. Abo-Credits und Vorteile gelten nach den Planbedingungen der jeweiligen Periode. Künftige Verlängerungspreise, Credit-Mengen und Vorteile können nach Hinweis oder Anzeige im Checkout und im Rahmen des Rechts geändert werden.",
+      "terminationTitle": "Sperrung und Beendigung",
+      "terminationBody": "Wir können Zugriff sperren oder beenden, Inhalte entfernen, Generierungen begrenzen, Werbe-Credits zurückhalten oder Leistungen verweigern, wenn wir Missbrauch, Betrug, Zahlungsrisiko, Sicherheitsrisiko, rechtliche Risiken oder einen Verstoß gegen diese Bedingungen vermuten.",
+      "disclaimersTitle": "Verfügbarkeit und Haftungsausschlüsse",
+      "disclaimersBody": "Image Easy wird wie besehen und nach Verfügbarkeit bereitgestellt. Wir garantieren keine unterbrechungsfreie Verfügbarkeit, kein bestimmtes Modellverhalten, keine bestimmte Ausgabequalität, Einzigartigkeit, dauerhafte Speicherung oder Eignung für jeden Geschäftszweck.",
+      "liabilityTitle": "Haftungsbeschränkung",
+      "liabilityBody": "Soweit gesetzlich zulässig, haften Image Easy und seine Betreiber nicht für indirekte, beiläufige, besondere, Folge-, Straf- oder Gewinnschäden aus der Nutzung des Dienstes, KI-Ausgaben, Kontoaktivitäten, Preisänderungen oder Drittanbietern.",
+      "changesTitle": "Änderungen der Bedingungen",
+      "changesBody": "Wir können diese Bedingungen aktualisieren, wenn sich Dienst, Preise, Credits, Modelle, Gesetze oder Geschäftsabläufe ändern. Die weitere Nutzung nach einer Aktualisierung bedeutet Zustimmung zu den geänderten Bedingungen.",
+      "contactTitle": "Kontakt",
+      "contactBody": "Fragen zu diesen Bedingungen senden Sie an support@image-easy.com mit Konto-E-Mail und kurzer Beschreibung."
     },
     "contact": {
       "metaTitle": "Kontakt",
@@ -160,8 +198,8 @@
       "kicker": "Kontakt",
       "title": "Kontakt zum Image Easy Team",
       "lead": "Wir halten den Support direkt, damit Generierungs- und Kontofragen schnell gelöst werden können.",
-      "supportTitle": "Launch-Support",
-      "supportBody": "Schreiben Sie für Launch-Support an das Image Easy Team unter support@image-easy.com.",
+      "supportTitle": "Online-Support",
+      "supportBody": "Schreiben Sie für Online-Support an das Image Easy Team unter support@image-easy.com.",
       "supportDetails": "Wenn Sie ein Generierungsproblem melden, geben Sie die Konto-E-Mail, ungefähre Uhrzeit, den Modellnamen und eine kurze Beschreibung des Vorfalls an."
     },
     "about": {
@@ -175,6 +213,26 @@
       "workspaceBody2": "Ziel ist es, die Modellwahl einfach zu machen, ohne Dashboards, Token-Jargon oder unnötige Einrichtung hinzuzufügen.",
       "betaTitle": "Aktueller Fokus",
       "betaBody": "Image Easy bringt Modellauswahl, Prompts, Referenzbilder und gespeicherte Ergebnisse in einen praktischen Workflow."
+    },
+    "legal": {
+      "metaTitle": "Rechtliches",
+      "metaDescription": "Rechtliche Hinweise zu Image Easy, einschließlich Betreiber, geistigem Eigentum, Rechtebeschwerden, Drittanbietern, rechtlichen Anfragen und Kontakt.",
+      "kicker": "Rechtliches",
+      "title": "Rechtlicher Hinweis",
+      "lead": "Diese Seite enthält rechtliche Hinweise zu Image Easy, einschließlich Betreiberkontakt, geistigem Eigentum, Rechtebeschwerden und Drittanbieterdiensten.",
+      "notice": "Dieser Hinweis ergänzt Datenschutzerklärung und Nutzungsbedingungen. Bei Konflikten gilt für den jeweiligen Gegenstand die spezifische Vereinbarung oder gesetzlich vorgeschriebene Mitteilung.",
+      "operatorTitle": "Betreiber",
+      "operatorBody": "Image Easy wird von Image Easy Inc. betrieben. Für rechtliche, Datenschutz-, Abrechnungs- oder Supportanfragen schreiben Sie an support@image-easy.com und geben Sie genügend Details zur Weiterleitung an.",
+      "ipTitle": "Geistiges Eigentum",
+      "ipBody": "Image Easy, Website-Design, Produktnamen, Logos, Software, Texte und Dienstmaterialien gehören Image Easy oder seinen Lizenzgebern und sind rechtlich geschützt. Kopieren, Ändern, Weiterverkaufen oder Missbrauch ist nur im Rahmen der Nutzungsbedingungen erlaubt.",
+      "copyrightTitle": "Urheberrechts- und Rechtebeschwerden",
+      "copyrightBody": "Wenn Sie glauben, dass Inhalte, die über Image Easy verarbeitet wurden, Ihre Rechte verletzen, schreiben Sie an support@image-easy.com mit Kontaktdaten, Beschreibung des Werks, beanstandetem Material, URL oder Kontodetails und einer Erklärung Ihrer Berechtigung.",
+      "thirdPartyTitle": "Drittanbieter",
+      "thirdPartyBody": "Image Easy nutzt Drittanbieter für KI-Modelle, Hosting, Speicher, Authentifizierung, Analyse und Zahlungen. Diese Anbieter können eigene Bedingungen, Datenschutzhinweise, Verfügbarkeitsgrenzen, Sicherheitsregeln und Preisänderungen haben.",
+      "lawRequestsTitle": "Rechtliche und behördliche Anfragen",
+      "lawRequestsBody": "Wir prüfen Vorladungen, Gerichtsbeschlüsse, Behördenanfragen, Sanktionsanforderungen und andere rechtliche Anforderungen nach geltendem Recht. Informationen können erhalten oder offengelegt werden, wenn dies rechtlich erforderlich oder zum Schutz von Nutzern, Dienst oder Dritten nötig ist.",
+      "contactTitle": "Rechtskontakt",
+      "contactBody": "Rechtliche Mitteilungen senden Sie an support@image-easy.com mit Name, Organisation, Kontaktdaten, Konto-E-Mail und klarer Beschreibung der Anfrage."
     }
   },
   "auth": {
@@ -345,5 +403,81 @@
     "statusIncomplete": "Incomplete",
     "statusExpired": "Expired",
     "statusUnknown": "Unknown"
+  },
+  "examples": {
+    "metaTitle": "KI-Bildbeispiele",
+    "metaDescription": "Entdecken Sie Image Easy Beispiele für Produktbilder, Werbung, Porträts, Innenräume, Food und Concept Art.",
+    "kicker": "Beispiele",
+    "title": "Beispiele generierter Bilder",
+    "lead": "Diese Beispiele zeigen, welche Ergebnisse Image Easy über mehrere KI-Bildmodelle hinweg erstellen, vergleichen, speichern und wiederverwenden kann.",
+    "galleryTitle": "Beispielgalerie",
+    "ctaTitle": "Erstellen Sie Ihre eigene Version.",
+    "ctaBody": "Wählen Sie ein Modell, beschreiben Sie die Szene und speichern Sie das Ergebnis in Ihren Kreationen.",
+    "ctaButton": "Jetzt erstellen",
+    "items": [
+      {
+        "title": "Minimalistische Skincare-Szene",
+        "category": "Produktbild",
+        "model": "GPT Image 2",
+        "body": "Ein klares kommerzielles Setup mit weichem Licht, neutralem Styling und Raum für Markenrichtung.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/minimal-skincare-product-scene.webp"
+      },
+      {
+        "title": "Running-Schuh Kampagnen-Close-up",
+        "category": "Werbung",
+        "model": "Seedream 4.5",
+        "body": "Eine dynamische Action-Aufnahme für Kampagnen-Moodboards, Social Ads und Performance-Konzepte.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/running-shoe-campaign-close-up.webp"
+      },
+      {
+        "title": "Kaffee-Verpackung Stillleben",
+        "category": "Packaging",
+        "model": "GPT Image 2",
+        "body": "Eine einfache Verpackungskomposition zum Testen von Layout, Material und Kampagnenstimmung.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/coffee-packaging-still-life.webp"
+      },
+      {
+        "title": "Filmisches Astronautenporträt",
+        "category": "Charakter",
+        "model": "Nano Banana Pro",
+        "body": "Ein detailreicher Porträtstil für Charakterstudien, Storywelten und visuelle Richtung.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/cinematic-astronaut-portrait.webp"
+      },
+      {
+        "title": "Farbig beleuchtetes Fashion-Porträt",
+        "category": "Porträt",
+        "model": "Seedream 4.5",
+        "body": "Ein stilisiertes Editorial-Porträt für Licht, Garderobenstimmung und kreative Identität.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/color-lit-fashion-portrait.webp"
+      },
+      {
+        "title": "Illustrierter Story-Charakter",
+        "category": "Illustration",
+        "model": "Nano Banana Pro",
+        "body": "Ein warmer Illustrationsstil für Story-Konzepte, Game-Referenzen und Visual Development.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/illustrated-story-character.webp"
+      },
+      {
+        "title": "Interior-Redesign Vergleich",
+        "category": "Bearbeitung",
+        "model": "Seedream 4.5",
+        "body": "Eine Vorher-nachher-Richtung, die Referenzbilder für Raumideen nutzbar macht.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/interior-redesign-comparison.webp"
+      },
+      {
+        "title": "Gesunde Mahlzeit von oben",
+        "category": "Food",
+        "model": "GPT Image 2",
+        "body": "Eine helle Food-Komposition für Menüs, Wellness-Inhalte, Rezeptkarten und Social Media.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/healthy-meal-overhead.webp"
+      },
+      {
+        "title": "Schwebende Inseln als Concept Art",
+        "category": "Concept Art",
+        "model": "Nano Banana Pro",
+        "body": "Eine Fantasy-Umgebung für Worldbuilding, Moodboards und ideenreiche Prompts.",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/floating-island-concept-art.webp"
+      }
+    ]
   }
 }

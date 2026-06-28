@@ -45,6 +45,9 @@ export async function generateMetadata({
       template: `%s · Image Easy`,
     },
     description: t("description"),
+    icons: {
+      icon: "/icon.svg",
+    },
     openGraph: {
       type: "website",
       siteName: t("siteName"),

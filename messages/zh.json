@@ -85,12 +85,15 @@
     "faq2A": "可以选择月付或年付订阅套餐继续生成。所有套餐都会按月发放积分。",
     "faq3Q": "我可以用哪些 AI 图片模型？",
     "faq3A": "当前支持 GPT Image 2、Seedream 4.5 和 Nano Banana Pro，后续会继续扩展更多模型。",
+    "limitedTitle": "免费积分开局，按需升级套餐。",
     "title": "五款 AI 图像模型，一个工作台。",
     "section1Title": "主流模型集中使用。",
     "section2Title": "三步，一个流程。",
     "section3Title": "准备好生成了吗？",
     "modelCompareTitle": "按任务选择模型。",
-    "limitedTitle": "免费积分开局，按需升级套餐。"
+    "examplesTitle": "看看 Image Easy 能生成什么。",
+    "examplesLead": "这组生成示例对应首页里的真实使用场景：产品图、广告视觉、人像、室内、食物和概念艺术。",
+    "examplesLink": "查看案例"
   },
   "trust": {
     "pricing": {
@@ -129,30 +132,65 @@
     },
     "privacy": {
       "metaTitle": "隐私政策",
-      "metaDescription": "Image Easy 的简明隐私说明。",
+      "metaDescription": "说明 Image Easy 如何收集、使用、存储和保护账号、提示词、图片、生成结果、支付和服务数据。",
       "kicker": "隐私",
-      "title": "上线阶段的隐私说明",
-      "lead": "本页概述你使用 Image Easy 时，服务会处理哪些信息。",
-      "summaryTitle": "Image Easy 会处理的信息",
-      "summaryUpload": "用户会向 Image Easy 上传图片和提示词。",
-      "summaryProvider": "Image Easy 会通过 kie.ai 将提示词和所需图片 URL 发送给第三方 AI 模型提供商。",
-      "summaryStorage": "Image Easy 会存储账号数据、生成历史、提示词、上传的图片和生成图片 URL。",
-      "betaTitle": "服务说明",
-      "betaBody1": "生成请求需要足够的提示词和图片信息，才能生成用户请求的结果。",
-      "betaBody2": "请不要上传你不希望用于此服务的图片或提示词。"
+      "title": "隐私政策",
+      "lead": "本政策说明你在注册账号、上传图片、输入提示词、生成结果、购买积分或联系支持时，Image Easy 如何处理相关信息。",
+      "notice": "生效日期：2026 年 6 月 28 日。本页面是面向商业化使用的实用隐私说明，应与使用条款一并阅读。",
+      "accountTitle": "账号和联系信息",
+      "accountBody": "我们可能收集你的邮箱、登录服务提供的认证标识、头像或昵称等资料、账号状态、积分余额、订阅状态、支持邮件以及运营账号所需的相关记录。",
+      "contentTitle": "提示词、上传图片和生成图片",
+      "contentBody": "当你使用 Image Easy 时，我们会处理提示词、上传的参考图片、模型设置、生成请求、生成结果、结果链接和历史记录，以便创建、保存、展示并帮助你复用图片。",
+      "providersTitle": "模型供应商和服务提供商",
+      "providersBody": "Image Easy 使用第三方提供 AI 模型、托管、存储、分析、认证、支付处理和安全运营。我们只共享这些服务合理需要的信息，例如提示词、必要的图片链接、支付元数据或技术日志。",
+      "paymentsTitle": "支付和账单",
+      "paymentsBody": "支付由 Stripe 或其他支付服务提供商处理。Image Easy 会保存交易记录、订阅状态、积分发放、发票或支付标识以及反欺诈相关数据，但我们不会有意在自己的服务器上保存完整银行卡号。",
+      "securityTitle": "安全",
+      "securityBody": "我们采用合理的技术和组织措施保护账号数据、上传内容、生成结果、支付记录和服务日志。任何在线服务都无法保证绝对安全，你也需要妥善保护自己的登录凭证。",
+      "retentionTitle": "数据保留",
+      "retentionBody": "我们会在提供服务、维护生成历史、处理支付、防止滥用、解决争议、履行法律义务和提升可靠性所需的期间内保留信息。不再需要的较旧记录可能会被删除或匿名化。",
+      "rightsTitle": "访问、删除和控制",
+      "rightsBody": "你可以联系我们请求访问、更正、导出或删除与你账号相关的个人信息。出于账单、安全、反欺诈、合规或正当业务记录目的，部分记录可能仍需保留。",
+      "childrenTitle": "儿童",
+      "childrenBody": "Image Easy 并非面向 13 岁以下儿童，我们不会有意收集儿童个人信息。如果你认为儿童向我们提供了个人信息，请联系我们，我们会在适当情况下审查并删除。",
+      "changesTitle": "政策变更",
+      "changesBody": "随着 Image Easy、模型、供应商、价格、法律要求或业务运营变化，我们可能更新本隐私政策。重大更新会体现在本页面，继续使用服务即表示更新后的政策适用。",
+      "contactTitle": "联系",
+      "contactBody": "隐私问题或请求请发送至 support@image-easy.com，并附上你的 Image Easy 账号邮箱，方便我们定位相关记录。"
     },
     "terms": {
       "metaTitle": "使用条款",
-      "metaDescription": "Image Easy 的基础使用条款。",
+      "metaDescription": "Image Easy 的商业化使用条款，涵盖账号、积分、订阅、内容权利、禁止用途、AI 输出限制和价格调整。",
       "kicker": "条款",
       "title": "使用条款",
-      "lead": "请负责任地使用 Image Easy，并且只使用你有权使用的内容。",
-      "summaryTitle": "核心规则",
-      "summaryRights": "用户需自行负责上传图片和生成结果的相关权利。",
-      "summaryProhibited": "用户不得生成违法、滥用或侵犯权利的内容。",
-      "summaryRemoval": "Image Easy 可以移除违反这些条款的访问权限或内容。",
-      "betaTitle": "服务可用性",
-      "betaBody": "随着 Image Easy 持续改进，功能、限制、模型可用性和政策可能会调整。"
+      "lead": "本条款适用于你访问和使用 Image Easy，包括图片生成、上传内容、生成结果、积分、订阅和相关服务。",
+      "notice": "生效日期：2026 年 6 月 28 日。使用 Image Easy 即表示你同意本条款。如果你代表公司或客户使用服务，你确认自己有权代表其接受本条款。",
+      "eligibilityTitle": "使用资格",
+      "eligibilityBody": "你必须具备签订有效协议的能力，并遵守适用法律。如果相关法律、制裁、出口管制或本地规定禁止你使用类似服务，你不得使用 Image Easy。",
+      "accountTitle": "账号责任",
+      "accountBody": "你需对自己的账号、登录凭证、提示词、上传内容、生成结果、支付活动以及通过你账号发生的使用行为负责。如认为账号被盗用，请及时通知我们。",
+      "creditsTitle": "积分和使用",
+      "creditsBody": "图片生成会根据所选模型、分辨率、功能和当前使用规则消耗积分。免费积分、促销积分、订阅积分和购买积分可能适用不同的可用性、有效期、退款、转让和防滥用规则。",
+      "priceChangesTitle": "价格和积分调整",
+      "priceChangesBody": "由于 AI 模型供应商成本、基础设施成本、汇率、税费、产品范围和业务条件可能变化，Image Easy 未来可能调整套餐价格、积分包、包含的积分数量、模型积分消耗、免费积分活动、税费、折扣和订阅权益。除法律另有要求或结账页面另有明确说明外，变更仅面向未来适用。",
+      "contentRightsTitle": "你的内容和权利",
+      "contentRightsBody": "你需确保对提示词、上传图片、参考素材以及生成结果的使用拥有必要权利和许可。你授予 Image Easy 为处理、传输、存储、展示、排障、保障安全和改进服务所需的权利。",
+      "prohibitedTitle": "禁止用途",
+      "prohibitedBody": "你不得使用 Image Easy 创建或传播违法、滥用、欺骗、仇恨、性剥削、侵犯隐私、侵犯权利、恶意软件相关或其他有害内容，也不得绕过安全、限流、支付或访问控制。",
+      "aiOutputsTitle": "AI 输出",
+      "aiOutputsBody": "AI 生成结果可能不准确、不可预期、与他人生成结果相似，或不适合特定商业、法律、医疗、金融或专业用途。你需要在使用、发布或依赖输出前自行审查。",
+      "subscriptionsTitle": "订阅、账单和取消",
+      "subscriptionsBody": "付费套餐会按照结账页面显示的计费周期续费，除非取消。订阅积分和权益按照该计费周期有效的套餐条款提供。后续续费价格、积分数量和包含权益可能在通知或结账流程披露后发生变化，并受适用法律约束。",
+      "terminationTitle": "暂停和终止",
+      "terminationBody": "如果我们认为存在滥用、欺诈、支付风险、安全风险、法律风险或违反本条款的情况，我们可以暂停或终止访问、移除内容、限制生成、拒发促销积分或拒绝服务。",
+      "disclaimersTitle": "服务可用性和免责声明",
+      "disclaimersBody": "Image Easy 按现状和可用状态提供。我们不保证服务不中断、模型行为特定、输出质量、输出唯一性、存储永久性或适合每一种商业目的。",
+      "liabilityTitle": "责任限制",
+      "liabilityBody": "在法律允许的最大范围内，Image Easy 及其运营方不对因使用服务、AI 输出、账号活动、价格变化或第三方服务产生的间接、附带、特殊、后果性、惩罚性或利润损失承担责任。",
+      "changesTitle": "条款变更",
+      "changesBody": "随着服务、价格、积分、模型、法律或业务运营变化，我们可能更新本使用条款。更新后继续使用服务，即表示你接受修订后的条款。",
+      "contactTitle": "联系",
+      "contactBody": "关于本条款的问题可发送至 support@image-easy.com。请附上账号邮箱和简要问题说明。"
     },
     "contact": {
       "metaTitle": "联系我们",
@@ -160,8 +198,8 @@
       "kicker": "联系",
       "title": "联系 Image Easy 团队",
       "lead": "我们保持直接支持，方便快速处理生成问题和账号问题。",
-      "supportTitle": "上线支持",
-      "supportBody": "如需上线支持，请发送邮件至 support@image-easy.com 联系 Image Easy 团队。",
+      "supportTitle": "线上支持",
+      "supportBody": "如需线上支持，请发送邮件至 support@image-easy.com 联系 Image Easy 团队。",
       "supportDetails": "报告生成问题时，请包含账号邮箱、大致时间、模型名称，以及对发生情况的简短描述。"
     },
     "about": {
@@ -175,6 +213,26 @@
       "workspaceBody2": "目标是让模型选择更简单，不增加仪表盘、额度术语或不必要的设置。",
       "betaTitle": "当前重点",
       "betaBody": "Image Easy 把模型选择、提示词、参考图片和已保存结果放进一个实用的工作流。"
+    },
+    "legal": {
+      "metaTitle": "法律",
+      "metaDescription": "Image Easy 的法律声明，包括运营方信息、知识产权、版权投诉、第三方服务、法律请求和联系方式。",
+      "kicker": "法律",
+      "title": "法律声明",
+      "lead": "本页面汇总 Image Easy 的法律声明，包括运营方联系信息、知识产权声明、版权投诉和第三方服务披露。",
+      "notice": "本声明补充隐私政策和使用条款。如有冲突，针对特定事项的专门协议或法律强制要求的通知优先适用。",
+      "operatorTitle": "运营方",
+      "operatorBody": "Image Easy 由 Image Easy Inc. 运营。一般法律、隐私、账单或支持问题请发送至 support@image-easy.com，并提供足够信息以便我们转交处理。",
+      "ipTitle": "知识产权",
+      "ipBody": "Image Easy、网站设计、产品名称、标识、软件、文字和服务材料归 Image Easy 或其许可方所有，并受知识产权法律保护。除使用条款允许外，你不得复制、修改、转售或滥用服务。",
+      "copyrightTitle": "版权和权利投诉",
+      "copyrightBody": "如果你认为通过 Image Easy 处理的内容侵犯了你的版权或其他权利，请发送邮件至 support@image-easy.com，并提供联系方式、作品说明、涉嫌侵权材料、相关 URL 或账号信息，以及你有权提交投诉的声明。",
+      "thirdPartyTitle": "第三方服务",
+      "thirdPartyBody": "Image Easy 依赖第三方服务提供 AI 模型、托管、存储、认证、分析和支付处理。这些服务可能有自己的条款、隐私声明、可用性限制、安全规则和价格变化。",
+      "lawRequestsTitle": "法律和政府请求",
+      "lawRequestsBody": "我们会根据适用法律审查传票、法院命令、执法请求、制裁要求和其他法律要求。在我们认为法律要求或为保护用户、服务或他人所必需时，我们可能保存或披露信息。",
+      "contactTitle": "法律联系",
+      "contactBody": "法律通知请发送至 support@image-easy.com。请包含你的姓名、组织（如适用）、联系方式、账号邮箱和清晰的请求说明。"
     }
   },
   "auth": {
@@ -345,5 +403,81 @@
     "statusIncomplete": "未完成",
     "statusExpired": "已过期",
     "statusUnknown": "未知"
+  },
+  "examples": {
+    "metaTitle": "AI 图片案例",
+    "metaDescription": "浏览 Image Easy 生成案例，覆盖产品视觉、广告、人像、室内、食物和概念艺术等场景。",
+    "kicker": "案例",
+    "title": "生成图片案例",
+    "lead": "这些样张展示 Image Easy 适合帮助你创建、对比、保存和复用的多模型 AI 图片输出类型。",
+    "galleryTitle": "案例图集",
+    "ctaTitle": "创建你自己的版本。",
+    "ctaBody": "选择模型，描述画面，并把结果保存到作品库中，方便复用或下载。",
+    "ctaButton": "开始创建",
+    "items": [
+      {
+        "title": "极简护肤品场景",
+        "category": "产品视觉",
+        "model": "GPT Image 2",
+        "body": "干净的商业产品布景，柔和光线和中性色调便于继续延展品牌方向。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/minimal-skincare-product-scene.webp"
+      },
+      {
+        "title": "跑鞋广告特写",
+        "category": "广告视觉",
+        "model": "Seedream 4.5",
+        "body": "富有动感的运动镜头，适合广告情绪板、社媒投放和性能产品概念。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/running-shoe-campaign-close-up.webp"
+      },
+      {
+        "title": "咖啡包装静物",
+        "category": "包装",
+        "model": "GPT Image 2",
+        "body": "简洁的包装构图，用来测试材质、版式和营销氛围。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/coffee-packaging-still-life.webp"
+      },
+      {
+        "title": "电影感宇航员人像",
+        "category": "角色",
+        "model": "Nano Banana Pro",
+        "body": "高细节人像风格，适合角色探索、故事世界和视觉方向研究。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/cinematic-astronaut-portrait.webp"
+      },
+      {
+        "title": "彩色灯光时装人像",
+        "category": "人像",
+        "model": "Seedream 4.5",
+        "body": "编辑部风格人像，用于探索灯光、服装情绪和创意身份。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/color-lit-fashion-portrait.webp"
+      },
+      {
+        "title": "绘本感故事角色",
+        "category": "插画",
+        "model": "Nano Banana Pro",
+        "body": "温暖的插画风格，适合故事概念、游戏参考和视觉开发。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/illustrated-story-character.webp"
+      },
+      {
+        "title": "室内改造对比",
+        "category": "编辑",
+        "model": "Seedream 4.5",
+        "body": "通过参考图探索改造方向，展示室内空间的前后变化。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/interior-redesign-comparison.webp"
+      },
+      {
+        "title": "健康餐俯拍",
+        "category": "食物",
+        "model": "GPT Image 2",
+        "body": "明亮的食物构图，适合菜单、健康内容、食谱卡和社媒视觉。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/healthy-meal-overhead.webp"
+      },
+      {
+        "title": "漂浮岛概念艺术",
+        "category": "概念艺术",
+        "model": "Nano Banana Pro",
+        "body": "幻想环境图，适合世界观构建、情绪板和高想象力提示词。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/floating-island-concept-art.webp"
+      }
+    ]
   }
 }

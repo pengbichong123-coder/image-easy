@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { SiteFooter } from "@/components/SiteFooter";
 import { Link, locales } from "@/i18n/routing";
 import { MODEL_GROUPS } from "@/lib/models";
 import { setRequestLocale, getMessages } from "next-intl/server";
@@ -6,11 +7,25 @@ import { generatePageMetadata } from "@/lib/page-metadata";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://image-easy.app";
 
+type ExampleItem = {
+  title: string;
+  category: string;
+  model: string;
+  body: string;
+  imageUrl: string;
+};
+
 const PROVIDER_NAME = {
   openai: "OpenAI",
   bytedance: "ByteDance",
   google: "Google",
 } as const;
+
+const USE_CASE_IMAGE_CARDS = [
+  { itemIndex: 1, tone: "bg-[#F7F2EA]" },
+  { itemIndex: 4, tone: "bg-[#F4ECF8]" },
+  { itemIndex: 6, tone: "bg-[#EEF2F4]" },
+] as const;
 
 export async function generateMetadata({
   params,
@@ -35,6 +50,9 @@ export default async function HomePage({
   const modelDescriptions = ((messages as Record<string, unknown>).model as {
     descriptions: Record<string, string>;
   }).descriptions;
+  const exampleItems =
+    (((messages as Record<string, unknown>).examples as { items?: ExampleItem[] } | undefined)
+      ?.items ?? []);
 
   return (
     <div className="bg-white">
@@ -83,6 +101,13 @@ export default async function HomePage({
           </Link>
         </div>
       </section>
+
+      <FeaturedExamples
+        title={t("examplesTitle")}
+        lead={t("examplesLead")}
+        linkLabel={t("examplesLink")}
+        items={exampleItems.slice(0, 6)}
+      />
 
       {/* ============================================
           FEATURE HERO — soft panel
@@ -196,9 +221,24 @@ export default async function HomePage({
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <UseCase title={t("useCase1Title")} body={t("useCase1Body")} />
-          <UseCase title={t("useCase2Title")} body={t("useCase2Body")} />
-          <UseCase title={t("useCase3Title")} body={t("useCase3Body")} />
+          <UseCaseImageCard
+            title={t("useCase1Title")}
+            body={t("useCase1Body")}
+            imageUrl={exampleItems[USE_CASE_IMAGE_CARDS[0].itemIndex]?.imageUrl ?? ""}
+            tone={USE_CASE_IMAGE_CARDS[0].tone}
+          />
+          <UseCaseImageCard
+            title={t("useCase2Title")}
+            body={t("useCase2Body")}
+            imageUrl={exampleItems[USE_CASE_IMAGE_CARDS[1].itemIndex]?.imageUrl ?? ""}
+            tone={USE_CASE_IMAGE_CARDS[1].tone}
+          />
+          <UseCaseImageCard
+            title={t("useCase3Title")}
+            body={t("useCase3Body")}
+            imageUrl={exampleItems[USE_CASE_IMAGE_CARDS[2].itemIndex]?.imageUrl ?? ""}
+            tone={USE_CASE_IMAGE_CARDS[2].tone}
+          />
         </div>
       </section>
 
@@ -231,88 +271,100 @@ export default async function HomePage({
         </Link>
       </section>
 
-      {/* ============================================
-          FOOTER
-          ============================================ */}
-      <footer className="border-t border-[#D2D2D7] py-10">
-        <div className="max-w-[1280px] mx-auto px-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8 text-[12px]">
-            <div>
-              <h4 className="text-[#1D1D1F] font-medium mb-3">{t("footerAtelier")}</h4>
-              <Link href="/" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
-                {t("footerCompose")}
-              </Link>
-              <Link href="/create" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
-                {t("footerExpose")}
-              </Link>
-              <Link href="/my-images" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
-                {t("footerArchive")}
-              </Link>
-            </div>
-            <div>
-              <h4 className="text-[#1D1D1F] font-medium mb-3">{t("footerModels")}</h4>
-              <span className="block text-[#6E6E73] py-1">GPT Image 2</span>
-              <span className="block text-[#6E6E73] py-1">Seedream 4.5</span>
-              <span className="block text-[#6E6E73] py-1">Nano Banana Pro</span>
-            </div>
-            <div>
-              <h4 className="text-[#1D1D1F] font-medium mb-3">{t("footerResources")}</h4>
-              <span className="block text-[#6E6E73] py-1">{t("footerJournal")}</span>
-              <span className="block text-[#6E6E73] py-1">{t("footerChangelog")}</span>
-              <span className="block text-[#6E6E73] py-1">{t("footerStatus")}</span>
-            </div>
-            <div>
-              <h4 className="text-[#1D1D1F] font-medium mb-3">{t("footerCompany")}</h4>
-              <Link href="/about" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
-                {t("footerAbout")}
-              </Link>
-              <Link href="/pricing" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
-                {t("footerPricing")}
-              </Link>
-              <Link href="/contact" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
-                {t("footerContact")}
-              </Link>
-              <Link href="/privacy" className="block text-[#6E6E73] hover:text-[#1D1D1F] py-1">
-                {t("footerPrivacy")}
-              </Link>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row justify-between gap-3 pt-6 border-t border-[#D2D2D7] text-[12px] text-[#6E6E73]">
-            <div>{t("footerCopyright")}</div>
-            <div className="flex gap-4">
-              <Link href="/privacy" className="hover:text-[#1D1D1F]">
-                {t("footerPrivacyPolicy")}
-              </Link>
-              <Link href="/terms" className="hover:text-[#1D1D1F]">
-                {t("footerTerms")}
-              </Link>
-              <Link href="/terms" className="hover:text-[#1D1D1F]">
-                {t("footerLegal")}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter variant="full" />
     </div>
   );
 }
 
-function UseCase({
+function FeaturedExamples({
+  title,
+  lead,
+  linkLabel,
+  items,
+}: {
+  title: string;
+  lead: string;
+  linkLabel: string;
+  items: ExampleItem[];
+}) {
+  return (
+    <section className="max-w-[1280px] mx-auto px-3 sm:px-5 pb-20">
+      <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-end">
+        <div className="px-2 sm:px-0">
+          <h2 className="display text-[40px] sm:text-[56px] text-[#1D1D1F] mb-3">
+            {title}
+          </h2>
+          <p className="text-[19px] text-[#6E6E73] max-w-[540px] leading-[1.4]">
+            {lead}
+          </p>
+          <div className="mt-7">
+            <Link href="/examples" className="btn btn-link">
+              {linkLabel} ›
+            </Link>
+          </div>
+        </div>
+        <Link
+          href="/examples"
+          className="group grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-[24px] bg-[#F5F5F7] p-2"
+          aria-label={linkLabel}
+        >
+          {items.map((item, index) => (
+            <div
+              key={`${item.title}-${index}`}
+              className="relative aspect-square overflow-hidden rounded-[18px] bg-white"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.imageUrl}
+                alt={item.title}
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-12">
+                <div className="text-[12px] font-medium text-white">
+                  {item.category}
+                </div>
+              </div>
+            </div>
+          ))}
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function UseCaseImageCard({
   title,
   body,
+  imageUrl,
+  tone,
 }: {
   title: string;
   body: string;
+  imageUrl: string;
+  tone: string;
 }) {
   return (
-    <div className="bg-[#F5F5F7] rounded-[24px] p-8 min-h-[220px]">
-      <h3 className="text-[22px] sm:text-[24px] font-semibold tracking-[-0.01em] mb-4 text-[#1D1D1F]">
-        {title}
-      </h3>
-      <p className="text-[15px] leading-[1.5] text-[#6E6E73]">
-        {body}
-      </p>
-    </div>
+    <Link
+      href="/examples"
+      className={`group overflow-hidden rounded-[24px] ${tone} min-h-[360px] flex flex-col`}
+    >
+      <div className="aspect-[4/3] overflow-hidden bg-white">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageUrl}
+          alt=""
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+        />
+      </div>
+      <div className="p-8">
+        <h3 className="text-[22px] sm:text-[24px] font-semibold tracking-[-0.01em] mb-4 text-[#1D1D1F]">
+          {title}
+        </h3>
+        <p className="text-[15px] leading-[1.5] text-[#6E6E73]">
+          {body}
+        </p>
+      </div>
+    </Link>
   );
 }
 

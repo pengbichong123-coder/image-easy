@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SiteFooter } from "@/components/SiteFooter";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -54,6 +55,7 @@ export default async function AboutPage({ params }: PageProps) {
           </p>
         </div>
       </section>
+      <SiteFooter variant="full" />
     </div>
   );
 }

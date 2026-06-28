@@ -4,7 +4,7 @@ import { locales, type Locale } from "@/i18n/routing";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://image-easy.app";
 
 // Pages we expose for SEO. Private and sign-in pages are intentionally excluded.
-const PAGES = ["/", "/create"] as const;
+const PAGES = ["/", "/create", "/examples", "/privacy", "/terms", "/legal"] as const;
 
 function localizedPath(locale: Locale, path: (typeof PAGES)[number]) {
   return path === "/" ? `/${locale}` : `/${locale}${path}`;

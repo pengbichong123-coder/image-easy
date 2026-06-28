@@ -93,7 +93,7 @@ function HistoryCard({
   }, [item.prompt]);
 
   return (
-    <article className="group flex flex-col h-full">
+    <article className="group flex flex-col h-full min-w-0">
       {item.status === "completed" && firstImage ? (
         <>
           <div className="rounded-[14px] overflow-hidden bg-[#F5F5F7] aspect-square">
@@ -121,9 +121,9 @@ function HistoryCard({
           <span className="text-[12px] text-[#6E6E73]">{tCommon("generating")}</span>
         </div>
       ) : item.status === "failed" ? (
-        <div className="aspect-square rounded-[14px] bg-[#F5F5F7] flex flex-col items-center justify-center gap-2 p-4 text-center">
+        <div className="aspect-square rounded-[14px] bg-[#F5F5F7] flex flex-col items-center justify-center gap-2 p-4 text-center overflow-hidden">
           <span className="text-[12px] text-[#D70015] font-medium">{tCommon("failed")}</span>
-          <span className="text-[11px] text-[#86868B] line-clamp-3 leading-[1.4]">
+          <span className="block max-w-full text-[11px] text-[#86868B] line-clamp-3 leading-[1.4] break-words [overflow-wrap:anywhere]">
             {item.errorMessage || t("unknownError")}
           </span>
         </div>
@@ -133,11 +133,11 @@ function HistoryCard({
           Discard / Reuse / Save row aligned across cards regardless of
           prompt length or which buttons are present. */}
       <div className="mt-3 flex-1 flex flex-col">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[12px] tracking-[0.05em] uppercase text-[#86868B] font-medium truncate">
+        <div className="flex items-center justify-between gap-3 mb-1 min-w-0">
+          <span className="min-w-0 text-[12px] tracking-[0.05em] uppercase text-[#86868B] font-medium truncate">
             {modelLabel}
           </span>
-          <span className="text-[11px] text-[#86868B] tabular">
+          <span className="shrink-0 text-[11px] text-[#86868B] tabular">
             {formatDate(item.createdAt)}
           </span>
         </div>
@@ -147,7 +147,7 @@ function HistoryCard({
         <p
           ref={promptRef}
           className={[
-            "text-[13px] text-[#6E6E73] leading-[1.4] min-h-[2.8em]",
+            "text-[13px] text-[#6E6E73] leading-[1.4] min-h-[2.8em] break-words [overflow-wrap:anywhere]",
             promptExpanded ? "" : "line-clamp-2",
           ].join(" ")}
         >
@@ -307,7 +307,7 @@ function DetailsDialog({
             <div className="text-[11px] tracking-[0.05em] uppercase text-[#D70015] mb-2">
               {t("modalError")}
             </div>
-            <p className="text-[13px] text-[#D70015] leading-[1.5]">
+            <p className="text-[13px] text-[#D70015] leading-[1.5] break-words [overflow-wrap:anywhere]">
               {item.errorMessage}
             </p>
           </div>

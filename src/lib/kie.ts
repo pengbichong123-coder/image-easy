@@ -91,7 +91,7 @@ function taskFailureMessage(record: TaskRecord) {
   return record.failMsg || "Generation failed";
 }
 
-function buildInput(model: ModelId, params: CreateTaskInput) {
+export function buildKieInput(model: ModelId, params: CreateTaskInput) {
   const input: Record<string, unknown> = {
     prompt: params.prompt,
   };
@@ -104,6 +104,8 @@ function buildInput(model: ModelId, params: CreateTaskInput) {
     // Different models use different param name for images
     if (model === "nano-banana-pro") {
       input.image_input = params.imageUrls;
+    } else if (model === "gpt-image-2-image-to-image") {
+      input.input_urls = params.imageUrls;
     } else {
       input.image_urls = params.imageUrls;
     }
@@ -125,7 +127,7 @@ async function createTask(
 
   const body: Record<string, unknown> = {
     model: MODELS[model].kieModel,
-    input: buildInput(model, input),
+    input: buildKieInput(model, input),
   };
   if (callBackUrl) body.callBackUrl = callBackUrl;
 

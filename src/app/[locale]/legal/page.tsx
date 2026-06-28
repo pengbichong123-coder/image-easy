@@ -11,7 +11,7 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "trust.privacy" });
+  const t = await getTranslations({ locale, namespace: "trust.legal" });
 
   return {
     title: t("metaTitle"),
@@ -19,24 +19,20 @@ export async function generateMetadata({
   };
 }
 
-export default async function PrivacyPage({ params }: PageProps) {
+export default async function LegalPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
 
   return (
     <>
       <LegalDocumentPage
-        namespace="trust.privacy"
+        namespace="trust.legal"
         sections={[
-          "account",
-          "content",
-          "providers",
-          "payments",
-          "security",
-          "retention",
-          "rights",
-          "children",
-          "changes",
+          "operator",
+          "ip",
+          "copyright",
+          "thirdParty",
+          "lawRequests",
           "contact",
         ]}
       />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CheckoutSessionRefresh } from "@/components/CheckoutSessionRefresh";
+import { SiteFooter } from "@/components/SiteFooter";
 import { SubscriptionPlanCheckout } from "@/components/SubscriptionPlanCheckout";
 import { GENERATION_CREDIT_COST_ROWS } from "@/lib/generation-credit-cost";
 import { isPaidCreditsEnabled } from "@/lib/pricing-mode";
@@ -146,6 +147,7 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
           </div>
         </div>
       </section>
+      <SiteFooter variant="full" />
     </div>
   );
 }

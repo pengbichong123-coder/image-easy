@@ -85,12 +85,15 @@
     "faq2A": "月額または年額プランで継続できます。各プランは毎月クレジットを付与します。",
     "faq3Q": "どの AI 画像モデルを使えますか？",
     "faq3A": "現在は GPT Image 2、Seedream 4.5、Nano Banana Pro に対応しており、今後さらに追加予定です。",
+    "limitedTitle": "無料クレジットで開始。必要に応じてプランをアップグレード。",
     "title": "5つのAI画像モデルを、ひとつのワークスペースで。",
     "section1Title": "本当に使えるモデル。",
     "section2Title": "3ステップ。ひとつの流れ。",
     "section3Title": "画像を生成しますか？",
     "modelCompareTitle": "用途に合うモデルを選択。",
-    "limitedTitle": "無料クレジットで開始。必要に応じてプランをアップグレード。"
+    "examplesTitle": "Image Easy で作れるものを見る。",
+    "examplesLead": "商品ビジュアル、広告、ポートレート、インテリア、フード、コンセプトアートなど、ページ内の用途に合わせた生成サンプルです。",
+    "examplesLink": "事例を見る"
   },
   "trust": {
     "pricing": {
@@ -129,30 +132,65 @@
     },
     "privacy": {
       "metaTitle": "プライバシーポリシー",
-      "metaDescription": "Image Easy のわかりやすいプライバシー概要です。",
+      "metaDescription": "Image Easy がアカウント、プロンプト、画像、生成、支払い、サービスデータを収集、利用、保存、保護する方法です。",
       "kicker": "プライバシー",
-      "title": "ローンチ時のプライバシー",
-      "lead": "このページでは、Image Easy の利用時に扱う情報をまとめています。",
-      "summaryTitle": "Image Easy が扱うもの",
-      "summaryUpload": "ユーザーは画像とプロンプトを Image Easy にアップロードします。",
-      "summaryProvider": "Image Easy は、kie.ai を通じてプロンプトと必要な画像 URL を第三者の AI モデルプロバイダーに送信します。",
-      "summaryStorage": "Image Easy は、アカウントデータ、生成履歴、プロンプト、アップロード画像、生成画像の URL を保存します。",
-      "betaTitle": "サービスに関する注記",
-      "betaBody1": "生成リクエストには、要求された出力を作るために十分なプロンプトと画像情報が必要です。",
-      "betaBody2": "このサービスで使用したくない画像やプロンプトはアップロードしないでください。"
+      "title": "プライバシーポリシー",
+      "lead": "本ポリシーは、アカウント作成、画像アップロード、プロンプト入力、結果生成、クレジット購入、サポート連絡の際に Image Easy が情報をどのように扱うかを説明します。",
+      "notice": "発効日：2026年6月28日。本ページは商用利用を想定した実務的なプライバシー通知であり、利用規約とあわせてお読みください。",
+      "accountTitle": "アカウントと連絡先情報",
+      "accountBody": "当社は、メールアドレス、認証識別子、ログイン提供元からのプロフィール情報、アカウント状態、クレジット残高、サブスクリプション状態、サポートメッセージ、アカウント運営に必要な記録を処理する場合があります。",
+      "contentTitle": "プロンプト、アップロード、生成画像",
+      "contentBody": "Image Easy の利用時、当社はプロンプト、アップロードされた参照画像、モデル設定、生成リクエスト、生成結果、結果URL、履歴を処理し、画像の作成、保存、表示、再利用を可能にします。",
+      "providersTitle": "モデル提供者とサービス事業者",
+      "providersBody": "Image Easy は AI モデル、ホスティング、ストレージ、分析、認証、決済、運用セキュリティのために第三者サービスを利用します。共有する情報は、プロンプト、必要な画像URL、チェックアウトメタデータ、技術ログなど、サービス提供に合理的に必要な範囲に限られます。",
+      "paymentsTitle": "支払いと請求",
+      "paymentsBody": "支払いは Stripe またはその他の決済事業者により処理されます。Image Easy は取引記録、サブスクリプション状態、クレジット付与、請求書または支払い識別子、不正防止データを保存しますが、自社サーバーに完全なカード番号を意図的に保存しません。",
+      "securityTitle": "セキュリティ",
+      "securityBody": "当社は、アカウントデータ、アップロード、生成結果、支払い記録、サービスログを保護するため合理的な技術的・組織的措置を講じます。ただしオンラインサービスに絶対的な安全はなく、利用者もログイン情報を保護する必要があります。",
+      "retentionTitle": "データ保持",
+      "retentionBody": "当社は、サービス提供、生成履歴、支払い処理、不正防止、紛争解決、法令遵守、信頼性向上に必要な期間、情報を保持します。不要になった古い記録は削除または匿名化される場合があります。",
+      "rightsTitle": "アクセス、削除、管理",
+      "rightsBody": "アカウントに関連する個人情報について、アクセス、訂正、エクスポート、削除を依頼できます。請求、安全、不正防止、法令遵守、正当な事業記録のため、一部記録は保持される場合があります。",
+      "childrenTitle": "児童",
+      "childrenBody": "Image Easy は13歳未満の児童を対象としておらず、児童の個人情報を意図的に収集しません。児童が情報を提供したと思われる場合は、確認と適切な削除のためご連絡ください。",
+      "changesTitle": "本ポリシーの変更",
+      "changesBody": "Image Easy、モデル、事業者、価格、法的要件、事業運営の変更に応じて、本ポリシーを更新することがあります。重要な更新は本ページに反映され、継続利用により更新後のポリシーが適用されます。",
+      "contactTitle": "連絡先",
+      "contactBody": "プライバシーに関する質問や依頼は support@image-easy.com までお送りください。関連記録を確認できるよう、Image Easy アカウントのメールアドレスを含めてください。"
     },
     "terms": {
       "metaTitle": "利用規約",
-      "metaDescription": "Image Easy の基本的な利用規約です。",
+      "metaDescription": "Image Easy の商用利用条件。アカウント、クレジット、サブスクリプション、コンテンツ権利、禁止用途、AI 出力、価格変更を含みます。",
       "kicker": "規約",
       "title": "利用規約",
-      "lead": "Image Easy は責任を持って、使用権限のあるコンテンツにのみ利用してください。",
-      "summaryTitle": "基本ルール",
-      "summaryRights": "ユーザーは、アップロード画像と生成された出力に関する権利について責任を負います。",
-      "summaryProhibited": "ユーザーは、違法、悪質、または権利侵害となるコンテンツを生成してはなりません。",
-      "summaryRemoval": "Image Easy は、これらの規約に違反するアクセスやコンテンツを削除する場合があります。",
-      "betaTitle": "サービス提供状況",
-      "betaBody": "Image Easy の改善に伴い、機能、制限、モデルの提供状況、ポリシーが変更される場合があります。"
+      "lead": "本規約は、画像生成、アップロード内容、生成結果、クレジット、サブスクリプション、関連サービスを含む Image Easy へのアクセスと利用に適用されます。",
+      "notice": "発効日：2026年6月28日。Image Easy を利用することで本規約に同意したものとみなされます。会社または顧客のために利用する場合、その者を代表して同意する権限があることを確認します。",
+      "eligibilityTitle": "利用資格",
+      "eligibilityBody": "利用者は有効な契約を締結でき、適用法を遵守する必要があります。制裁、輸出規制、地域法その他の規則により類似サービスの利用が禁止される場合、Image Easy を利用できません。",
+      "accountTitle": "アカウント責任",
+      "accountBody": "利用者は、アカウント、認証情報、プロンプト、アップロード、生成結果、支払い活動、およびアカウントを通じた利用について責任を負います。アカウント侵害の疑いがある場合は速やかに通知してください。",
+      "creditsTitle": "クレジットと利用",
+      "creditsBody": "画像生成は、選択したモデル、解像度、機能、現在の利用ルールに基づいてクレジットを消費します。無料、プロモーション、サブスクリプション、購入済みクレジットには、利用可能性、有効期限、返金、譲渡、不正防止に関する異なるルールが適用される場合があります。",
+      "priceChangesTitle": "価格とクレジットの調整",
+      "priceChangesBody": "AIモデル提供者のコスト、インフラ費用、為替、税金、製品範囲、事業環境は変化する可能性があるため、Image Easy は将来、プラン価格、クレジットパッケージ、含まれるクレジット数、モデル別クレジット消費、無料クレジット施策、税金、手数料、割引、サブスクリプション特典を変更することがあります。法令またはチェックアウトで明示される場合を除き、変更は将来に向けて適用されます。",
+      "contentRightsTitle": "利用者のコンテンツと権利",
+      "contentRightsBody": "利用者は、プロンプト、アップロード画像、参照素材、および生成結果の利用に必要な権利と許可を有する責任を負います。利用者は、処理、送信、保存、表示、トラブルシューティング、安全確保、サービス改善に必要な権利を Image Easy に許諾します。",
+      "prohibitedTitle": "禁止用途",
+      "prohibitedBody": "違法、虐待的、欺瞞的、憎悪的、性的搾取、プライバシー侵害、権利侵害、マルウェア関連、その他有害なコンテンツの作成または配布、ならびに安全、レート制限、支払い、アクセス制御の回避は禁止されます。",
+      "aiOutputsTitle": "AI 出力",
+      "aiOutputsBody": "AI 生成結果は不正確、予期しないもの、他者の結果と類似するもの、または特定の商業、法律、医療、金融、専門用途に適さない場合があります。利用、公開、依拠する前に利用者自身で確認してください。",
+      "subscriptionsTitle": "サブスクリプション、請求、解約",
+      "subscriptionsBody": "有料プランは、解約されない限り、チェックアウトで表示された請求期間に従って更新されます。サブスクリプションクレジットと特典は当該期間のプラン条件に従います。将来の更新価格、クレジット数、特典は、通知またはチェックアウト表示により、適用法に従って変更される場合があります。",
+      "terminationTitle": "停止と終了",
+      "terminationBody": "当社は、悪用、不正、支払いリスク、セキュリティリスク、法的リスク、または本規約違反があると判断した場合、アクセス停止または終了、コンテンツ削除、生成制限、プロモーションクレジットの保留、サービス拒否を行うことがあります。",
+      "disclaimersTitle": "サービス提供と免責",
+      "disclaimersBody": "Image Easy は現状有姿かつ提供可能な範囲で提供されます。当社は、継続的な利用可能性、特定のモデル挙動、出力品質、出力の一意性、保存の永続性、あらゆる事業目的への適合性を保証しません。",
+      "liabilityTitle": "責任制限",
+      "liabilityBody": "法律で認められる最大限の範囲で、Image Easy およびその運営者は、サービス利用、AI 出力、アカウント活動、価格変更、第三者サービスに起因する間接、付随、特別、結果、懲罰的損害または利益損失について責任を負いません。",
+      "changesTitle": "規約の変更",
+      "changesBody": "サービス、価格、クレジット、モデル、法律、事業運営の変更に応じて、本規約を更新することがあります。更新後の継続利用により、改定後の規約に同意したものとみなされます。",
+      "contactTitle": "連絡先",
+      "contactBody": "本規約に関する質問は support@image-easy.com まで、アカウントメールと簡潔な説明を添えてお送りください。"
     },
     "contact": {
       "metaTitle": "お問い合わせ",
@@ -160,8 +198,8 @@
       "kicker": "お問い合わせ",
       "title": "Image Easy チームへ連絡",
       "lead": "生成やアカウントの問題を迅速に扱えるよう、直接サポートを行います。",
-      "supportTitle": "ローンチサポート",
-      "supportBody": "ローンチサポートが必要な場合は、support@image-easy.com まで Image Easy チームにメールしてください。",
+      "supportTitle": "オンラインサポート",
+      "supportBody": "オンラインサポートが必要な場合は、support@image-easy.com まで Image Easy チームにメールしてください。",
       "supportDetails": "生成の問題を報告する際は、アカウントのメールアドレス、おおよその時刻、モデル名、発生した内容の短い説明を含めてください。"
     },
     "about": {
@@ -175,6 +213,26 @@
       "workspaceBody2": "目標は、ダッシュボード、トークン用語、不要な設定を増やさずに、モデル選択を簡単にすることです。",
       "betaTitle": "現在の重点",
       "betaBody": "Image Easy は、モデル選択、プロンプト、参照画像、保存結果を実用的なワークフローにまとめます。"
+    },
+    "legal": {
+      "metaTitle": "法的情報",
+      "metaDescription": "Image Easy の法的通知。運営者、知的財産、権利侵害申立、第三者サービス、法的請求、連絡先を含みます。",
+      "kicker": "法的情報",
+      "title": "法的通知",
+      "lead": "本ページは、運営者の連絡先、知的財産、権利侵害申立、第三者サービスに関する Image Easy の法的通知をまとめたものです。",
+      "notice": "本通知はプライバシーポリシーおよび利用規約を補足します。矛盾がある場合、当該事項についての個別契約または法的に要求される通知が優先します。",
+      "operatorTitle": "運営者",
+      "operatorBody": "Image Easy は Image Easy Inc. により運営されています。法律、プライバシー、請求、サポートに関する問い合わせは、内容を確認できる十分な詳細とともに support@image-easy.com へお送りください。",
+      "ipTitle": "知的財産",
+      "ipBody": "Image Easy、サイトデザイン、製品名、ロゴ、ソフトウェア、テキスト、サービス資料は Image Easy またはそのライセンサーに帰属し、知的財産法により保護されます。利用規約で認められる場合を除き、複製、改変、再販売、悪用はできません。",
+      "copyrightTitle": "著作権および権利侵害申立",
+      "copyrightBody": "Image Easy を通じて処理されたコンテンツが権利を侵害していると考える場合、連絡先、作品説明、問題の素材、関連URLまたはアカウント情報、申立権限の表明を添えて support@image-easy.com へご連絡ください。",
+      "thirdPartyTitle": "第三者サービス",
+      "thirdPartyBody": "Image Easy は AI モデル、ホスティング、ストレージ、認証、分析、決済に第三者サービスを利用します。これらの提供者には独自の規約、プライバシー通知、可用性制限、安全ルール、価格変更がある場合があります。",
+      "lawRequestsTitle": "法的および政府機関からの請求",
+      "lawRequestsBody": "当社は、召喚状、裁判所命令、法執行機関からの要請、制裁要件、その他法的要求を適用法に従って確認します。法的に必要または利用者、サービス、第三者を保護するため必要と判断した場合、情報を保存または開示することがあります。",
+      "contactTitle": "法的連絡先",
+      "contactBody": "法的通知は support@image-easy.com までお送りください。氏名、組織名（該当する場合）、連絡先、アカウントメール、明確な依頼内容を含めてください。"
     }
   },
   "auth": {
@@ -345,5 +403,81 @@
     "statusIncomplete": "Incomplete",
     "statusExpired": "Expired",
     "statusUnknown": "Unknown"
+  },
+  "examples": {
+    "metaTitle": "AI画像の事例",
+    "metaDescription": "商品ビジュアル、広告、ポートレート、インテリア、フード、コンセプトアートの Image Easy 生成例をご覧ください。",
+    "kicker": "事例",
+    "title": "生成画像の事例",
+    "lead": "これらのサンプルは、Image Easy が複数のAI画像モデルで作成、比較、保存、再利用を支援する出力例です。",
+    "galleryTitle": "事例ギャラリー",
+    "ctaTitle": "自分のバージョンを作成。",
+    "ctaBody": "モデルを選び、シーンを説明し、結果を作品として保存して再利用やダウンロードに使えます。",
+    "ctaButton": "作成を開始",
+    "items": [
+      {
+        "title": "ミニマルなスキンケア商品シーン",
+        "category": "商品ビジュアル",
+        "model": "GPT Image 2",
+        "body": "柔らかな光とニュートラルなスタイルで、ブランド展開しやすい商用商品カットです。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/minimal-skincare-product-scene.webp"
+      },
+      {
+        "title": "ランニングシューズ広告の接写",
+        "category": "広告",
+        "model": "Seedream 4.5",
+        "body": "キャンペーンのムードボード、SNS広告、スポーツ商品の企画に使いやすい動きのあるビジュアルです。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/running-shoe-campaign-close-up.webp"
+      },
+      {
+        "title": "コーヒーパッケージの静物",
+        "category": "パッケージ",
+        "model": "GPT Image 2",
+        "body": "素材、レイアウト、キャンペーンの雰囲気を検討するためのシンプルな構図です。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/coffee-packaging-still-life.webp"
+      },
+      {
+        "title": "映画的な宇宙飛行士ポートレート",
+        "category": "キャラクター",
+        "model": "Nano Banana Pro",
+        "body": "キャラクター探索、物語世界、ビジュアル方向の研究に向いた高精細な肖像です。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/cinematic-astronaut-portrait.webp"
+      },
+      {
+        "title": "カラーライトのファッションポートレート",
+        "category": "ポートレート",
+        "model": "Seedream 4.5",
+        "body": "照明、衣装の雰囲気、クリエイティブな個性を探る編集的な肖像です。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/color-lit-fashion-portrait.webp"
+      },
+      {
+        "title": "物語風のイラストキャラクター",
+        "category": "イラスト",
+        "model": "Nano Banana Pro",
+        "body": "ストーリー案、ゲーム参考、ビジュアル開発に使いやすい温かいイラスト調です。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/illustrated-story-character.webp"
+      },
+      {
+        "title": "インテリア改装の比較",
+        "category": "編集",
+        "model": "Seedream 4.5",
+        "body": "参照画像を使いながら室内空間の変更方向を検討できるビフォーアフター例です。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/interior-redesign-comparison.webp"
+      },
+      {
+        "title": "ヘルシーミールの俯瞰",
+        "category": "フード",
+        "model": "GPT Image 2",
+        "body": "メニュー、ウェルネス記事、レシピカード、SNSに使いやすい明るい料理構図です。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/healthy-meal-overhead.webp"
+      },
+      {
+        "title": "浮遊島のコンセプトアート",
+        "category": "コンセプトアート",
+        "model": "Nano Banana Pro",
+        "body": "世界観づくり、ムードボード、想像力のあるプロンプトに向いた幻想的な環境です。",
+        "imageUrl": "https://assets.image-easy.com/site/examples/2026-06-29/floating-island-concept-art.webp"
+      }
+    ]
   }
 }
