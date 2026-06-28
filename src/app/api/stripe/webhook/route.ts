@@ -35,8 +35,33 @@ async function findCheckoutPayment(
   tx: Prisma.TransactionClient,
   session: Stripe.Checkout.Session,
 ): Promise<CheckoutPaymentForValidation> {
-  const payment = await tx.payment.findUnique({
+  const paymentBySessionId = await tx.payment.findUnique({
     where: { stripeCheckoutSessionId: session.id },
+    select: {
+      id: true,
+      userId: true,
+      stripeCheckoutSessionId: true,
+      credits: true,
+      amountCents: true,
+      currency: true,
+      status: true,
+    },
+  });
+
+  if (paymentBySessionId) {
+    return paymentBySessionId;
+  }
+
+  const metadataPaymentId = session.metadata?.paymentId;
+  if (!metadataPaymentId) {
+    throw new Error(`Local payment not found and Stripe checkout session ${session.id} has no metadata paymentId`);
+  }
+
+  const payment = await tx.payment.findFirst({
+    where: {
+      id: metadataPaymentId,
+      userId: session.metadata?.userId,
+    },
     select: {
       id: true,
       userId: true,
@@ -55,16 +80,49 @@ async function findCheckoutPayment(
   return payment;
 }
 
+async function attachCheckoutSessionIdIfMissing(
+  tx: Prisma.TransactionClient,
+  payment: CheckoutPaymentForValidation,
+  session: Stripe.Checkout.Session,
+) {
+  if (payment.stripeCheckoutSessionId === session.id) {
+    return;
+  }
+
+  if (payment.stripeCheckoutSessionId) {
+    throw new Error("Local payment is already linked to a different Stripe checkout session");
+  }
+
+  const attached = await tx.payment.updateMany({
+    where: {
+      id: payment.id,
+      stripeCheckoutSessionId: null,
+    },
+    data: {
+      stripeCheckoutSessionId: session.id,
+    },
+  });
+
+  if (attached.count !== 1) {
+    throw new Error(`Failed to attach Stripe checkout session ${session.id} to payment ${payment.id}`);
+  }
+
+  payment.stripeCheckoutSessionId = session.id;
+}
+
 async function markCheckoutSessionPayment(
   tx: Prisma.TransactionClient,
   input: {
+    payment: CheckoutPaymentForValidation;
     session: Stripe.Checkout.Session;
     status: "canceled" | "failed";
   },
 ) {
+  await attachCheckoutSessionIdIfMissing(tx, input.payment, input.session);
+
   await tx.payment.updateMany({
     where: {
-      stripeCheckoutSessionId: input.session.id,
+      id: input.payment.id,
       status: "pending",
     },
     data: {
@@ -77,6 +135,7 @@ async function markCheckoutSessionPayment(
 async function processCheckoutSessionPaid(tx: Prisma.TransactionClient, session: Stripe.Checkout.Session) {
   const payment = await findCheckoutPayment(tx, session);
   validateCheckoutSessionAgainstPayment(session, payment);
+  await attachCheckoutSessionIdIfMissing(tx, payment, session);
 
   if (payment.status === "paid") {
     await grantPurchasedCreditsInTransaction(tx, {
@@ -120,6 +179,7 @@ async function processCheckoutSessionCompleted(tx: Prisma.TransactionClient, ses
 
   if (session.payment_status !== "paid") {
     validateCheckoutSessionPaymentDetails(session, payment);
+    await attachCheckoutSessionIdIfMissing(tx, payment, session);
     await tx.payment.updateMany({
       where: {
         id: payment.id,
@@ -142,7 +202,10 @@ async function processCheckoutSessionTerminalFailure(
 ) {
   const payment = await findCheckoutPayment(tx, input.session);
   validateCheckoutSessionPaymentDetails(input.session, payment);
-  await markCheckoutSessionPayment(tx, input);
+  await markCheckoutSessionPayment(tx, {
+    ...input,
+    payment,
+  });
 }
 
 async function stripeWebhookEventExists(eventId: string) {

@@ -4,7 +4,7 @@ import { defaultLocale, hasLocale } from "@/i18n/routing";
 export type CheckoutPaymentForValidation = {
   id: string;
   userId: string;
-  stripeCheckoutSessionId: string;
+  stripeCheckoutSessionId: string | null;
   credits: number;
   amountCents: number;
   currency: string;
@@ -29,7 +29,15 @@ export function validateCheckoutSessionPaymentDetails(
   session: Stripe.Checkout.Session,
   payment: CheckoutPaymentForValidation,
 ) {
-  if (session.id !== payment.stripeCheckoutSessionId) {
+  if (session.metadata?.paymentId !== payment.id) {
+    throw new Error("Stripe checkout session metadata paymentId does not match local payment");
+  }
+
+  if (session.metadata?.userId !== payment.userId) {
+    throw new Error("Stripe checkout session metadata userId does not match local payment user");
+  }
+
+  if (payment.stripeCheckoutSessionId && session.id !== payment.stripeCheckoutSessionId) {
     throw new Error("Stripe checkout session id does not match local payment");
   }
 

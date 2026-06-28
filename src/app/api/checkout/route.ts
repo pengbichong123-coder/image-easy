@@ -59,6 +59,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid price" }, { status: 400 });
   }
 
+  let payment: { id: string };
+  try {
+    payment = await prisma.payment.create({
+      data: {
+        userId: session.user.id,
+        amountCents: creditPackage.priceCents,
+        currency: creditPackage.currency.toLowerCase(),
+        credits: creditPackage.credits,
+        status: "pending",
+      },
+      select: {
+        id: true,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to create local payment", error);
+    return NextResponse.json({ error: "Checkout failed" }, { status: 500 });
+  }
+
   try {
     const stripe = getStripeClient();
     const { successUrl, cancelUrl } = buildCheckoutReturnUrls(getAppUrl(), body.locale);
@@ -74,6 +93,7 @@ export async function POST(req: NextRequest) {
       cancel_url: cancelUrl,
       client_reference_id: session.user.id,
       metadata: {
+        paymentId: payment.id,
         userId: session.user.id,
         creditPackageId: creditPackage.id,
         credits: String(creditPackage.credits),
@@ -84,19 +104,30 @@ export async function POST(req: NextRequest) {
       throw new Error("Stripe checkout session did not include a redirect URL");
     }
 
-    await prisma.payment.create({
-      data: {
-        userId: session.user.id,
-        stripeCheckoutSessionId: checkoutSession.id,
-        amountCents: creditPackage.priceCents,
-        currency: creditPackage.currency.toLowerCase(),
-        credits: creditPackage.credits,
-        status: "pending",
-      },
-    });
+    try {
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: {
+          stripeCheckoutSessionId: checkoutSession.id,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to attach Stripe checkout session to local payment", error);
+    }
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {
+    await prisma.payment.updateMany({
+      where: {
+        id: payment.id,
+        status: "pending",
+        stripeCheckoutSessionId: null,
+      },
+      data: {
+        status: "failed",
+      },
+    });
+
     console.error("Checkout creation failed", error);
     return NextResponse.json({ error: "Checkout failed" }, { status: 500 });
   }
