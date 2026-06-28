@@ -72,7 +72,7 @@ export function CreateContent() {
     });
   }
 
-  function trackResultAction(name: "download_result" | "copy_result_url", index: number, url: string) {
+  function trackResultAction(name: "download_result" | "copy_result_url", index: number) {
     if (!output) return;
     const outputModel = isModelId(output.model) ? output.model : modelId;
     trackEvent(name, {
@@ -83,7 +83,6 @@ export function CreateContent() {
       ),
       task_id: output.taskId,
       result_index: index,
-      result_url: url,
     });
   }
 
@@ -191,7 +190,7 @@ export function CreateContent() {
     setError(null);
     setOutput(null);
     const submittedModelId = modelId;
-    const submittedHasReferenceImage = images.length > 0;
+    const submittedHasReferenceImage = isImageToImageModel(submittedModelId) && images.length > 0;
     try {
       trackEvent(
         "submit_generation",
@@ -350,8 +349,8 @@ export function CreateContent() {
               prompt={prompt}
               model={modelId}
               onRegenerate={canSubmit ? handleSubmit : undefined}
-              onDownloadResult={(index, url) => trackResultAction("download_result", index, url)}
-              onCopyResultUrl={(index, url) => trackResultAction("copy_result_url", index, url)}
+              onDownloadResult={(index) => trackResultAction("download_result", index)}
+              onCopyResultUrl={(index) => trackResultAction("copy_result_url", index)}
             />
           </div>
         </div>
