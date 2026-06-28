@@ -47,8 +47,7 @@ cp .env.example .env
 - `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`: Stripe Checkout 和 webhook 服务端密钥
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe 前端 publishable key
 - `ENABLE_PAID_CREDITS`: 设置为 `true` 后显示订阅套餐并允许创建 Stripe Checkout
-- `STRIPE_PRICE_STARTER_MONTHLY` / `STRIPE_PRICE_CREATOR_MONTHLY` / `STRIPE_PRICE_STUDIO_MONTHLY`: 三个按月订阅 Price ID
-- `STRIPE_PRICE_STARTER_ANNUAL` / `STRIPE_PRICE_CREATOR_ANNUAL` / `STRIPE_PRICE_STUDIO_ANNUAL`: 三个年付订阅 Price ID
+- `STRIPE_PRICE_ENV`: 当前使用哪套套餐价格配置，`sandbox` 或 `production`；套餐详情和 Price ID 在 `src/config/pricing.ts` 中维护
 - `CRON_SECRET`: Vercel Cron 调用年付月度积分发放接口的密钥
 - `NEXT_PUBLIC_APP_URL`: 站点公开 URL，生产环境使用 `https://www.image-easy.com`
 
@@ -172,12 +171,7 @@ STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 ENABLE_PAID_CREDITS=false
-STRIPE_PRICE_STARTER_MONTHLY=
-STRIPE_PRICE_CREATOR_MONTHLY=
-STRIPE_PRICE_STUDIO_MONTHLY=
-STRIPE_PRICE_STARTER_ANNUAL=
-STRIPE_PRICE_CREATOR_ANNUAL=
-STRIPE_PRICE_STUDIO_ANNUAL=
+STRIPE_PRICE_ENV=sandbox
 CRON_SECRET=
 NEXT_PUBLIC_APP_URL=https://www.image-easy.com
 ```
@@ -192,7 +186,7 @@ NEXT_PUBLIC_APP_URL=https://www.image-easy.com
 - `STRIPE_WEBHOOK_SECRET`: Stripe webhook endpoint secret，用于 `/api/stripe/webhook` 验签。
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe publishable key，供前端 Stripe 集成使用。
 - `ENABLE_PAID_CREDITS`: 生产打开支付时设为 `true`；未开启时价格页只展示限时免费说明。
-- `STRIPE_PRICE_*`: Stripe 后台创建 6 个 recurring Price 后，把对应 `price_xxx` 填入。月付为 $9.90 / $29.90 / $69.90；年付为 $99 / $299 / $699。
+- `STRIPE_PRICE_ENV`: 设置为 `sandbox` 使用沙盒 Price ID，设置为 `production` 使用正式 Price ID。套餐详情、价格、级别、类型和 Price ID 在 `src/config/pricing.ts` 中维护。
 - `CRON_SECRET`: 保护 `/api/cron/subscription-credits`。年付订阅首月由 Stripe webhook 发放，后续每月由 Vercel Cron 发放。
 - `NEXT_PUBLIC_APP_URL`: Checkout success/cancel 回跳的公开站点 URL，生产环境设置为 `https://www.image-easy.com`。
 

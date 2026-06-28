@@ -1,86 +1,44 @@
+import { PRICING_CONFIG, type PricingBillingType, type PricingEnvironment } from "@/config/pricing";
+
 export type SubscriptionPlanTier = "starter" | "creator" | "studio";
 export type SubscriptionPlanInterval = "month" | "year";
 
 export type SubscriptionPlan = {
   id: string;
   tier: SubscriptionPlanTier;
+  billingType: PricingBillingType;
   interval: SubscriptionPlanInterval;
   name: string;
   monthlyCredits: number;
   priceCents: number;
   currency: string;
   stripePriceId: string | null;
+  pricingEnvironment: PricingEnvironment;
 };
 
 type PriceEnv = Record<string, string | undefined>;
 
-const PLAN_DEFINITIONS = [
-  {
-    id: "starter-monthly",
-    tier: "starter",
-    interval: "month",
-    name: "Starter",
-    monthlyCredits: 800,
-    priceCents: 990,
-    envKey: "STRIPE_PRICE_STARTER_MONTHLY",
-  },
-  {
-    id: "creator-monthly",
-    tier: "creator",
-    interval: "month",
-    name: "Creator",
-    monthlyCredits: 2500,
-    priceCents: 2990,
-    envKey: "STRIPE_PRICE_CREATOR_MONTHLY",
-  },
-  {
-    id: "studio-monthly",
-    tier: "studio",
-    interval: "month",
-    name: "Studio",
-    monthlyCredits: 6500,
-    priceCents: 6990,
-    envKey: "STRIPE_PRICE_STUDIO_MONTHLY",
-  },
-  {
-    id: "starter-annual",
-    tier: "starter",
-    interval: "year",
-    name: "Starter Annual",
-    monthlyCredits: 800,
-    priceCents: 9900,
-    envKey: "STRIPE_PRICE_STARTER_ANNUAL",
-  },
-  {
-    id: "creator-annual",
-    tier: "creator",
-    interval: "year",
-    name: "Creator Annual",
-    monthlyCredits: 2500,
-    priceCents: 29900,
-    envKey: "STRIPE_PRICE_CREATOR_ANNUAL",
-  },
-  {
-    id: "studio-annual",
-    tier: "studio",
-    interval: "year",
-    name: "Studio Annual",
-    monthlyCredits: 6500,
-    priceCents: 69900,
-    envKey: "STRIPE_PRICE_STUDIO_ANNUAL",
-  },
-] as const;
+export function resolvePricingEnvironment(env: PriceEnv = process.env): PricingEnvironment {
+  const configured = env[PRICING_CONFIG.environmentEnvKey]?.trim().toLowerCase();
+  if (configured === "production" || configured === "sandbox") return configured;
+  if (env.STRIPE_SECRET_KEY?.startsWith("sk_live_")) return "production";
+  return PRICING_CONFIG.defaultEnvironment;
+}
 
 export function getSubscriptionPlans(env: PriceEnv = process.env): SubscriptionPlan[] {
-  return PLAN_DEFINITIONS.map((plan) => ({
+  const pricingEnvironment = resolvePricingEnvironment(env);
+
+  return PRICING_CONFIG.plans.map((plan) => ({
     id: plan.id,
     tier: plan.tier,
+    billingType: plan.billingType,
     interval: plan.interval,
     name: plan.name,
     monthlyCredits: plan.monthlyCredits,
     priceCents: plan.priceCents,
-    currency: "usd",
-    stripePriceId: env[plan.envKey]?.trim() || null,
+    currency: plan.currency,
+    stripePriceId: plan.stripePriceIds[pricingEnvironment],
+    pricingEnvironment,
   }));
 }
 

@@ -5,31 +5,36 @@ import ts from "typescript";
 import vm from "node:vm";
 
 function loadSubscriptionPlansModule() {
+  const pricingConfigSource = fs.readFileSync(new URL("../src/config/pricing.ts", import.meta.url), "utf8");
   const source = fs.readFileSync(new URL("../src/lib/subscription-plans.ts", import.meta.url), "utf8");
+  const compilerOptions = {
+    module: ts.ModuleKind.CommonJS,
+    target: ts.ScriptTarget.ES2022,
+  };
+  const pricingConfigOutput = ts.transpileModule(pricingConfigSource, { compilerOptions }).outputText;
   const { outputText } = ts.transpileModule(source, {
-    compilerOptions: {
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.ES2022,
-    },
+    compilerOptions,
+  });
+  const pricingConfigModule = { exports: {} };
+  vm.runInNewContext(pricingConfigOutput, {
+    exports: pricingConfigModule.exports,
+    module: pricingConfigModule,
   });
   const module = { exports: {} };
   vm.runInNewContext(outputText, {
     exports: module.exports,
     module,
+    require: (id) => {
+      if (id === "@/config/pricing") return pricingConfigModule.exports;
+      throw new Error(`Unexpected require: ${id}`);
+    },
   });
   return module.exports;
 }
 
 test("subscription plans expose three monthly and three annual tiers", () => {
   const { getSubscriptionPlans } = loadSubscriptionPlansModule();
-  const plans = getSubscriptionPlans({
-    STRIPE_PRICE_STARTER_MONTHLY: "price_starter_monthly",
-    STRIPE_PRICE_CREATOR_MONTHLY: "price_creator_monthly",
-    STRIPE_PRICE_STUDIO_MONTHLY: "price_studio_monthly",
-    STRIPE_PRICE_STARTER_ANNUAL: "price_starter_annual",
-    STRIPE_PRICE_CREATOR_ANNUAL: "price_creator_annual",
-    STRIPE_PRICE_STUDIO_ANNUAL: "price_studio_annual",
-  });
+  const plans = getSubscriptionPlans({});
   const plainPlans = JSON.parse(JSON.stringify(plans));
 
   assert.deepEqual(
@@ -53,13 +58,45 @@ test("subscription plans expose three monthly and three annual tiers", () => {
   );
 });
 
-test("subscription plans can be found by Stripe price id", () => {
+test("subscription plans use sandbox and production Stripe price ids separately", () => {
+  const { getSubscriptionPlans } = loadSubscriptionPlansModule();
+
+  const sandboxPlans = getSubscriptionPlans({
+    STRIPE_PRICE_ENV: "sandbox",
+  });
+  const productionPlans = getSubscriptionPlans({
+    STRIPE_PRICE_ENV: "production",
+  });
+
+  assert.equal(sandboxPlans.find((plan) => plan.id === "starter-monthly").pricingEnvironment, "sandbox");
+  assert.equal(productionPlans.find((plan) => plan.id === "starter-monthly").pricingEnvironment, "production");
+  assert.equal(sandboxPlans.find((plan) => plan.id === "starter-monthly").stripePriceId, "price_1TnHcw6B6kkgkutj66Pd9Izw");
+  assert.equal(productionPlans.find((plan) => plan.id === "starter-monthly").stripePriceId, null);
+});
+
+test("subscription plan config carries tier, billing type, and interval details", () => {
+  const { getSubscriptionPlans } = loadSubscriptionPlansModule();
+  const [starter] = getSubscriptionPlans({});
+
+  assert.equal(starter.tier, "starter");
+  assert.equal(starter.billingType, "subscription");
+  assert.equal(starter.interval, "month");
+  assert.equal(starter.currency, "usd");
+});
+
+test("subscription plans can be found by configured sandbox Stripe price id", () => {
   const { findSubscriptionPlanByStripePriceId } = loadSubscriptionPlansModule();
-  const plan = findSubscriptionPlanByStripePriceId("price_creator_annual", {
-    STRIPE_PRICE_CREATOR_ANNUAL: "price_creator_annual",
+  const plan = findSubscriptionPlanByStripePriceId("price_1TnHcz6B6kkgkutj9MQEy6Sy", {
+    STRIPE_PRICE_ENV: "sandbox",
   });
 
   assert.equal(plan.id, "creator-annual");
   assert.equal(plan.interval, "year");
   assert.equal(plan.monthlyCredits, 2500);
+});
+
+test("production plans are hidden until live Stripe price ids are configured", () => {
+  const { getConfiguredSubscriptionPlans } = loadSubscriptionPlansModule();
+
+  assert.equal(getConfiguredSubscriptionPlans({ STRIPE_PRICE_ENV: "production" }).length, 0);
 });
