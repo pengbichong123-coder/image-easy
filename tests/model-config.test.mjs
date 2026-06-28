@@ -41,3 +41,16 @@ test("model groups merge multiple capabilities under one model", () => {
     ["image-to-image"],
   );
 });
+
+test("models keep stable app ids separate from Kie model names", () => {
+  const { MODELS } = loadModelsModule();
+
+  assert.equal(MODELS["seedream-4-5-text-to-image"].kieModel, "seedream/4.5-text-to-image");
+  assert.equal(MODELS["seedream-4-5-edit"].kieModel, "seedream/4.5-edit");
+
+  for (const model of Object.values(MODELS)) {
+    assert.equal(typeof model.id, "string");
+    assert.equal(typeof model.kieModel, "string");
+    assert.ok(model.kieModel.length > 0);
+  }
+});

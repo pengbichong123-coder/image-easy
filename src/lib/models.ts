@@ -32,6 +32,7 @@ export type ModelCapability = "text-to-image" | "image-to-image";
 
 export interface ModelInfo {
   id: ModelId;
+  kieModel: string;
   modelSlug: string;
   name: string;
   displayName: string;
@@ -69,6 +70,7 @@ export interface ModelGroup {
 export const MODELS: Record<ModelId, ModelInfo> = {
   "gpt-image-2-text-to-image": {
     id: "gpt-image-2-text-to-image",
+    kieModel: "gpt-image-2-text-to-image",
     modelSlug: "gpt-image-2",
     name: "GPT Image 2",
     displayName: "GPT Image 2",
@@ -108,6 +110,7 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "gpt-image-2-image-to-image": {
     id: "gpt-image-2-image-to-image",
+    kieModel: "gpt-image-2-image-to-image",
     modelSlug: "gpt-image-2",
     name: "GPT Image 2 (i2i)",
     displayName: "GPT Image 2 (Edit)",
@@ -147,6 +150,7 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "seedream-4-5-text-to-image": {
     id: "seedream-4-5-text-to-image",
+    kieModel: "seedream/4.5-text-to-image",
     modelSlug: "seedream-4-5",
     name: "Seedream 4.5",
     displayName: "Seedream 4.5",
@@ -178,6 +182,7 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "seedream-4-5-edit": {
     id: "seedream-4-5-edit",
+    kieModel: "seedream/4.5-edit",
     modelSlug: "seedream-4-5",
     name: "Seedream 4.5 (Edit)",
     displayName: "Seedream 4.5 (Edit)",
@@ -209,6 +214,7 @@ export const MODELS: Record<ModelId, ModelInfo> = {
   },
   "nano-banana-pro": {
     id: "nano-banana-pro",
+    kieModel: "nano-banana-pro",
     modelSlug: "nano-banana-pro",
     name: "Nano Banana Pro",
     displayName: "Nano Banana Pro",

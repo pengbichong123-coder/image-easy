@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { consumeReservedCreditInTransaction, refundGenerationCreditInTransaction } from "@/lib/credits";
 import { prisma } from "@/lib/db";
+import { resolveGenerationResultUrls } from "@/lib/generation-results";
 import { getGenerationTaskResult, KieError } from "@/lib/kie";
 import { generatedImageKey } from "@/lib/storage/keys";
 import { deleteObjectFromR2, fetchRemoteImageForR2, getSignedAssetUrl, putObjectToR2 } from "@/lib/storage/r2";
@@ -39,24 +40,6 @@ export function canMarkGenerationFailedWithStorageState(input: {
   return input.storageStartedAt < input.staleStorageStartedBefore;
 }
 
-function parseJsonStringArray(value: string | null) {
-  if (!value) {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(value) as unknown;
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
-  } catch {
-    console.error("Failed to parse generation result metadata");
-    return [];
-  }
-}
-
 export async function generationToDto(generation: {
   id: string;
   model: string;
@@ -66,18 +49,12 @@ export async function generationToDto(generation: {
   resultAssetKeys: string | null;
   errorMessage: string | null;
 }) {
-  const persistedResultUrls = parseJsonStringArray(generation.resultUrls);
-  const resultUrls =
-    persistedResultUrls.length > 0
-      ? persistedResultUrls
-      : await Promise.all(parseJsonStringArray(generation.resultAssetKeys).map((key) => getSignedAssetUrl(key)));
-
   return {
     id: generation.id,
     model: generation.model,
     taskId: generation.taskId,
     status: generation.status,
-    resultUrls,
+    resultUrls: await resolveGenerationResultUrls(generation, getSignedAssetUrl),
     errorMessage: generation.errorMessage,
   };
 }

@@ -54,3 +54,29 @@ test("status refresh result is merged into the matching history item", () => {
     ],
   );
 });
+
+test("failed status refresh clears stale result URLs", () => {
+  const { mergeHistoryItemStatusRefresh } = loadHistoryStatusRefreshModule();
+  const items = [
+    { id: "gen_1", status: "processing", resultUrls: ["stale-image"], prompt: "old" },
+  ];
+
+  const mergedItems = mergeHistoryItemStatusRefresh(items, {
+    id: "gen_1",
+    status: "failed",
+    errorMessage: "Rejected by provider",
+  });
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(mergedItems)),
+    [
+      {
+        id: "gen_1",
+        status: "failed",
+        resultUrls: [],
+        prompt: "old",
+        errorMessage: "Rejected by provider",
+      },
+    ],
+  );
+});

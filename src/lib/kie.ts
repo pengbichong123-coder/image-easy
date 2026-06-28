@@ -8,6 +8,7 @@ import type {
   Quality,
   OutputFormat,
 } from "./models";
+import { MODELS } from "./models";
 
 const KIE_BASE_URL = process.env.KIE_API_BASE || "https://api.kie.ai";
 
@@ -123,7 +124,7 @@ async function createTask(
   }
 
   const body: Record<string, unknown> = {
-    model,
+    model: MODELS[model].kieModel,
     input: buildInput(model, input),
   };
   if (callBackUrl) body.callBackUrl = callBackUrl;

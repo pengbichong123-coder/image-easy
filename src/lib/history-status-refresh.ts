@@ -19,9 +19,14 @@ export function mergeHistoryItemStatusRefresh<T extends RefreshableHistoryItem>(
   items: T[],
   updatedItem: HistoryItemStatusRefresh<T>,
 ) {
+  const normalizedUpdatedItem =
+    updatedItem.status === "failed"
+      ? { ...updatedItem, resultUrls: [] }
+      : updatedItem;
+
   return items.map((item) => (
     item.id === updatedItem.id
-      ? { ...item, ...updatedItem }
+      ? { ...item, ...normalizedUpdatedItem }
       : item
   ));
 }

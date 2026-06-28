@@ -1,45 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { parseJsonStringArray, resolveGenerationResultUrls } from "@/lib/generation-results";
 import { MODEL_GROUPS } from "@/lib/models";
 import { deleteObjectFromR2, getSignedAssetUrl } from "@/lib/storage/r2";
 
 export const runtime = "nodejs";
 const GENERATION_STILL_PROCESSING_MESSAGE = "Generation is still processing. Please wait before deleting it.";
 
-function parseJsonStringArray(value: string | null) {
-  if (!value) {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(value) as unknown;
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
-  } catch {
-    console.error("Failed to parse generation result metadata");
-    return [];
-  }
-}
-
 async function getGenerationResultUrls(generation: {
   resultUrls: string | null;
   resultAssetKeys: string | null;
 }) {
-  try {
-    const persistedResultUrls = parseJsonStringArray(generation.resultUrls);
-    if (persistedResultUrls.length > 0) {
-      return persistedResultUrls;
-    }
-
-    return await Promise.all(parseJsonStringArray(generation.resultAssetKeys).map((key) => getSignedAssetUrl(key)));
-  } catch {
-    console.error("Failed to resolve generation result URLs");
-    return [];
-  }
+  return resolveGenerationResultUrls(generation, getSignedAssetUrl);
 }
 
 // GET /api/history?limit=30&cursor=xxx
