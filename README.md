@@ -40,6 +40,9 @@ cp .env.example .env
 - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`: Google OAuth 凭据
 - `AUTH_SECRET`: 一个 32+ 字符的随机字符串（生产环境）
 - `KIE_API_KEY`: kie.ai 的 API key
+- `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET_NAME`: Cloudflare R2 存储桶配置
+- `R2_PUBLIC_BASE_URL`: R2 自定义域名或公开访问基础 URL；如果使用私有桶和签名 URL，可以留空
+- `R2_SIGNED_URL_TTL_SECONDS`: R2 签名下载 URL 的有效期，默认 `3600`
 
 ### 3. 初始化数据库
 
@@ -142,6 +145,25 @@ docker-compose.yml                         # PostgreSQL
 ### 生产数据库
 
 把 `DATABASE_URL` 换成生产 PostgreSQL（Neon / Supabase / RDS 都行），跑 `npx prisma db push`。
+
+### 环境变量
+
+生产环境除了数据库、Auth 和 kie.ai 配置外，还需要按实际部署方式配置 R2：
+
+```text
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=
+R2_PUBLIC_BASE_URL=
+R2_SIGNED_URL_TTL_SECONDS=3600
+```
+
+- `R2_ACCOUNT_ID`: Cloudflare 账户 ID，用于拼接 R2 S3 API endpoint。
+- `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`: R2 API Token 的访问密钥，不要提交到代码仓库。
+- `R2_BUCKET_NAME`: 保存用户上传图和生成结果的 R2 bucket 名称。
+- `R2_PUBLIC_BASE_URL`: 如果 bucket 绑定了公开域名，填完整基础 URL；私有 bucket 或只使用签名 URL 时可以留空。
+- `R2_SIGNED_URL_TTL_SECONDS`: 私有资源签名 URL 的有效期秒数，未配置时默认 `3600`。
 
 ## License
 
