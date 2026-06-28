@@ -25,6 +25,48 @@ function estimateBase64DecodedByteLength(payload: string) {
   return Math.floor((payload.length * 3) / 4) - padding;
 }
 
+function sniffImageMimeType(buffer: Buffer): string | undefined {
+  if (
+    buffer.byteLength >= 8 &&
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47 &&
+    buffer[4] === 0x0d &&
+    buffer[5] === 0x0a &&
+    buffer[6] === 0x1a &&
+    buffer[7] === 0x0a
+  ) {
+    return "image/png";
+  }
+
+  if (
+    buffer.byteLength >= 3 &&
+    buffer[0] === 0xff &&
+    buffer[1] === 0xd8 &&
+    buffer[2] === 0xff
+  ) {
+    return "image/jpeg";
+  }
+
+  if (
+    buffer.byteLength >= 12 &&
+    buffer.subarray(0, 4).toString("ascii") === "RIFF" &&
+    buffer.subarray(8, 12).toString("ascii") === "WEBP"
+  ) {
+    return "image/webp";
+  }
+
+  if (buffer.byteLength >= 6) {
+    const signature = buffer.subarray(0, 6).toString("ascii");
+    if (signature === "GIF87a" || signature === "GIF89a") {
+      return "image/gif";
+    }
+  }
+
+  return undefined;
+}
+
 function parseBase64Image(input: string | undefined, requestedMimeType: string | undefined) {
   if (typeof input !== "string") {
     return { error: "base64Data is required" } as const;
@@ -46,13 +88,18 @@ function parseBase64Image(input: string | undefined, requestedMimeType: string |
     payloadBase64 = dataUrlMatch[2] ?? "";
   }
 
-  const effectiveMimeType = detectedMimeType || normalizeMimeType(requestedMimeType) || "image/png";
-  if (!effectiveMimeType.startsWith("image/")) {
-    return { error: "Unsupported upload MIME type" } as const;
-  }
+  const declaredMimeTypes = [
+    detectedMimeType,
+    normalizeMimeType(requestedMimeType),
+  ].filter((mimeType): mimeType is string => Boolean(mimeType));
+  for (const declaredMimeType of declaredMimeTypes) {
+    if (!declaredMimeType.startsWith("image/")) {
+      return { error: "Unsupported upload MIME type" } as const;
+    }
 
-  if (!SUPPORTED_UPLOAD_MIME_TYPES.has(effectiveMimeType)) {
-    return { error: "Unsupported image MIME type" } as const;
+    if (!SUPPORTED_UPLOAD_MIME_TYPES.has(declaredMimeType)) {
+      return { error: "Unsupported image MIME type" } as const;
+    }
   }
 
   const normalizedPayload = payloadBase64.replace(/\s+/g, "");
@@ -83,10 +130,23 @@ function parseBase64Image(input: string | undefined, requestedMimeType: string |
     return { error: "File too large (max 20MB)", status: 413 } as const;
   }
 
+  const sniffedMimeType = sniffImageMimeType(buffer);
+  if (!sniffedMimeType) {
+    return { error: "Unsupported or invalid image data" } as const;
+  }
+
+  if (!SUPPORTED_UPLOAD_MIME_TYPES.has(sniffedMimeType)) {
+    return { error: "Unsupported image MIME type" } as const;
+  }
+
+  if (declaredMimeTypes.some((declaredMimeType) => declaredMimeType !== sniffedMimeType)) {
+    return { error: "Image MIME type does not match file data" } as const;
+  }
+
   return {
     buffer,
-    effectiveMimeType,
-    providerBase64Data: isDataUrl ? `data:${effectiveMimeType};base64,${normalizedPayload}` : normalizedPayload,
+    effectiveMimeType: sniffedMimeType,
+    providerBase64Data: isDataUrl ? `data:${sniffedMimeType};base64,${normalizedPayload}` : normalizedPayload,
   } as const;
 }
 
