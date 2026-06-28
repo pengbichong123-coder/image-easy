@@ -13,3 +13,8 @@ test("account menu refreshes session outside the state updater", () => {
     /setMenuOpen\(\(open\)\s*=>\s*\{[\s\S]*?update\(\)/,
   );
 });
+
+test("account menu fetches fresh account summary without refreshing the session provider", () => {
+  assert.doesNotMatch(headerSource, /const \{ data: session, status, update \} = useSession\(\)/);
+  assert.match(headerSource, /\/api\/account\/summary/);
+});

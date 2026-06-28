@@ -1,6 +1,7 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { getAccountSummary } from "@/lib/account-summary";
 import { prisma } from "@/lib/db";
 
 declare module "next-auth" {
@@ -22,34 +23,6 @@ declare module "next-auth" {
   }
 }
 
-async function getSessionAccountSummary(userId: string) {
-  const [user, subscription] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: { credits: true },
-    }),
-    prisma.userSubscription.findFirst({
-      where: {
-        userId,
-        status: { in: ["active", "trialing", "past_due", "unpaid", "incomplete"] },
-      },
-      orderBy: [{ createdAt: "desc" }],
-      select: {
-        tier: true,
-        interval: true,
-        status: true,
-      },
-    }),
-  ]);
-
-  return {
-    credits: user?.credits ?? 10,
-    planTier: subscription?.tier ?? null,
-    planInterval: subscription?.interval ?? null,
-    planStatus: subscription?.status ?? null,
-  };
-}
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
@@ -66,14 +39,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user, trigger }) {
       if (user) {
-        const summary = await getSessionAccountSummary(user.id as string);
+        const summary = await getAccountSummary(user.id as string);
         token.credits = summary.credits;
         token.planTier = summary.planTier;
         token.planInterval = summary.planInterval;
         token.planStatus = summary.planStatus;
       }
       if (trigger === "update" && token.sub) {
-        const summary = await getSessionAccountSummary(token.sub);
+        const summary = await getAccountSummary(token.sub);
         token.credits = summary.credits;
         token.planTier = summary.planTier;
         token.planInterval = summary.planInterval;

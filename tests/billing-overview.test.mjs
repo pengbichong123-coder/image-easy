@@ -42,3 +42,11 @@ test("subscription status labels are user friendly", () => {
   assert.equal(subscriptionStatusLabel("canceled"), "Canceled");
   assert.equal(subscriptionStatusLabel("unknown"), "Unknown");
 });
+
+test("billing overview prefers current subscriptions before historical records", () => {
+  const source = fs.readFileSync(new URL("../src/lib/billing-overview.ts", import.meta.url), "utf8");
+
+  assert.match(source, /CURRENT_SUBSCRIPTION_STATUSES/);
+  assert.match(source, /status: \{ in: CURRENT_SUBSCRIPTION_STATUSES \}/);
+  assert.match(source, /subscription: currentSubscription \?\? fallbackSubscription/);
+});

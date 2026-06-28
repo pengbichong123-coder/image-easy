@@ -7,8 +7,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { locales, localeLabels, type Locale } from "@/i18n/routing";
 
+type AccountSummary = {
+  credits: number;
+  planTier: string | null;
+  planInterval: string | null;
+  planStatus: string | null;
+};
+
 export function Header() {
-  const { data: session, status, update } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const locale = useLocale();
@@ -17,6 +24,7 @@ export function Header() {
   const tLanguage = useTranslations("language");
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [accountSummary, setAccountSummary] = useState<AccountSummary | null>(null);
   const [, startTransition] = useTransition();
 
   function switchLocale(next: Locale) {
@@ -26,19 +34,33 @@ export function Header() {
     });
   }
 
+  async function refreshAccountSummary() {
+    try {
+      const response = await fetch("/api/account/summary", {
+        cache: "no-store",
+      });
+      if (!response.ok) return;
+      const summary = await response.json() as AccountSummary;
+      setAccountSummary(summary);
+    } catch {
+      // Keep the session snapshot as a fallback when the summary endpoint is unavailable.
+    }
+  }
+
   function toggleAccountMenu() {
     const nextOpen = !menuOpen;
     setMenuOpen(nextOpen);
     if (nextOpen) {
-      update().catch(() => {});
+      refreshAccountSummary();
     }
   }
 
   const accountPlanLabel = formatAccountPlanLabel({
-    interval: session?.user?.planInterval,
+    interval: accountSummary?.planInterval ?? session?.user?.planInterval,
     locale,
-    tier: session?.user?.planTier,
+    tier: accountSummary?.planTier ?? session?.user?.planTier,
   });
+  const accountCredits = accountSummary?.credits ?? session?.user?.credits ?? 0;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-[#D2D2D7]/40">
@@ -132,8 +154,8 @@ export function Header() {
                     </div>
                     <div className="text-[11px] text-[#6E6E73] mt-1 tabular">
                       {locale === "zh"
-                        ? `${session.user.credits ?? 0} 积分`
-                        : `${session.user.credits ?? 0} credits`}
+                        ? `${accountCredits} 积分`
+                        : `${accountCredits} credits`}
                     </div>
                   </div>
                   <div className="p-1">

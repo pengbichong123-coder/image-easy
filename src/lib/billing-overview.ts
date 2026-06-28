@@ -1,5 +1,13 @@
 import { prisma } from "@/lib/db";
 
+const CURRENT_SUBSCRIPTION_STATUSES = [
+  "active",
+  "trialing",
+  "past_due",
+  "unpaid",
+  "incomplete",
+];
+
 export function creditTransactionLabel(type: string) {
   if (type === "grant") return "Free credits";
   if (type === "reserve") return "Generation reserved";
@@ -23,14 +31,39 @@ export function subscriptionStatusLabel(status: string | null | undefined) {
 }
 
 export async function getBillingOverview(userId: string) {
-  const [user, subscription, creditTransactions, billingEvents] = await Promise.all([
+  const [user, currentSubscription, fallbackSubscription, creditTransactions, billingEvents] = await Promise.all([
     prisma.user.findUniqueOrThrow({
       where: { id: userId },
       select: { credits: true },
     }),
     prisma.userSubscription.findFirst({
+      where: {
+        userId,
+        status: { in: CURRENT_SUBSCRIPTION_STATUSES },
+      },
+      orderBy: [
+        { updatedAt: "desc" },
+        { createdAt: "desc" },
+      ],
+      select: {
+        id: true,
+        planId: true,
+        tier: true,
+        interval: true,
+        status: true,
+        monthlyCredits: true,
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd: true,
+        nextCreditGrantAt: true,
+        stripeCustomerId: true,
+      },
+    }),
+    prisma.userSubscription.findFirst({
       where: { userId },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [
+        { updatedAt: "desc" },
+        { createdAt: "desc" },
+      ],
       select: {
         id: true,
         planId: true,
@@ -80,7 +113,7 @@ export async function getBillingOverview(userId: string) {
 
   return {
     credits: user.credits,
-    subscription,
+    subscription: currentSubscription ?? fallbackSubscription,
     creditTransactions,
     billingEvents,
   };
