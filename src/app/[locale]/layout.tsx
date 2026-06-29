@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { Header } from "@/components/Header";
 import {
   hasLocale,
@@ -95,6 +96,7 @@ export default async function RootLayout({ children, params }: Props) {
     <html lang={localeHtmlLang[locale as Locale]}>
       <body>
         <GoogleAnalytics />
+        <MicrosoftClarity />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SessionProvider session={session}>
             <Header />
