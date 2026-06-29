@@ -10,6 +10,7 @@ export type SubscriptionPlan = {
   interval: SubscriptionPlanInterval;
   name: string;
   monthlyCredits: number;
+  periodCredits: number;
   priceCents: number;
   currency: string;
   stripePriceId: string | null;
@@ -35,11 +36,18 @@ export function getSubscriptionPlans(env: PriceEnv = process.env): SubscriptionP
     interval: plan.interval,
     name: plan.name,
     monthlyCredits: plan.monthlyCredits,
+    periodCredits: getSubscriptionPlanPeriodCredits(plan),
     priceCents: plan.priceCents,
     currency: plan.currency,
     stripePriceId: plan.stripePriceIds[pricingEnvironment],
     pricingEnvironment,
   }));
+}
+
+export function getSubscriptionPlanPeriodCredits(
+  plan: Pick<SubscriptionPlan, "interval" | "monthlyCredits">,
+) {
+  return plan.interval === "year" ? plan.monthlyCredits * 12 : plan.monthlyCredits;
 }
 
 export function getConfiguredSubscriptionPlans(env: PriceEnv = process.env) {

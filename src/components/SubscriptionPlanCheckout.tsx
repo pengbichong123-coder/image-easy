@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { SubscriptionPlan } from "@/lib/subscription-plans";
+import {
+  getSubscriptionPlanPeriodCredits,
+  type SubscriptionPlan,
+} from "@/lib/subscription-plans";
 
 type CheckoutResponse = {
   url?: string;
@@ -18,6 +21,7 @@ type CheckoutLabels = {
   perMonth: string;
   perYear: string;
   creditsPerMonth: string;
+  creditsPerYear: string;
   annualBadge: string;
 };
 
@@ -115,9 +119,11 @@ export function SubscriptionPlanCheckout({
                 ) : null}
               </div>
               <div className="mt-3 text-[32px] font-semibold leading-none text-[#1D1D1F]">
-                {plan.monthlyCredits.toLocaleString()}
+                {getSubscriptionPlanPeriodCredits(plan).toLocaleString()}
               </div>
-              <div className="mt-1 text-[14px] text-[#6E6E73]">{labels.creditsPerMonth}</div>
+              <div className="mt-1 text-[14px] text-[#6E6E73]">
+                {plan.interval === "year" ? labels.creditsPerYear : labels.creditsPerMonth}
+              </div>
               <div className="mt-6 text-[20px] font-semibold text-[#1D1D1F]">
                 {formatPrice(plan.priceCents, plan.currency, locale)}
                 <span className="ml-1 text-[13px] font-normal text-[#6E6E73]">

@@ -53,6 +53,10 @@ test("subscription plans expose three monthly and three annual tiers", () => {
     [800, 2500, 6500, 800, 2500, 6500],
   );
   assert.deepEqual(
+    plainPlans.map((plan) => plan.periodCredits),
+    [800, 2500, 6500, 9600, 30000, 78000],
+  );
+  assert.deepEqual(
     plainPlans.map((plan) => plan.priceCents),
     [990, 2990, 6990, 9900, 29900, 69900],
   );
@@ -93,6 +97,16 @@ test("subscription plans can be found by configured sandbox Stripe price id", ()
   assert.equal(plan.id, "creator-annual");
   assert.equal(plan.interval, "year");
   assert.equal(plan.monthlyCredits, 2500);
+  assert.equal(plan.periodCredits, 30000);
+});
+
+test("annual subscription credits are granted once per paid yearly period", () => {
+  const { findSubscriptionPlanById, getSubscriptionPlanPeriodCredits } = loadSubscriptionPlansModule();
+
+  assert.equal(getSubscriptionPlanPeriodCredits(findSubscriptionPlanById("starter-monthly", {})), 800);
+  assert.equal(getSubscriptionPlanPeriodCredits(findSubscriptionPlanById("starter-annual", {})), 9600);
+  assert.equal(getSubscriptionPlanPeriodCredits(findSubscriptionPlanById("creator-annual", {})), 30000);
+  assert.equal(getSubscriptionPlanPeriodCredits(findSubscriptionPlanById("studio-annual", {})), 78000);
 });
 
 test("production plans are hidden until live Stripe price ids are configured", () => {

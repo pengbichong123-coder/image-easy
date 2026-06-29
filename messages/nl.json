@@ -128,6 +128,7 @@
       "perMonth": "/mnd",
       "perYear": "/jr",
       "creditsPerMonth": "credits / maand",
+      "creditsPerYear": "credits / jaar",
       "annualBadge": "Ongeveer 17% korting"
     },
     "privacy": {
@@ -370,6 +371,9 @@
     "noPlan": "No subscription plan",
     "status": "Status",
     "monthlyCredits": "Monthly credits",
+    "planCredits": "Plan credits",
+    "creditsPerMonth": "credits / month",
+    "creditsPerYear": "credits / year",
     "nextGrant": "Next credit grant",
     "periodEnd": "Current period ends",
     "manageSubscription": "Manage subscription",

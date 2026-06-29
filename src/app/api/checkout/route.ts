@@ -5,7 +5,10 @@ import { prisma } from "@/lib/db";
 import { buildCheckoutReturnUrls } from "@/lib/stripe-checkout";
 import { getStripeClient } from "@/lib/stripe";
 import { isPaidCreditsEnabled } from "@/lib/pricing-mode";
-import { findSubscriptionPlanByStripePriceId } from "@/lib/subscription-plans";
+import {
+  findSubscriptionPlanByStripePriceId,
+  getSubscriptionPlanPeriodCredits,
+} from "@/lib/subscription-plans";
 
 export const runtime = "nodejs";
 
@@ -69,6 +72,7 @@ export async function POST(req: NextRequest) {
         tier: subscriptionPlan.tier,
         interval: subscriptionPlan.interval,
         monthlyCredits: String(subscriptionPlan.monthlyCredits),
+        periodCredits: String(getSubscriptionPlanPeriodCredits(subscriptionPlan)),
       },
       subscription_data: {
         metadata: {
@@ -77,6 +81,7 @@ export async function POST(req: NextRequest) {
           tier: subscriptionPlan.tier,
           interval: subscriptionPlan.interval,
           monthlyCredits: String(subscriptionPlan.monthlyCredits),
+          periodCredits: String(getSubscriptionPlanPeriodCredits(subscriptionPlan)),
         },
       },
     });

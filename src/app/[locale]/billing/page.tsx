@@ -43,6 +43,16 @@ function formatPlan(tier: string, interval: string) {
   return `${tier.charAt(0).toUpperCase()}${tier.slice(1)} / ${interval}`;
 }
 
+function formatPlanCredits(
+  subscription: { interval: string; monthlyCredits: number } | null | undefined,
+  labels: { month: string; year: string },
+) {
+  if (!subscription) return "-";
+  const isAnnual = subscription.interval === "year";
+  const credits = isAnnual ? subscription.monthlyCredits * 12 : subscription.monthlyCredits;
+  return `${credits.toLocaleString()} ${isAnnual ? labels.year : labels.month}`;
+}
+
 function formatCreditAmount(amount: number) {
   return amount > 0 ? `+${amount}` : String(amount);
 }
@@ -110,8 +120,12 @@ export default async function BillingPage({ params }: PageProps) {
             <div>
               {t("status")}: {subscription?.status ? (statusLabels[subscription.status] ?? t("statusUnknown")) : t("statusUnknown")}
             </div>
-            <div>{t("monthlyCredits")}: {subscription?.monthlyCredits?.toLocaleString() ?? "-"}</div>
-            <div>{t("nextGrant")}: {formatDate(subscription?.nextCreditGrantAt, locale)}</div>
+            <div>
+              {t("planCredits")}: {formatPlanCredits(subscription, {
+                month: t("creditsPerMonth"),
+                year: t("creditsPerYear"),
+              })}
+            </div>
             <div>{t("periodEnd")}: {formatDate(subscription?.currentPeriodEnd, locale)}</div>
           </div>
           {subscription?.stripeCustomerId ? (

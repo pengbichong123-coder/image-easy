@@ -128,6 +128,7 @@
       "perMonth": "/월",
       "perYear": "/년",
       "creditsPerMonth": "크레딧 / 월",
+      "creditsPerYear": "크레딧 / 년",
       "annualBadge": "약 17% 할인"
     },
     "privacy": {
@@ -370,6 +371,9 @@
     "noPlan": "No subscription plan",
     "status": "Status",
     "monthlyCredits": "Monthly credits",
+    "planCredits": "Plan credits",
+    "creditsPerMonth": "credits / month",
+    "creditsPerYear": "credits / year",
     "nextGrant": "Next credit grant",
     "periodEnd": "Current period ends",
     "manageSubscription": "Manage subscription",

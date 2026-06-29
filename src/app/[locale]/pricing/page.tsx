@@ -85,6 +85,7 @@ export default async function PricingPage({ params, searchParams }: PageProps) {
                 perMonth: t("perMonth"),
                 perYear: t("perYear"),
                 creditsPerMonth: t("creditsPerMonth"),
+                creditsPerYear: t("creditsPerYear"),
                 annualBadge: t("annualBadge"),
               }}
               locale={locale}

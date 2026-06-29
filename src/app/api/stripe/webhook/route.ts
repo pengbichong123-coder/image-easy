@@ -10,13 +10,11 @@ import {
   type BillingEventType,
 } from "@/lib/billing-events";
 import { prisma } from "@/lib/db";
-import {
-  buildStripeInvoiceGrantKey,
-  nextMonthlyCreditGrantAt,
-} from "@/lib/subscription-credit-grants";
+import { buildStripeInvoiceGrantKey } from "@/lib/subscription-credit-grants";
 import {
   findSubscriptionPlanById,
   findSubscriptionPlanByStripePriceId,
+  getSubscriptionPlanPeriodCredits,
   type SubscriptionPlan,
 } from "@/lib/subscription-plans";
 import {
@@ -148,13 +146,6 @@ function subscriptionPeriodEnd(subscription: Stripe.Subscription) {
 
   return stripeDate(rawSubscription.current_period_end)
     ?? stripeDate(rawSubscription.items?.data?.[0]?.current_period_end);
-}
-
-function nextGrantForPlan(plan: SubscriptionPlan, grantAt: Date, currentPeriodEnd?: Date | null) {
-  if (plan.interval !== "year") return null;
-  const nextGrantAt = nextMonthlyCreditGrantAt(grantAt);
-  if (currentPeriodEnd && nextGrantAt >= currentPeriodEnd) return null;
-  return nextGrantAt;
 }
 
 function isUniqueConstraintError(error: unknown) {
@@ -437,12 +428,10 @@ async function grantSubscriptionPeriodCredits(
   tx: Prisma.TransactionClient,
   input: {
     subscriptionId: string;
-    stripeSubscriptionId: string;
     userId: string;
     plan: SubscriptionPlan;
     grantKey: string;
     grantAt: Date;
-    currentPeriodEnd?: Date | null;
     reason: string;
   },
 ) {
@@ -450,7 +439,7 @@ async function grantSubscriptionPeriodCredits(
     userId: input.userId,
     subscriptionId: input.subscriptionId,
     grantKey: input.grantKey,
-    amount: input.plan.monthlyCredits,
+    amount: getSubscriptionPlanPeriodCredits(input.plan),
     reason: input.reason,
   });
 
@@ -459,7 +448,7 @@ async function grantSubscriptionPeriodCredits(
       where: { id: input.subscriptionId },
       data: {
         lastCreditGrantAt: input.grantAt,
-        nextCreditGrantAt: nextGrantForPlan(input.plan, input.grantAt, input.currentPeriodEnd),
+        nextCreditGrantAt: null,
       },
     });
   }
@@ -515,7 +504,6 @@ async function processSubscriptionCheckoutCompleted(
     const grantAt = stripeDate(session.created) ?? new Date();
     await grantSubscriptionPeriodCredits(tx, {
       subscriptionId: subscription.id,
-      stripeSubscriptionId,
       userId,
       plan,
       grantKey: buildStripeInvoiceGrantKey(invoiceId),
@@ -565,12 +553,10 @@ async function processInvoicePaid(tx: Prisma.TransactionClient, invoice: Stripe.
 
   await grantSubscriptionPeriodCredits(tx, {
     subscriptionId: subscription.id,
-    stripeSubscriptionId,
     userId: subscription.userId,
     plan,
     grantKey: buildStripeInvoiceGrantKey(invoice.id),
     grantAt: invoicePeriodStart(invoice),
-    currentPeriodEnd: invoicePeriodEnd(invoice),
     reason: "Grant subscription credits after Stripe invoice paid",
   });
 
